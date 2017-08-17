@@ -1,11 +1,11 @@
 
 function[TT,y]=DE_track_age(Tin,y0,t0,treat)
 
-global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect total_PWID PWID0...
+global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect total_PWID PWID0 dt...
     r_AF0 r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2...
     imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 imported...
-    scenario cascade_scale_time age_mix start_year ...
-    APRI num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor progression...
+    scenario cascade_scale_time age_mix start_year r_inc_up followup ...
+    APRI num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor progression progression_base...
     ost_enrollment ost_duration nsp_enrollment nsp_duration RNAtesting
 
 
@@ -17,14 +17,15 @@ end
 
 y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1); % adding cascade states to capture transfers
 
-%Running the ODEs
-[TT,y] = ode45(@Sim_sub,[t0(end),t0(end)+Tin],y0);
+tvec = [t0(end):dt:t0(end)+Tin]'; % time steps
 
+y(1,:) = [y0];
 %ODE subfunction
-    function[ydot]=Sim_sub(TT,y)
+    for t = 2:length(tvec)
+        TT = tvec(t);
         if TT > start_year
             
-            Y=reshape(y,num_pops, num_cascade, num_age, num_intervention, num_engagement,num_region,27+6);
+            Y=reshape(y(t-1,:),num_pops, num_cascade, num_age, num_intervention, num_engagement,num_region,27+6);
             
             S=Y(:,:,:,:,:,:,1);
             S1=Y(:,:,:,:,:,:,2);
@@ -67,7 +68,7 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
             R_inc=1;
             
             %Version that gets ~9% in F34 at 2015
-            if TT<40 R_inc=1+ (1.5/40)*(TT); elseif TT>=40 && TT<45 R_inc=2.5-(1.5/5)*(TT-40); elseif TT>=45 R_inc=1; end
+            if TT<40 R_inc=1+ (r_inc_up/40)*(TT); elseif TT>=40 && TT<45 R_inc=1+r_inc_up-(r_inc_up/5)*(TT-40); elseif TT>=45 R_inc=1; end
             
             
             
@@ -186,8 +187,8 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
             
             ydot4=0*Y;
             ydot4([1],:,:,:,:,:,1:20)=-Y([1],:,:,:,:,:,1:20)*exit_IDU_rel + Y([2],:,:,:,:,:,1:20)*r_relapse;
-            ydot4([2],:,:,:,:,:,1:20)=Y([1],:,:,:,:,:,1:20)*exit_IDU_rel-Y([2],:,:,:,:,:,1:20)*r_relapse- 1/(10*12)*Y([2],:,:,:,:,:,1:20); % former for 10 years
-            ydot4([3],:,:,:,:,:,1:20)=1/(10*12)*Y([2],:,:,:,:,:,1:20);
+            ydot4([2],:,:,:,:,:,1:20)=Y([1],:,:,:,:,:,1:20)*exit_IDU_rel-Y([2],:,:,:,:,:,1:20)*r_relapse- 1/(5*12)*Y([2],:,:,:,:,:,1:20); % former for 10 years
+            ydot4([3],:,:,:,:,:,1:20)=1/(5*12)*Y([2],:,:,:,:,:,1:20);
             
             
             %% Ageing
@@ -228,9 +229,9 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
             elseif TT>=55 && TT<60 import_infections=imp8;
             elseif TT>=60 && TT<65 import_infections=imp9;
             elseif TT>=65 import_infections=0; end
-            ydot6(2,1,1,1,2,1,12)=0.2*import_infections;
-            ydot6(2,1,1,1,2,1,1)=(0.2*import_infections)/max(1,(sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,12:20)))))))/max(1,sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,1:20)))))))))); % keep prevalence constant among former
-            ydot6(3,1,1,1,2,1,12)=0.8*import_infections;
+            ydot6(2,1,1,1,2,1,12)=0*import_infections;
+            ydot6(2,1,1,1,2,1,1)=(0*import_infections)/max(1,(sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,12:20)))))))/max(1,sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,1:20)))))))))); % keep prevalence constant among former
+            ydot6(3,1,1,1,2,1,12)=1*import_infections;
             
             %% Progression in cascade
             if TT > 66 && TT <= 67
@@ -245,13 +246,27 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
                 end
                 apply_cascade_rates(scenario, mult);
             end
+            progress = progression;
+            
+            if TT>=66 && TT <= 70 % scale-up of Antibody and RNA testing rates between now and 2020
+                mult = min(1, 1 - (TT-66) / 4);
+                progress(1,1,2,1) = mult*progression_base(1,1,2,1) + (1-mult)*progression(1,1,2,1);
+                progress(2,1,2,1) = mult*progression_base(2,1,2,1) + (1-mult)*progression(2,1,2,1);
+                progress(1,2,2,1) = mult*progression_base(1,2,2,1) + (1-mult)*progression(1,2,2,1);
+                progress(2,2,2,1) = mult*progression_base(2,2,2,1) + (1-mult)*progression(2,2,2,1);
+            end
             
             %only those in care progress due to zeroes in prog
-            prog = permute(reshape(repmat(progression,1,num_age*num_intervention),num_pops,num_cascade,num_age,num_intervention,num_engagement,num_region),[1,2,3,4,5,6]);
+            prog = permute(reshape(repmat(progress,1,num_age*num_intervention),num_pops,num_cascade,num_age,num_intervention,num_engagement,num_region),[1,2,3,4,5,6]);
+            prog = min(1/dt, prog); % need to protect against adding too many people at once if time steps are too large
             
+            prog(1:2,1,:,:,:,:) = (followup) * prog(1:2,1,:,:,:,:);
+            if strcmp(scenario,'OST_test') == 1
+                prog(1,1,:,1:2,:,:) = 0*prog(1,1,:,1:2,:,:); % In these scenarios don't test people who are not engaged in OST of NSP
+            end
             ydot7=0*Y;
             
-            ydot7(1,1:4,:,:,:,:,17:20) = -12*Y(1,1:4,:,:,:,:,17:20); % assumes DC, HCC and LT HCV antibodies are detected and made ready for treatment immediately
+            ydot7(1,1:4,:,:,:,:,17:20) = -min(12, 1/dt)*Y(1,1:4,:,:,:,:,17:20); % assumes DC, HCC and LT HCV antibodies are detected and made ready for treatment immediately
             ydot7(1,6,:,:,2,:,17:20) = reshape(sum(sum(-ydot7(1,1:4,:,:,:,:,17:20),2),5),1,1,num_age,num_intervention, 1, num_region,4); % they all go to the second engagement level
             
             ydot7(:,[1,2,3,4],:,:,:,:,12) = ydot7(:,[1,2,3,4],:,:,:,:,12)-prog(:,[1,2,3,4],:,:,:,:).*Y(:,[1,2,3,4],:,:,:,:,12); % HCV antibody screening rate, RNA testing, genotype and liver testing for F0-F4 disease
@@ -266,19 +281,19 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
             ydot7(:,[2,3,4,6],:,:,:,:,15) = ydot7(:,[2,3,4,6],:,:,:,:,15)+prog(:,[1,2,3,4],:,:,:,:).*Y(:,[1,2,3,4],:,:,:,:,15);
             ydot7(:,[2,3,4,6],:,:,:,:,16) = ydot7(:,[2,3,4,6],:,:,:,:,16)+prog(:,[1,2,3,4],:,:,:,:).*Y(:,[1,2,3,4],:,:,:,:,16);
             
-            ydot7(:,2,:,:,:,:,28) = +prog(:,1,:,:,:,:).*sum(Y(:,1,:,:,:,:,12:16),7) + sum(12*Y(:,1,:,:,:,:,17:20),7);%Total antibody tests. Assumed to occur at the same rate for all PWID
-            ydot7(:,3,:,:,:,:,29) = +prog(:,2,:,:,:,:).*sum(Y(:,2,:,:,:,:,12:16),7) + sum(sum(12*Y(:,1:2,:,:,:,:,17:20),2),7); % Total RNA detections
-            ydot7(:,4,:,:,:,:,30) = +prog(:,3,:,:,:,:).*sum(Y(:,3,:,:,:,:,12:16),7) + sum(sum(12*Y(:,1:3,:,:,:,:,17:20),2),7); % total genotypes completed
+            ydot7(:,2,:,:,:,:,28) = +prog(:,1,:,:,:,:).*sum(Y(:,1,:,:,:,:,12:16),7) + sum(min(12,1/dt)*Y(:,1,:,:,:,:,17:20),7);%Total antibody tests. Assumed to occur at the same rate for all PWID
+            ydot7(:,3,:,:,:,:,29) = +prog(:,2,:,:,:,:).*sum(Y(:,2,:,:,:,:,12:16),7) + sum(sum(min(12,1/dt)*Y(:,1:2,:,:,:,:,17:20),2),7); % Total RNA detections
+            ydot7(:,4,:,:,:,:,30) = +prog(:,3,:,:,:,:).*sum(Y(:,3,:,:,:,:,12:16),7) + sum(sum(min(12,1/dt)*Y(:,1:3,:,:,:,:,17:20),2),7); % total genotypes completed
             ydot7(:,6,:,:,:,:,31) = +prog(:,4,:,:,:,:).*sum(Y(:,4,:,:,:,:,12:15),7); % total liver tests (fibroscans) early disease stage
             ydot7(:,6,:,:,:,:,32) = +prog(:,4,:,:,:,:).*Y(:,4,:,:,:,:,16)...
-                + reshape(sum(sum(12*Y(:,1:4,:,:,:,:,17:20),2),7),num_pops,1,num_age,num_intervention, num_engagement, num_region); % total liver tests (fibroscans) late disease stage
+                + reshape(sum(sum(min(12,1/dt)*Y(:,1:4,:,:,:,:,17:20),2),7),num_pops,1,num_age,num_intervention, num_engagement, num_region); % total liver tests (fibroscans) late disease stage
             
-            
-            
+
             if TT > 67 && APRI == 1 % From 2017 fibroscan not required for F2 or less if scenario uses APRI. Also genotype removed
                 if cascade_scale_time==0 mult=1; else mult = min(1, 1 - ((cascade_scale_time - (TT-67)) / cascade_scale_time)); end
                 prog2 = prog;
-                prog2(:,4,:,:,2:end,:) = ((1-mult)*prog2(:,4,:,:,2:end,:)+mult*52.*prog2(:,4,:,:,2:end,:)./prog2(:,4,:,:,2:end,:));
+                prog2(:,4,:,:,2:end,:) = ((1-mult)*prog2(:,4,:,:,2:end,:)+mult*52.*prog2(:,4,:,:,2:end,:)./prog2(:,4,:,:,2:end,:)); % cascade progression rates super fast meaning skipped fibroscan
+                prog2 = min(1/dt, prog2);
                 ydot7(:,4,:,:,2:end,:,12) = prog2(:,3,:,:,2:end,:).*Y(:,3,:,:,2:end,:,12)- prog2(:,4,:,:,2:end,:).*Y(:,4,:,:,2:end,:,12);  % Fibroscan skipped for F0-F2
                 ydot7(:,4,:,:,2:end,:,13) = prog2(:,3,:,:,2:end,:).*Y(:,3,:,:,2:end,:,13)- prog2(:,4,:,:,2:end,:).*Y(:,4,:,:,2:end,:,13);
                 ydot7(:,4,:,:,2:end,:,14) = prog2(:,3,:,:,2:end,:).*Y(:,3,:,:,2:end,:,14)- prog2(:,4,:,:,2:end,:).*Y(:,4,:,:,2:end,:,14);
@@ -289,63 +304,6 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
                 
                 ydot7(:,6,:,:,:,:,31) = +prog(:,4,:,:,:,:).*Y(:,4,:,:,:,:,15);
                 
-                if strcmp(scenario,'RNA') == 1
-                    ydot7(1,1,:,3:4,:,:,12) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,1,:,3:4,:,:,12); % RNA testing of PWID on OST
-                    ydot7(1,1,:,3:4,:,:,13) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,1,:,3:4,:,:,13);
-                    ydot7(1,1,:,3:4,:,:,14) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,1,:,3:4,:,:,14);
-                    ydot7(1,1,:,3:4,:,:,15) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,1,:,3:4,:,:,15);
-                    ydot7(1,1,:,3:4,:,:,16) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,1,:,3:4,:,:,16);
-                    
-                    ydot7(1,2,:,3:4,:,:,12) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,2,:,3:4,:,:,12);
-                    ydot7(1,2,:,3:4,:,:,13) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,2,:,3:4,:,:,13);
-                    ydot7(1,2,:,3:4,:,:,14) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,2,:,3:4,:,:,14);
-                    ydot7(1,2,:,3:4,:,:,15) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,2,:,3:4,:,:,15);
-                    ydot7(1,2,:,3:4,:,:,16) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,3:4,:,:)).*Y(1,2,:,3:4,:,:,16);
-                    
-                    ydot7(1,2,:,3:4,:,:,12:16) = - 50.*Y(1,2,:,3:4,:,:,12:16); % annual RNA testing, skipping this step
-                    ydot7(1,3,:,3:4,:,:,12:16) = ydot7(1,3,:,3:4,:,:,12:16) + 50.*Y(1,2,:,3:4,:,:,12:16); % annual RNA testing
-                    
-                    
-                    ydot7(1,2,:,1:2,:,:,28) = +prog2(1,1,:,1:2,:,:).*sum(Y(1,1,:,1:2,:,:,12:16),7) + sum(12*Y(1,1,:,1:2,:,:,17:20),7);%Total antibody tests.
-                    ydot7(2:3,2,:,:,:,:,28) = +prog2(2:3,1,:,:,:,:).*sum(Y(2:3,1,:,:,:,:,12:16),7) + sum(12*Y(2:3,1,:,:,:,:,17:20),7);%Total antibody tests.
-                    
-                    ydot7(1,3,:,1:2,:,:,29) = +prog2(1,2,:,1:2,:,:).*sum(Y(1,2,:,1:2,:,:,12:16),7) + sum(sum(12*Y(1,1:2,:,1:2,:,:,17:20),2),7); % Total RNA tests, PWID not on OST
-                    ydot7(1,3,:,3:4,:,:,29) = RNAtesting.*sum(Y(1,1,:,3:4,:,:,12:16),7) + sum(sum(12*Y(1,1:2,:,3:4,:,:,17:20),2),7); % Total RNA tests, PWID on OST
-                    ydot7(2:3,3,:,:,:,:,29) = +prog2(2:3,2,:,:,:,:).*sum(Y(2:3,2,:,:,:,:,12:16),7) + sum(sum(12*Y(2:3,1:2,:,:,:,:,17:20),2),7); % Total RNA tests, other
-                    ydot7(:,4,:,:,:,:,30) = +prog2(:,3,:,:,:,:).*sum(Y(:,3,:,:,:,:,12:16),7) + sum(sum(12*Y(:,1:3,:,:,:,:,17:20),2),7); % total genotypes completed
-                    ydot7(:,6,:,:,:,:,31) = +prog2(:,4,:,:,:,:).*sum(Y(:,4,:,:,:,:,12:15),7); % total liver tests (fibroscans) early disease stage
-                    ydot7(:,6,:,:,:,:,32) = +prog2(:,4,:,:,:,:).*Y(:,4,:,:,:,:,16)...
-                        + reshape(sum(sum(12*Y(:,1:4,:,:,:,:,17:20),2),7),num_pops,1,num_age,num_intervention, num_engagement, num_region); % total liver tests (fibroscans) late disease stage
-                end
-                
-                if strcmp(scenario,'RNA_all') == 1
-                    ydot7(1,1,:,:,:,:,12) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,1,:,:,:,:,12); % RNA testing of PWID on OST
-                    ydot7(1,1,:,:,:,:,13) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,1,:,:,:,:,13);
-                    ydot7(1,1,:,:,:,:,14) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,1,:,:,:,:,14);
-                    ydot7(1,1,:,:,:,:,15) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,1,:,:,:,:,15);
-                    ydot7(1,1,:,:,:,:,16) = -(mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,1,:,:,:,:,16);
-                    
-                    ydot7(1,2,:,:,:,:,12) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,2,:,:,:,:,12);
-                    ydot7(1,2,:,:,:,:,13) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,2,:,:,:,:,13);
-                    ydot7(1,2,:,:,:,:,14) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,2,:,:,:,:,14);
-                    ydot7(1,2,:,:,:,:,15) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,2,:,:,:,:,15);
-                    ydot7(1,2,:,:,:,:,16) = + (mult*RNAtesting+(1-mult)*prog2(1,1,:,:,:,:)).*Y(1,2,:,:,:,:,16);
-                    
-                    ydot7(1,2,:,:,:,:,12:16) = - 50.*Y(1,2,:,:,:,:,12:16); % annual RNA testing, skipping this step
-                    ydot7(1,3,:,:,:,:,12:16) = ydot7(1,3,:,:,:,:,12:16) + 50.*Y(1,2,:,:,:,:,12:16); % annual RNA testing
-                    
-                    
-                    ydot7(1,2,:,1:2,:,:,28) = +prog2(1,1,:,1:2,:,:).*sum(Y(1,1,:,1:2,:,:,12:16),7) + sum(12*Y(1,1,:,1:2,:,:,17:20),7);%Total antibody tests.
-                    ydot7(2:3,2,:,:,:,:,28) = +prog2(2:3,1,:,:,:,:).*sum(Y(2:3,1,:,:,:,:,12:16),7) + sum(12*Y(2:3,1,:,:,:,:,17:20),7);%Total antibody tests.
-                    
-                    ydot7(1,3,:,1:2,:,:,29) = +prog2(1,2,:,1:2,:,:).*sum(Y(1,2,:,1:2,:,:,12:16),7) + sum(sum(12*Y(1,1:2,:,1:2,:,:,17:20),2),7); % Total RNA tests, PWID not on OST
-                    ydot7(1,3,:,3:4,:,:,29) = RNAtesting.*sum(Y(1,1,:,3:4,:,:,12:16),7) + sum(sum(12*Y(1,1:2,:,3:4,:,:,17:20),2),7); % Total RNA tests, PWID on OST
-                    ydot7(2:3,3,:,:,:,:,29) = +prog2(2:3,2,:,:,:,:).*sum(Y(2:3,2,:,:,:,:,12:16),7) + sum(sum(12*Y(2:3,1:2,:,:,:,:,17:20),2),7); % Total RNA tests, other
-                    ydot7(:,4,:,:,:,:,30) = +prog2(:,3,:,:,:,:).*sum(Y(:,3,:,:,:,:,12:16),7) + sum(sum(12*Y(:,1:3,:,:,:,:,17:20),2),7); % total genotypes completed
-                    ydot7(:,6,:,:,:,:,31) = +prog2(:,4,:,:,:,:).*sum(Y(:,4,:,:,:,:,12:15),7); % total liver tests (fibroscans) early disease stage
-                    ydot7(:,6,:,:,:,:,32) = +prog2(:,4,:,:,:,:).*Y(:,4,:,:,:,:,16)...
-                        + reshape(sum(sum(12*Y(:,1:4,:,:,:,:,17:20),2),7),num_pops,1,num_age,num_intervention, num_engagement, num_region); % total liver tests (fibroscans) late disease stage
-                end
             end
             
             
@@ -381,8 +339,8 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
             ydot8(:,8,:,:,:,:,19) = (1-completion(:,6,:,:,:,:)).*(-ydot8(:,6,:,:,:,:,19));
             ydot8(:,8,:,:,:,:,20) = (1-completion(:,6,:,:,:,:)).*(-ydot8(:,6,:,:,:,:,20));
             
-            ydot8(:,7,:,:,2:end,:,7:11) = ydot8(:,7,:,:,2:end,:,7:11) - omega*Y(:,7,:,:,2:end,:,7:11); % Recovering and moving to the 1-st level. Must be engaged in care
-            ydot8(:,1,:,:,2:end,:,1:5) = + omega*Y(:,7,:,:,2:end,:,7:11); % Recovering and moving to the 1-st level
+            ydot8(:,7,:,:,2:end,:,7:11) = ydot8(:,7,:,:,2:end,:,7:11) - min(omega, 1/dt) *Y(:,7,:,:,2:end,:,7:11); % Recovering and moving to the 1-st level. Must be engaged in care
+            ydot8(:,1,:,:,2:end,:,1:5) = + min(omega, 1/dt)*Y(:,7,:,:,2:end,:,7:11); % Recovering and moving to the 1-st level
             
             ydot8(:,6,:,:,:,:,23) = - sum(ydot8(:,6,:,:,:,:,12:15),7); % total first round treatments from F0-F3
             ydot8(:,6,:,:,:,:,25) = - sum(ydot8(:,6,:,:,:,:,16:20),7); % total first round treatments from F4 onwards
@@ -416,33 +374,34 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
             ydot9(:,10,:,:,:,:,19) = (1-completion(:,8,:,:,:,:)).*(-ydot9(:,8,:,:,:,:,19));
             ydot9(:,10,:,:,:,:,20) = (1-completion(:,8,:,:,:,:)).*(-ydot9(:,8,:,:,:,:,20));
             
-            ydot9(:,9,:,:,2:end,:,7:11) = ydot9(:,9,:,:,2:end,:,7:11) - omega*Y(:,9,:,:,2:end,:,7:11); % Recovering and moving to the 1-st level. Must be engaged in care
-            ydot9(:,1,:,:,2:end,:,1:5) = + omega*Y(:,9,:,:,2:end,:,7:11); % Recovering and moving to the 1-st level
+            ydot9(:,9,:,:,2:end,:,7:11) = ydot9(:,9,:,:,2:end,:,7:11) - min(omega, 1/dt)*Y(:,9,:,:,2:end,:,7:11); % Recovering and moving to the 1-st level. Must be engaged in care
+            ydot9(:,1,:,:,2:end,:,1:5) = + min(omega, 1/dt)*Y(:,9,:,:,2:end,:,7:11); % Recovering and moving to the 1-st level
             
             ydot9(:,8,:,:,:,:,23) = - sum(ydot9(:,8,:,:,:,:,12:15),7); % total first round treatments from F0-F3
             ydot9(:,8,:,:,:,:,25) = - sum(ydot9(:,8,:,:,:,:,16:20),7); % total first round treatments from F4 onwards
             
             %% Engagement in care
             ydot10 = 0*Y;
-            ydot10(:,:,:,:,1,:,16:20) = -12*Y(:,:,:,:,1,:,16:20); % sick people engaged in care
-            ydot10(:,:,:,:,2,:,16:20) = 12*Y(:,:,:,:,1,:,16:20);
+            ydot10(:,:,:,:,1,:,16:20) = -min(12, 1/dt)*Y(:,:,:,:,1,:,16:20); % sick people engaged in care
+            ydot10(:,:,:,:,2,:,16:20) = min(12, 1/dt)*Y(:,:,:,:,1,:,16:20);
             
+
             %% Changes in intervention coverage
             ydot11 = 0*Y;
             %OST
-            ydot11(1,:,:,1:2,:,:,1:20) = -ost_enrollment * Y(1,:,:,1:2,:,:,1:20);
-            ydot11(1,:,:,3:4,:,:,1:20) = ost_enrollment * Y(1,:,:,1:2,:,:,1:20);
-            ydot11(1,:,:,3:4,:,:,1:20) = ydot11(1,:,:,3:4,:,:,1:20) - (1/ost_duration) * Y(1,:,:,3:4,:,:,1:20);
-            ydot11(1,:,:,1:2,:,:,1:20) = ydot11(1,:,:,1:2,:,:,1:20) + (1/ost_duration) * Y(1,:,:,3:4,:,:,1:20);
+            ydot11(1,:,:,1:2,:,:,1:20) = -min(ost_enrollment, 1/dt) * Y(1,:,:,1:2,:,:,1:20);
+            ydot11(1,:,:,3:4,:,:,1:20) = min(ost_enrollment, 1/dt) * Y(1,:,:,1:2,:,:,1:20);
+            ydot11(1,:,:,3:4,:,:,1:20) = ydot11(1,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
+            ydot11(1,:,:,1:2,:,:,1:20) = ydot11(1,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
             
-            ydot11(2:3,:,:,3:4,:,:,1:20) = ydot11(2:3,:,:,3:4,:,:,1:20) - (1/ost_duration) * Y(2:3,:,:,3:4,:,:,1:20); %former and other can drop out of OST but not recruit
-            ydot11(2:3,:,:,1:2,:,:,1:20) = ydot11(2:3,:,:,1:2,:,:,1:20) + (1/ost_duration) * Y(2:3,:,:,3:4,:,:,1:20);
+            ydot11(2:3,:,:,3:4,:,:,1:20) = ydot11(2:3,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20); %former and other can drop out of OST but not recruit
+            ydot11(2:3,:,:,1:2,:,:,1:20) = ydot11(2:3,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20);
             
             %NSP
-            ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) - nsp_enrollment * Y(1,:,:,[1,3],:,:,1:20);
-            ydot11(1,:,:,[2,4],:,:,1:20) = ydot11(1,:,:,[2,4],:,:,1:20) + nsp_enrollment * Y(1,:,:,[1,3],:,:,1:20);
-            ydot11(1,:,:,[2,4],:,:,1:20) = ydot11(1,:,:,[2,4],:,:,1:20) - (1/nsp_duration) * Y(1,:,:,[2,4],:,:,1:20);
-            ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) + (1/nsp_duration) * Y(1,:,:,[2,4],:,:,1:20);
+            ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) - min(nsp_enrollment, 1/dt) * Y(1,:,:,[1,3],:,:,1:20);
+            ydot11(1,:,:,[2,4],:,:,1:20) = ydot11(1,:,:,[2,4],:,:,1:20) + min(nsp_enrollment, 1/dt) * Y(1,:,:,[1,3],:,:,1:20);
+            ydot11(1,:,:,[2,4],:,:,1:20) = ydot11(1,:,:,[2,4],:,:,1:20) - min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,:,1:20);
+            ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) + min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,:,1:20);
             
             
             %% Combine
@@ -455,14 +414,15 @@ y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_r
             ydot = zeros(num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1);
         end
         %% Rate function
-        function ad = rate(r_XY_PWID,r_XY) % sub-function that distributes factors for PWID and everyone else
-            ad = reshape(repmat([r_XY_PWID;r_XY;r_XY],num_cascade,num_age,num_intervention,num_engagement,num_region),num_pops,num_cascade,num_age,num_intervention, num_engagement,num_region);
-        end
         
+        
+        y(t,:)=y(t-1,:)+max(dt*ydot', -y(t-1,:));
     end
-
+    function ad = rate(r_XY_PWID,r_XY) % sub-function that distributes factors for PWID and everyone else
+        ad = reshape(repmat([r_XY_PWID;r_XY;r_XY],num_cascade,num_age,num_intervention,num_engagement,num_region),num_pops,num_cascade,num_age,num_intervention, num_engagement,num_region);
+    end
 y=reshape(y,size(y,1),num_pops,num_cascade,num_age,num_intervention,num_engagement,num_region,(27+6));
-TT=TT(1:end);
+TT=tvec;%TT(1:end);
 TT=[t0(1:end-1);TT];
 
 y1=y;

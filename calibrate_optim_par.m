@@ -1,29 +1,34 @@
-function [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases] = calibrate_optim(maxiter, swarmsize)
-global infect prev0 progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 cascade0 cascade0_PWID disease0 cases0 ost0 nsp0...
-    data y0_init t0_init y0 t0 treat Tin infect_base progression_base ost_enrollment nsp_enrollment...
+function [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost, output_nsp, output_diagnoses] = calibrate_optim(maxiter, swarmsize)
+global infect prev0 progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 cascade0 cascade0_PWID disease0 cases0 ost0 nsp0 diagnoses0...
+    data y0_init t0_init y0 t0 treat Tin infect_base progression_base ost_enrollment nsp_enrollment r_inc_up start_year followup...
     num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor treat_projected 
 
-data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0}; % prevalence, cascade to calibrate to
+data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0, diagnoses0}; % prevalence, cascade to calibrate to
 lag = 1; % iterations between successive samples
 xp = [10*infect,...
     progression(1,1:4,2,1), ... %PWID first 4 steps
     progression(2,1:4,2,1),... %former PWID first 4 steps
     progression(3,1:4,2,1),... % Other first 4 steps
-    imp1, imp2, imp3, imp4, imp5, imp6, imp7, imp8, imp9, ost_enrollment, nsp_enrollment];
+    imp1, imp2, imp3, imp4, imp5, imp6, imp7, imp8, imp9, ...
+    ost_enrollment, nsp_enrollment,r_inc_up, start_year];
 
 nvars = length(xp);
 
-lb = max(0.5*xp, 0.001*ones(1,length(xp)));
-%lb(1) = 1.2;
-ub = 1.5*xp;
-%lb = 0.0000001*ones(1,length(xp));
-%ub = [0.3,5*ones(1,12),10^4*ones(1,9)];
+lb = max(0.1*xp, 0.001*ones(1,length(xp)));
+lb(1) = 0.2; lb(22) = 0; 
+lb(25) = 0.5; lb(26) = 0; % lower bounds for height of rel_incidence function and epidemic start year
+ub = 10*xp;
+ub(14:21) = 4500; ub(21) = 1000; ub(22) = 0; 
+ub(25) = 5; ub(26) = 30; % upper bounds for height of rel_incidence function and epidemic start year
+
+
 %options.UseVectorized = true;
 ms = MultiStart('UseParallel', true);
-options = optimoptions('particleswarm', 'Display', 'iter', 'MaxIter', maxiter,'Swarmsize',swarmsize,'UseParallel',false);
+options = optimoptions('particleswarm', 'Display', 'iter', 'MaxIter', maxiter,'StallIterlimit',20,'Swarmsize',swarmsize,'UseParallel',false);
 [x, fval, exitflag, output] = particleswarm(@objective,nvars,lb,ub, options)
 
-[infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment] = feval(@assign,x);
+[infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9,...
+    ost_enrollment, nsp_enrollment, r_inc_up, start_year] = feval(@assign,x);
 
 Run=16; %Years to run the model
 
@@ -81,11 +86,11 @@ end
 if x(14) < 500
     x(14) = 500;
 end
-for k = 15:(length(x)-2)
-    if x(k)< 0.9*x(k-1)
-        x(k) = x(k-1);
-    end
-end
+% for k = 15:(length(x)-2)
+%     if x(k)< 0.9*x(k-1)
+%         x(k) = x(k-1);
+%     end
+% end
 
 infect = x(1) / 10;
 progression(1,1:4,2,1) = x(2:5);
@@ -102,10 +107,12 @@ imp8 = x(21);
 imp9 = x(22);
 ost_enrollment = x(23);
 nsp_enrollment = x(24);
+r_inc_up = x(25);
+start_year = x(26);
 
 [TT, y] = DE_track_age(Tin, y0, 0, treat);
 
-[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp] = model_vals(TT,y)
+[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y)
 
 
 
@@ -113,12 +120,12 @@ nsp_enrollment = x(24);
 
     function probX = objective(xp)
         
-        loaddata
+        %loaddata
         
-        [infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment] = feval(@assign,xp);
+        [infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment, r_inc_up, start_year] = feval(@assign,xp);
         
          
-        data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0}; % prevalence, cascade to calibrate to
+        data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0, diagnoses0}; % prevalence, cascade to calibrate to
         
         
         for k = 6:13
@@ -129,11 +136,11 @@ nsp_enrollment = x(24);
         if xp(14) < 500
             xp(14) = 500;
         end
-        for k = 15:(length(xp)-2)
-            if xp(k)< 0.9*xp(k-1)
-                xp(k) = xp(k-1);
-            end
-        end
+%         for k = 15:(length(xp)-2)
+%             if xp(k)< 0.9*xp(k-1)
+%                 xp(k) = xp(k-1);
+%             end
+%         end
         
         infect = xp(1) / 10;
         progression(1,1:4,2,1) = xp(2:5);
@@ -150,6 +157,8 @@ nsp_enrollment = x(24);
         imp9 = xp(22);
         ost_enrollment = xp(23);
         nsp_enrollment = xp(24);
+        r_inc_up = xp(25);
+        start_year = xp(26);
                 
         probX = 0;
         
@@ -157,15 +166,16 @@ nsp_enrollment = x(24);
         [TT, y] = DE_track_age(Tin, y0_init, 0, treat);
         %infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7);
         
-        [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp] = model_vals(TT,y);
+        [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y);
 
-        sigma_prev = 0.0001*data{1}(:,2:end); %standard deviations for prevalence by year
-        sigma_cascade = 0.0001*data{2}(:,2:end); %standard deviations for cascade by year
-        sigma_cascade_PWID = 0.0001*data{3}(:,2:end); %standard deviations for cascade by year
-        sigma_disease = 0.1*data{4}(:,2:end); %standard deviations for disease by year
-        sigma_cases = 0.0005*data{5}(:,2:end); %standard deviations for cases by year
-        sigma_ost = 0.0005*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year
-        sigma_nsp = 0.0005*data{7}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
+        sigma_prev = 0.01*data{1}(:,2:end); %standard deviations for prevalence by year
+        sigma_cascade = 0.01*data{2}(:,2:end); %standard deviations for cascade by year
+        sigma_cascade_PWID = 0.01*data{3}(:,2:end); %standard deviations for cascade by year
+        sigma_disease = 0.5*data{4}(:,2:end); %standard deviations for disease by year
+        sigma_cases = 0.01*data{5}(:,2:end); %standard deviations for cases by year
+        sigma_ost = 0.001*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year
+        sigma_nsp = 0.001*data{7}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
+        sigma_diagnoses = 0.1*data{8}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
         
         for years = 1:length(output_prev(:,1))
             probX = probX - (-(data{1}(years,2)-output_prev(years))^2/(2*sigma_prev(years)^2)); %*...
@@ -197,9 +207,12 @@ nsp_enrollment = x(24);
         for years = 1:length(output_nsp(:,1))
             probX = probX - (-(data{7}(years,2)-output_nsp(years))^2/(2*sigma_nsp(years)^2));%/sigma_cases(years); %*...
         end
+        for years = 1:length(output_diagnoses(:,1))
+            probX = probX - (-(data{8}(years,2)-output_diagnoses(years))^2/(2*sigma_diagnoses(years)^2));%/sigma_cases(years); %*...
+        end
     end
 
-    function [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp] = model_vals(TT,y)
+    function [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y)
         output_prev = zeros(length(prev0(:,1)),1);
         output_cascade = zeros(length(cascade0(:,1)),1);
         output_cascade_PWID = zeros(length(cascade0_PWID(:,1)),1);
@@ -207,6 +220,7 @@ nsp_enrollment = x(24);
         output_cases = zeros(length(cases0(:,1)),1);
         output_ost = zeros(length(ost0(:,1)),1);
         output_nsp = zeros(length(nsp0(:,1)),1);
+        output_diagnoses = zeros(length(diagnoses0(:,1)),1);
         
         for years = 1:length(prev0(:,1))
             output_prev(years) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-prev0(years,1)),1),1,:,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-prev0(years,1)),1),1,:,:,:,:,1,1:20))))));
@@ -243,10 +257,15 @@ nsp_enrollment = x(24);
         for years = 1:length(nsp0(:,1))
             output_nsp(years) = sum(sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-nsp0(years,1)),1),1,:,:,[2,4],:,1,1:20))))))) / sum(sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-nsp0(years,1)),1),1,:,:,:,:,1,1:20)))))));
         end
+        for years = 1:length(diagnoses0(:,1))
+            temp = Tin-(2016-diagnoses0(years,1));
+            output_diagnoses(years) = sum(sum(sum(sum(sum(sum(sum(...
+                y(find(TT>=temp-1,1):find(TT>=temp,1)-1,:,2,:,:,:,:,28))))))));
+        end
     end
 
-    function[infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment] = assign(x)
-        loaddata
+    function[infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment, r_inc_up, start_year] = assign(x)
+        %loaddata
         infect = x(1) / 10;
         progression = zeros(num_pops,num_cascade,num_engagement,num_region);
         progression(1,1:4,2,1) = x(2:5);
@@ -265,6 +284,8 @@ nsp_enrollment = x(24);
         
         ost_enrollment = x(23);
         nsp_enrollment = x(24);
+        r_inc_up = x(25);
+        start_year = x(26);
         
     end
 
