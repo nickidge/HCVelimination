@@ -55,7 +55,7 @@ for s=1:sens
     progression(1,6,2,1) = 1/(30/365); progression(2,6,2,1) = 1/(30/365); progression(3,6,2,1) = 1/(30/365);
     treat=[2000,0,2000]; %capped treatments; third entry is for old regimen
     alpha = alpha_DAA;
-    dt = 1/52; 
+    dt = 1/26; 
     [TT2,y2]=DE_track_age(Run,y1_end,TT1,treat);
     [ycomb_noage, summary(1,:,s), tr, tr_] = gather_outputs(y1,y2,TT2);
     
