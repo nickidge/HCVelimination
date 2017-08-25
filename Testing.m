@@ -43,6 +43,9 @@ for s=1:sens
     %    calibrate_optim_par(500, 20);
     %save('C:\Users\Nick\Desktop\Matlab Sims\Testing\calibration')
     load('calibration_data')
+    %filename is stored in calibration_data so have to add here so that we
+    %can have multiple users using these files
+    filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Testing\foo");
     infect_base=infect;
     progression_base = progression;
     
