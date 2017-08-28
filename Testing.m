@@ -4,8 +4,9 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
     r_AF0 r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2... % disease progression parameters
     Q_sens q_svr q_svr_PWID q_treat  c_daa discount treat  ... % QALY and cost parameters
     p_complete total_PWID PWID0 age_mix prev0 r_inc_up followup...%PWID parameters
+    prev0_MSM ... %MSM parameters
     incarceration_rate prison_length ... %Prison parameters
-    cascade0 cascade0_PWID disease0 cases0 ost0 nsp0 HCC0 diagnoses0 infect_factor infect_base progression_base imported... % data and calibration
+    cascade0 cascade0_PWID cascade0_MSM disease0 disease0_HIV cases0 ost0 nsp0 HCC0 diagnoses0 infect_factor infect_base progression_base imported... % data and calibration
     ost_duration  nsp_duration treat_projected target_inc target_death cascade_scale_time care RNAtesting... %intervention
     infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment % calibtation parameters
 
@@ -39,6 +40,12 @@ for s=1:sens
     alpha=alpha_old; % calibrate in pre-DAA era
     target_late=1; % target treatments to people with late-liver disease
 
+    %moved these up because need to use these for calibration if
+    %calibration is running.
+    infect_base=infect;
+    progression_base = progression;
+    
+    
     %[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
     %    calibrate_optim_par(500, 20);
     %save('C:\Users\Nick\Desktop\Matlab Sims\Testing\calibration')
@@ -46,8 +53,7 @@ for s=1:sens
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Testing\foo");
-    infect_base=infect;
-    progression_base = progression;
+
     
 
     %Run model in prior to 2016
