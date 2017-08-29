@@ -9,11 +9,7 @@ global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect 
     ost_enrollment ost_duration nsp_enrollment nsp_duration RNAtesting
 
 
-if strcmp(scenario,'APRI') == 1 ||  strcmp(scenario,'rapidRNA') == 1 || strcmp(scenario,'WHO') == 1 || strcmp(scenario,'WHO1') == 1 || strcmp(scenario,'target_PWID') == 1 || strcmp(scenario,'annualRNA') == 1 || strcmp(scenario,'annualRNA_all') == 1
-    APRI = 1;
-else
-    APRI = 1;
-end
+APRI = 1;
 
 y0=reshape(y0,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1); % adding cascade states to capture transfers
 
@@ -86,12 +82,11 @@ y(1,:) = [y0];
                     %                         else
                     p = i;
                     %                        end
-                    for a=2:num_age-1
-                        if sum(sum(sum(sum(sum(Y(i,:,a,:,:,:,1:20)))))) > 0
-                            lambda_age(i,a,j) = max(0, R_inc*infect*(...
-                                age_mix * sum(sum(sum(sum(A(p,:,a,:,:,j)+F0(p,:,a,:,:,j)+F1(p,:,a,:,:,j)+F2(p,:,a,:,:,j)+F3(p,:,a,:,:,j)+F4(p,:,a,:,:,j)+DC(p,:,a,:,:,j)+HCC(p,:,a,:,:,j)+LT(p,:,a,:,:,j)+LT2(p,:,a,:,:,j)))))/sum(sum(sum(sum(sum(Y(p,:,a,:,:,j,1:20)))))) + ...
-                                (1-age_mix)*sum(sum(sum(sum(sum(A(p,:,[1:a-1,a+1:end],:,:,j)+F0(p,:,[1:a-1,a+1:end],:,:,j)+F1(p,:,[1:a-1,a+1:end],:,:,j)+F2(p,:,[1:a-1,a+1:end],:,:,j)+F3(p,:,[1:a-1,a+1:end],:,:,j)+F4(p,:,[1:a-1,a+1:end],:,:,j)+DC(p,:,[1:a-1,a+1:end],:,:,j)+HCC(p,:,[1:a-1,a+1:end],:,:,j)+LT(p,:,[1:a-1,a+1:end],:,:,j)+LT2(p,:,[1:a-1,a+1:end],:,:,j))))))/sum(sum(sum(sum(sum(sum(Y(p,:,[1:a-1,a+1:end],:,:,j,1:20))))))) ...
-                                ));
+                    if i == 4
+                        for a = 1:num_age
+                            lambda_age(i,a,j) = max(0,infect_MSM*(...
+                            sum(sum(sum(sum(A(p,:,:,:,:,j)+F0(p,:,:,:,:,j)+F1(p,:,:,:,:,j)+F2(p,:,:,:,:,j)+F3(p,:,:,:,:,j)+F4(p,:,:,:,:,j)+DC(p,:,:,:,:,j)+HCC(p,:,:,:,:,j)+LT(p,:,:,:,:,j)+LT2(p,:,:,:,:,j)))))/sum(sum(sum(sum(sum(Y(p,:,:,:,:,j,1:20)))))) ...
+                            ));
                         end
                     end
                     if sum(sum(sum(sum(Y(i,:,1,:,:,j,1:20))))) > 0 && sum(sum(sum(sum(sum(Y(i,:,2:end,:,:,j,1:20)))))) > 0
@@ -99,6 +94,14 @@ y(1,:) = [y0];
                             age_mix*sum(sum(sum(sum(A(p,:,1,:,:,j)+F0(p,:,1,:,:,j)+F1(p,:,1,:,:,j)+F2(p,:,1,:,:,j)+F3(p,:,1,:,:,j)+F4(p,:,1,:,:,j)+DC(p,:,1,:,:,j)+HCC(p,:,1,:,:,j)+LT(p,:,1,:,:,j)+LT2(p,:,1,:,:,j)))))/sum(sum(sum(sum(sum(Y(p,:,1,:,:,j,1:20)))))) + ...
                             (1-age_mix)*sum(sum(sum(sum(sum(A(p,:,2:end,:,:,j)+F0(p,:,2:end,:,:,j)+F1(p,:,2:end,:,:,j)+F2(p,:,2:end,:,:,j)+F3(p,:,2:end,:,:,j)+F4(p,:,2:end,:,:,j)+DC(p,:,2:end,:,:,j)+HCC(p,:,2:end,:,:,j)+LT(p,:,2:end,:,:,j)+LT2(p,:,2:end,:,:,j))))))/sum(sum(sum(sum(sum(sum(Y(p,:,2:end,:,:,j,1:20))))))) ...
                             ));
+                    end
+                    for a=2:num_age-1
+                        if sum(sum(sum(sum(sum(Y(i,:,a,:,:,:,1:20)))))) > 0
+                            lambda_age(i,a,j) = max(0, R_inc*infect*(...
+                                age_mix * sum(sum(sum(sum(A(p,:,a,:,:,j)+F0(p,:,a,:,:,j)+F1(p,:,a,:,:,j)+F2(p,:,a,:,:,j)+F3(p,:,a,:,:,j)+F4(p,:,a,:,:,j)+DC(p,:,a,:,:,j)+HCC(p,:,a,:,:,j)+LT(p,:,a,:,:,j)+LT2(p,:,a,:,:,j)))))/sum(sum(sum(sum(sum(Y(p,:,a,:,:,j,1:20)))))) + ...
+                                (1-age_mix)*sum(sum(sum(sum(sum(A(p,:,[1:a-1,a+1:end],:,:,j)+F0(p,:,[1:a-1,a+1:end],:,:,j)+F1(p,:,[1:a-1,a+1:end],:,:,j)+F2(p,:,[1:a-1,a+1:end],:,:,j)+F3(p,:,[1:a-1,a+1:end],:,:,j)+F4(p,:,[1:a-1,a+1:end],:,:,j)+DC(p,:,[1:a-1,a+1:end],:,:,j)+HCC(p,:,[1:a-1,a+1:end],:,:,j)+LT(p,:,[1:a-1,a+1:end],:,:,j)+LT2(p,:,[1:a-1,a+1:end],:,:,j))))))/sum(sum(sum(sum(sum(sum(Y(p,:,[1:a-1,a+1:end],:,:,j,1:20))))))) ...
+                                ));
+                        end
                     end
                     if sum(sum(sum(Y(i,:,num_age,1:20)))) > 0
                         lambda_age(i,num_age,j) = max(0, R_inc*infect*(...
