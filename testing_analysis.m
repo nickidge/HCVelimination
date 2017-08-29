@@ -10,8 +10,12 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
     infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment % calibtation parameters
 
 
-load('C:\Users\Nick\Desktop\Matlab Sims\Testing\cal_vary_rel_start')
-load('C:\Users\Nick\Desktop\Matlab Sims\Testing\30prevcalibration1')
+%load('C:\Users\Nick\Desktop\Matlab Sims\Testing\cal_vary_rel_start')
+%load('C:\Users\Nick\Desktop\Matlab Sims\Testing\60prev')
+
+load('calibration_data')
+load('60prev')
+load('30prev')
 dt = 1/12;
 s=1;
 followup = 1;
@@ -38,7 +42,7 @@ progression(1,6,2,1) = 1/(30/365); progression(2,6,2,1) = 1/(30/365); progressio
 progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
 target_late = 1; 
 alpha = alpha_DAA;
-range_test = [-1, 0.5, 1, 2]; % divided by 2 to assume that infection happens midway between tests
+range_test = [-1, 0.5, 1, 2, 4]; % divided by 2 to assume that infection happens midway between tests
 range_followup = [-1,0.46,0.5:0.1:1];
 treat = [20000,000,2000];
 for i = 1:length(range_test)
@@ -93,7 +97,7 @@ for j = 1:length(scenarios)
     treat = [20000,000,2000];
     followup = 1;
     
-    RNAtesting_range = [-1,1/2,1,2]; % divide by two to represent being infected midway between tests
+    RNAtesting_range = [-1,1/2,1,2,4]; % divide by two to represent being infected midway between tests
     for i = 1:length(RNAtesting_range)
         if RNAtesting_range(i) > 0
             progression(2,2,2,1) = 1/0.25; progression(1,2,2,1) = 1 / 0.25;
@@ -181,28 +185,62 @@ legend('Coverage: PWID through OST and NSP', 'Coverage: all PWID','location','so
 set(gca,'XTicklabel',{'Current Ab\newlinetesting rates \newlinereplaced with \newlineRNA tests','Two-yearly \newlineRNA testing', 'Annual \newlineRNA testing', 'Six-monthly \newlineRNA testing'});
 title(['\fontsize{14}2030 incidence reduction following treatment availability' char(10) '\it{}\fontsize{12}Antibody testing replaced with RNA testing among PWID'],'HorizontalAlignment','center');
 
+a4 = a3; a4(2:end,2) = a3(2:end,2) + a3(2:end,1);
 figure(3)
 subplot(1,2,1)
-b = bar(a3,'stacked'); grid on;
+b = bar(a4(2:end,2:end),'stacked'); grid on;
 b(1).Parent.Parent.Colormap = flipud(CM1(3:8,:));
 set(b,'edgecolor','none');
 ylim([0,100]); ylabel('Estimated incidence reduction in 2030 (%)');
-legend('Current average RNA follow-up rates (46%)', '50% RNA tested within 3 months', '60% ...', '70% ...', '80% ...',...
+legend('50% RNA tested within 3 months', '60% ...', '70% ...', '80% ...',...
     '90% ...','100% RNA tested within 3 months', 'location','southeast');
-set(gca,'XTicklabel',{'Current \newlinetesting rates','Two-yearly \newlineAb testing, \newlineall PWID',...
+set(gca,'XTicklabel',{'Two-yearly \newlineAb testing, \newlineall PWID',...
     'Annual \newlineAb testing, \newlineall PWID',...
-    'Six-monthly \newlineAb testing, \newlineall PWID'});
+    'Six-monthly \newlineAb testing, \newlineall PWID',...
+    'Three-monthly \newlineAb testing, \newlineall PWID'});
 title(['\it{}\fontsize{10}Changes to antibody testing and follow-up rates among PWID'],'HorizontalAlignment','center');
 hold off;
 subplot(1,2,2)
-b2 = bar(a2,'stacked'); grid on;
+b2 = bar(a2(2:end,:),'stacked'); grid on;
 b2(1).Parent.Parent.Colormap = flipud(CM1(3:8,:)); set(b2,'edgecolor','none');
 ylim([0,100]); ylabel('Estimated incidence reduction in 2030 (%)');
 legend('Coverage: PWID through OST and NSP', 'Coverage: all PWID','location','southeast');
-set(gca,'XTicklabel',{'Current Ab\newlinetesting rates \newlinereplaced with \newlineRNA tests','Two-yearly \newlineRNA testing', 'Annual \newlineRNA testing', 'Six-monthly \newlineRNA testing'});
+set(gca,'XTicklabel',{'Two-yearly \newlineRNA testing', 'Annual \newlineRNA testing', 'Six-monthly \newlineRNA testing', 'Three-monthly \newlineRNA testing'});
 title(['\it{}\fontsize{10}Antibody testing replaced with RNA testing among PWID'],'HorizontalAlignment','center');
 axes('Position',[0 0 1 1],'Visible','off');
 text(0.5,0.98,{'\fontsize{14}2030 incidence reduction following treatment availability'},'HorizontalAlignment','Center')
+
+
+
+%% AUs case only
+
+figure(4)
+subplot(1,2,1)
+b = bar(a3(1:end,:),'stacked'); grid on;
+b(1).Parent.Parent.Colormap = flipud(CM1(3:8,:));
+set(b,'edgecolor','none');
+ylim([0,100]); ylabel('Estimated incidence reduction in 2030 (%)');
+legend('Current average RNA follow-up rates in AUS (46%)',...
+    '50% RNA tested within 3 months', '60% ...', '70% ...', '80% ...',...
+    '90% ...','100% RNA tested within 3 months', 'location','southeast');
+set(gca,'XTicklabel',{'Current \newlinetesting rates',...
+    'Two-yearly \newlineAb testing, \newlineall PWID',...
+    'Annual \newlineAb testing, \newlineall PWID',...
+    'Six-monthly \newlineAb testing, \newlineall PWID',...
+    'Three-monthly \newlineAb testing, \newlineall PWID'});
+title(['\it{}\fontsize{10}Changes to antibody testing and follow-up rates among PWID'],'HorizontalAlignment','center');
+hold off;
+subplot(1,2,2)
+b2 = bar(a2(1:end,:),'stacked'); grid on;
+b2(1).Parent.Parent.Colormap = flipud(CM1(3:8,:)); set(b2,'edgecolor','none');
+ylim([0,100]); ylabel('Estimated incidence reduction in 2030 (%)');
+legend('Coverage: PWID through OST and NSP', 'Coverage: all PWID','location','southeast');
+set(gca,'XTicklabel',{'Current Ab \newlinetesting rates \newlinereplaced with \newlineRNA tests',...
+    'Two-yearly \newlineRNA testing', 'Annual \newlineRNA testing', 'Six-monthly \newlineRNA testing', 'Three-monthly \newlineRNA testing'});
+title(['\it{}\fontsize{10}Antibody testing replaced with RNA testing among PWID'],'HorizontalAlignment','center');
+axes('Position',[0 0 1 1],'Visible','off');
+text(0.5,0.98,{'\fontsize{14}2030 incidence reduction following treatment availability'},'HorizontalAlignment','Center')
+
 
 
 
