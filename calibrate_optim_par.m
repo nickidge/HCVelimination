@@ -233,10 +233,10 @@ start_year = x(26);
             %output_cascade(years,5) = sum(sum(sum(y(find(TT>=Tin-(2015-cascade0(years,1)),1),:,8,:,6:20))))./sum(sum(sum(sum(y(find(TT>=Tin-(2015-cascade0(years,1)),1),:,:,:,6:20)))));
         end
         for years = 1:length(cascade0_PWID(:,1))
-            output_cascade_PWID(years,1) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,2:10,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,1:10,:,:,:,1,6:20))))));
-            output_cascade_PWID(years,2) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,3:10,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,1:10,:,:,:,1,6:20))))));
-            output_cascade_PWID(years,3) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,4:10,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,1:10,:,:,:,1,6:20))))));
-            output_cascade_PWID(years,4) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,6:10,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,1:10,:,:,:,1,6:20))))));
+            output_cascade_PWID(years,1) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0_PWID(years,1)),1),1,2:10,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,1:10,:,:,:,1,6:20))))));
+            output_cascade_PWID(years,2) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0_PWID(years,1)),1),1,3:10,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,1:10,:,:,:,1,6:20))))));
+            output_cascade_PWID(years,3) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0_PWID(years,1)),1),1,4:10,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,1:10,:,:,:,1,6:20))))));
+            output_cascade_PWID(years,4) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0_PWID(years,1)),1),1,6:10,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),1,1:10,:,:,:,1,6:20))))));
             %output_cascade(years,5) = sum(sum(sum(y(find(TT>=Tin-(2015-cascade0(years,1)),1),:,8,:,6:20))))./sum(sum(sum(sum(y(find(TT>=Tin-(2015-cascade0(years,1)),1),:,:,:,6:20)))));
         end
         
