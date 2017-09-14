@@ -53,7 +53,9 @@ for s=1:sens
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Testing\foo");
-
+    
+    infect_base=infect;
+    progression_base = progression;
     
 
     %Run model in prior to 2016
