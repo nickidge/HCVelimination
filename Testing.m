@@ -8,7 +8,8 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
     incarceration_rate prison_length ... %Prison parameters
     cascade0 cascade0_PWID cascade0_MSM disease0 disease0_HIV cases0 ost0 nsp0 HCC0 diagnoses0 infect_factor infect_base progression_base imported... % data and calibration
     ost_duration  nsp_duration treat_projected target_inc target_death cascade_scale_time care RNAtesting... %intervention
-    infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment % calibtation parameters
+    infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment... % calibtation parameters
+    ave_sentence
 
 %Define the output file using variables based on the current
 %working directory or relative paths so that this can work on
@@ -46,10 +47,10 @@ for s=1:sens
     progression_base = progression;
     
     
-    %[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    %    calibrate_optim_par(500, 20);
-    %save('C:\Users\Nick\Desktop\Matlab Sims\Testing\calibration')
-    load('calibration_data')
+    [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
+        calibrate_optim_par(5, 4);
+    save('C:\Users\Nick\Desktop\Matlab Sims\Testing\prison_cal')
+    %load('calibration_data')
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Testing\foo");

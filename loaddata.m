@@ -1,13 +1,14 @@
 function loaddata
 
-global mu mu_PWID mu_former exit_IDU r_relapse delta alpha alpha_old alpha_DAA p_complete omega infect target_late prev0 prev0_MSM age_cohort P Tin Run y0_init y0 t0...
+global mu mu_PWID mu_former exit_IDU r_relapse delta alpha alpha_old alpha_DAA p_complete omega infect target_late dem prev0 prev0_prison prev0_MSM age_cohort P Tin Run y0_init y0 t0...
     r_AF0 r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2...
     Q_sens q_svr q_svr_PWID q_treat sens c_daa discount total_PWID PWID0 treat age_mix start_year...
     imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 imported r_inc_up...
     cascade0 cascade0_PWID cascade0_MSM disease0 disease0_HIV cases0 ost0 nsp0 HCC0 diagnoses0 cascade_target cascade_target_PWID scenario cascade_scale_time care filename ...
     infect_base progression_base treat_projected ...
     num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor progression...
-    ost_enrollment ost_duration nsp_enrollment nsp_duration target_inc target_death 
+    ost_enrollment ost_duration nsp_enrollment nsp_duration target_inc target_death ...
+    ave_sentence
 
 
 %% Epi parameters
@@ -26,7 +27,7 @@ target_late=1; %Proportion of treatments allocated to late liver disease stage (
 treat_projected = [24000,16000,2000]; %capped treatments; third entry is for old regimen
 treat=treat_projected;
 
-
+dem = xlsread('Template.xlsx','demographics');
 
 %% Model setup
 [setup0,setup0_label,setup0_raw] = xlsread('Template.xlsx','structure');
@@ -48,6 +49,7 @@ infect_factor(:,:,1) = [[1,0,0];...
 
 %% Calibration data
 prev0 = xlsread('Template.xlsx','prev_PWID');
+prev0_prison = xlsread('Template.xlsx','prev_prison');
 prev0_MSM = xlsread('Template.xlsx','prev_MSM');
 cascade0 = xlsread('Template.xlsx','cascade_all');
 cascade0_PWID = xlsread('Template.xlsx','cascade_PWID');
@@ -137,7 +139,11 @@ Cas6=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num
 S(1,1,1,1,2,1)=(1-infected0)*PWID0;
 S(2,1,1,1,2,1)=P-PWID0;
 F0(1,1,1,1,2,1)=infected0*PWID0;
-
+for prison = 1:(num_region-1)
+    S(1,1,1,1,2,prison+1)=(1-infected0)*100;
+    S(2,1,1,1,2,prison+1)=dem(end,3+prison)-100;
+    F0(1,1,1,1,2,prison+1)=infected0*100;
+end
 
 y0=reshape(cat(7,S,S1,S2,S3,S4,A,T,T1,T2,T3,T4,F0,F1,F2,F3,F4,DC,HCC,LT,LT2,F4_transfer,Ldeath,T_total,HCC_transfer,T_F4on_total,Liver_transplants,Inc,Cas1,Cas2,Cas3,Cas4,Cas5,Cas6),...
     num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,33);

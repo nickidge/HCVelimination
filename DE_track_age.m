@@ -1,12 +1,13 @@
 
 function[TT,y]=DE_track_age(Tin,y0,t0,treat)
 
-global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect total_PWID PWID0 dt...
+global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect total_PWID dem PWID0 dt...
     r_AF0 r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2...
     imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 imported...
     scenario cascade_scale_time age_mix start_year r_inc_up followup ...
     APRI num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor progression progression_base...
-    ost_enrollment ost_duration nsp_enrollment nsp_duration RNAtesting
+    ost_enrollment ost_duration nsp_enrollment nsp_duration RNAtesting ...
+    ave_sentence
 
 
 APRI = 1;
@@ -215,8 +216,8 @@ y(1,:) = [y0];
             elseif TT>=55
                 IDUs = total_PWID;
             end
-            mu_arrivals = max(IDUs-sum(sum(sum(sum(sum(sum(sum(Y([1],:,:,:,:,:,1:20))))))))...
-                +sum(sum(sum(sum(sum(sum(sum(-ydot3([1],:,:,:,:,:,:))))))))+sum(sum(sum(sum(sum(sum(sum(-ydot4([1],:,:,:,:,:,1:20)))))))),...
+            mu_arrivals = max(IDUs-sum(sum(sum(sum(sum(sum(sum(Y([1],:,:,:,:,1,1:20))))))))...
+                +sum(sum(sum(sum(sum(sum(sum(-ydot3([1],:,:,:,:,1,:))))))))+sum(sum(sum(sum(sum(sum(sum(-ydot4([1],:,:,:,:,1,1:20)))))))),...
                 0);
             %         mu_arrivals=sum(sum(sum(sum(-ydot3(:,:,:,:)))));
             ydot6=0*Y;
@@ -235,7 +236,7 @@ y(1,:) = [y0];
             ydot6(2,1,1,1,2,1,12)=0*import_infections;
             ydot6(2,1,1,1,2,1,1)=(0*import_infections)/max(1,(sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,12:20)))))))/max(1,sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,1:20)))))))))); % keep prevalence constant among former
             ydot6(3,1,1,1,2,1,12)=1*import_infections;
-            
+           
             %% Progression in cascade
             if TT > 66 && TT <= 67
                 mult = min(1, (TT-66));
@@ -398,20 +399,32 @@ y(1,:) = [y0];
             %% Changes in intervention coverage
             ydot11 = 0*Y;
             %OST
-            ydot11(1,:,:,1:2,:,:,1:20) = -min(ost_enrollment, 1/dt) * Y(1,:,:,1:2,:,:,1:20);
-            ydot11(1,:,:,3:4,:,:,1:20) = min(ost_enrollment, 1/dt) * Y(1,:,:,1:2,:,:,1:20);
-            ydot11(1,:,:,3:4,:,:,1:20) = ydot11(1,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
-            ydot11(1,:,:,1:2,:,:,1:20) = ydot11(1,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
+            ydot11(1,:,:,1:2,:,1,1:20) = -min(ost_enrollment, 1/dt) * Y(1,:,:,1:2,:,1,1:20);
+            ydot11(1,:,:,3:4,:,1,1:20) = min(ost_enrollment, 1/dt) * Y(1,:,:,1:2,:,1,1:20);
+            ydot11(1,:,:,3:4,:,1,1:20) = ydot11(1,:,:,3:4,:,1,1:20) - min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,1,1:20);
+            ydot11(1,:,:,1:2,:,1,1:20) = ydot11(1,:,:,1:2,:,1,1:20) + min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,1,1:20);
             
-            ydot11(2:3,:,:,3:4,:,:,1:20) = ydot11(2:3,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20); %former and other can drop out of OST but not recruit
-            ydot11(2:3,:,:,1:2,:,:,1:20) = ydot11(2:3,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20);
+            ydot11(2:3,:,:,3:4,:,1,1:20) = ydot11(2:3,:,:,3:4,:,1,1:20) - min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,1,1:20); %former and other can drop out of OST but not recruit
+            ydot11(2:3,:,:,1:2,:,1,1:20) = ydot11(2:3,:,:,1:2,:,1,1:20) + min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,1,1:20);
             
             %NSP
-            ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) - min(nsp_enrollment, 1/dt) * Y(1,:,:,[1,3],:,:,1:20);
-            ydot11(1,:,:,[2,4],:,:,1:20) = ydot11(1,:,:,[2,4],:,:,1:20) + min(nsp_enrollment, 1/dt) * Y(1,:,:,[1,3],:,:,1:20);
-            ydot11(1,:,:,[2,4],:,:,1:20) = ydot11(1,:,:,[2,4],:,:,1:20) - min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,:,1:20);
-            ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) + min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,:,1:20);
+            ydot11(1,:,:,[1,3],:,1,1:20) = ydot11(1,:,:,[1,3],:,1,1:20) - min(nsp_enrollment, 1/dt) * Y(1,:,:,[1,3],:,1,1:20);
+            ydot11(1,:,:,[2,4],:,1,1:20) = ydot11(1,:,:,[2,4],:,1,1:20) + min(nsp_enrollment, 1/dt) * Y(1,:,:,[1,3],:,1,1:20);
+            ydot11(1,:,:,[2,4],:,1,1:20) = ydot11(1,:,:,[2,4],:,1,1:20) - min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,1,1:20);
+            ydot11(1,:,:,[1,3],:,1,1:20) = ydot11(1,:,:,[1,3],:,1,1:20) + min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,1,1:20);
             
+            %% Incarceration
+            ydot12 = 0*Y;
+            ydot12(:,:,:,:,:,2:end,1:20) = - min(1/ave_sentence, 1/dt) * Y(:,:,:,:,:,2:end,1:20); % release
+            ydot12(:,:,:,:,:,1,1:20) = + sum(min(1/ave_sentence, 1/dt) * Y(:,:,:,:,:,2:end,1:20),6);
+            for prison = 1:(num_region-1) % incarceration
+                ydot12(:,:,:,:,:,1+prison,1:20) = ydot12(:,:,:,:,:,1+prison,1:20) + ...
+                    min(1/dt, (dem(end,3+prison) - sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1+prison,1:20),1),2),3),4),5),7))...
+                     ./ sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1,1:20)))))))).* Y(:,:,:,:,:,1,1:20);
+                ydot12(:,:,:,:,:,1,1:20) = ydot12(:,:,:,:,:,1,1:20) - ...
+                    min(1/dt, (dem(end,3+prison) - sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1+prison,1:20),1),2),3),4),5),7))...
+                    ./ sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1,1:20)))))))) .* Y(:,:,:,:,:,1,1:20);
+            end
             
             %% Combine
             ydot=real(reshape(ydot1+ydot3+ydot4+ydot5+ydot6+ydot7+ydot8+ydot9+ydot10+ydot11,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1));

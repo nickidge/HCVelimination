@@ -1,5 +1,5 @@
 function [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost, output_nsp, output_diagnoses] = calibrate_optim(maxiter, swarmsize)
-global infect prev0 progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 cascade0 cascade0_PWID disease0 cases0 ost0 nsp0 diagnoses0...
+global infect dem prev0 prev0_prison progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 cascade0 cascade0_PWID disease0 cases0 ost0 nsp0 diagnoses0...
     data y0_init t0_init y0 t0 treat Tin infect_base progression_base ost_enrollment nsp_enrollment r_inc_up start_year followup...
     num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor treat_projected 
 
@@ -23,7 +23,7 @@ ub(25) = 5; ub(26) = 30; % upper bounds for height of rel_incidence function and
 
 
 %options.UseVectorized = true;
-ms = MultiStart('UseParallel', true);
+%ms = MultiStart('UseParallel', true);
 options = optimoptions('particleswarm', 'Display', 'iter', 'MaxIter', maxiter,'StallIterlimit',20,'Swarmsize',swarmsize,'UseParallel',false);
 [x, fval, exitflag, output] = particleswarm(@objective,nvars,lb,ub, options)
 
@@ -72,7 +72,11 @@ Cas6=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num
 S(1,1,1,1,2,1)=(1-infected0)*PWID0;
 S(2,1,1,1,2,1)=P-PWID0;
 F0(1,1,1,1,2,1)=infected0*PWID0;
-
+for prison = 1:(num_region-1)
+    S(1,1,1,1,2,prison+1)=(1-infected0)*100;
+    S(2,1,1,1,2,prison+1)=dem(end,3+prison)-100;
+    F0(1,1,1,1,2,prison+1)=infected0*100;
+end
 
 y0=reshape(cat(7,S,S1,S2,S3,S4,A,T,T1,T2,T3,T4,F0,F1,F2,F3,F4,DC,HCC,LT,LT2,F4_transfer,Ldeath,T_total,HCC_transfer,T_F4on_total,Liver_transplants,Inc,Cas1,Cas2,Cas3,Cas4,Cas5,Cas6),...
     num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,33);
@@ -224,6 +228,13 @@ start_year = x(26);
         
         for years = 1:length(prev0(:,1))
             output_prev(years) = sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-prev0(years,1)),1),1,:,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-prev0(years,1)),1),1,:,:,:,:,1,1:20))))));
+        end
+        for prison = 1:(length(num_region)-1)
+            for years = 1:length(prev0_prison(:,1))
+                if not(isnan(prev0_prison(years,prison)))
+                    output_prev_prison(years,prison) = sum(sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-prev0_prison(years,1)),1),:,:,:,:,:,1+prison,6:20)))))))./sum(sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-prev0_prison(years,1)),1),:,:,:,:,:,1+prison,1:20)))))));
+                end
+            end
         end
         for years = 1:length(cascade0(:,1))
             output_cascade(years,1) = sum(sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),:,2:10,:,:,:,1,6:20)))))))./sum(sum(sum(sum(sum(sum(y(find(TT>=Tin-(2016-cascade0(years,1)),1),:,1:10,:,:,:,1,6:20)))))));
