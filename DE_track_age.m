@@ -264,6 +264,7 @@ y(1,:) = [y0];
             prog = min(1/dt, prog); % need to protect against adding too many people at once if time steps are too large
             
             prog(1:2,1,:,:,:,:) = (followup) * prog(1:2,1,:,:,:,:);
+            %prog(1,:,:,:,1,:) = 0;
             if strcmp(scenario,'OST_test') == 1
                 prog(1,1,:,1:2,:,:) = 0*prog(1,1,:,1:2,:,:); % In these scenarios don't test people who are not engaged in OST of NSP
             end
@@ -388,6 +389,11 @@ y(1,:) = [y0];
             ydot10(:,:,:,:,1,:,16:20) = -min(12, 1/dt)*Y(:,:,:,:,1,:,16:20); % sick people engaged in care
             ydot10(:,:,:,:,2,:,16:20) = min(12, 1/dt)*Y(:,:,:,:,1,:,16:20);
             
+            ydot10(:,:,:,:,1,:,:) = ydot10(:,:,:,:,1,:,:) - min(1*exit_IDU, 1/dt)*Y(:,:,:,:,1,:,:)...
+                + min(1*exit_IDU, 1/dt)*Y(:,:,:,:,2,:,:); 
+            ydot10(:,:,:,:,2,:,:) = ydot10(:,:,:,:,2,:,:) + min(1*exit_IDU, 1/dt)*Y(:,:,:,:,1,:,:)...
+                - min(1*exit_IDU, 1/dt)*Y(:,:,:,:,2,:,:);
+            
 
             %% Changes in intervention coverage
             ydot11 = 0*Y;
@@ -408,7 +414,7 @@ y(1,:) = [y0];
             
             
             %% Combine
-            ydot=real(reshape(ydot1+ydot3+ydot4+ydot5+ydot6+ydot7+ydot8+ydot9+ydot11,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1));
+            ydot=real(reshape(ydot1+ydot3+ydot4+ydot5+ydot6+ydot7+ydot8+ydot9+ydot10+ydot11,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1));
             %clear Y ydot1 ydot3 ydot4 ydot5 ydot6 ydot7 ydot8 ydot9 ydot10 ydot11 prog MU lambda2 ...
             %    S S1 S2 S3 S4 A T T1 T2 T3 T4 F0 F1 F2 F3 F4 DC HCC LT LT2 F4_transfer Ldeath T_total HCC_transfer T_F4on_total Liver_transplants Inc Cas1 Cas2 Cas3 Cas4 Cas5 Cas6
             
