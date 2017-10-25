@@ -418,16 +418,28 @@ y(1,:) = [y0];
             ydot12(:,:,:,:,:,2:end,1:20) = - min(1/ave_sentence, 1/dt) * Y(:,:,:,:,:,2:end,1:20); % release
             ydot12(:,:,:,:,:,1,1:20) = + sum(min(1/ave_sentence, 1/dt) * Y(:,:,:,:,:,2:end,1:20),6);
             for prison = 1:(num_region-1) % incarceration
+                missing = dem(end,3+prison) - (sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1+prison,1:20),1),2),3),4),5),7) ...
+                    + sum(sum(sum(sum(sum(sum(ydot12(:,:,:,:,:,1+prison,1:20),1),2),3),4),5),7)...
+                    + sum(sum(sum(sum(sum(sum(ydot3(:,:,:,:,:,1+prison,1:20),1),2),3),4),5),7));
                 ydot12(:,:,:,:,:,1+prison,1:20) = ydot12(:,:,:,:,:,1+prison,1:20) + ...
-                    min(1/dt, (dem(end,3+prison) - sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1+prison,1:20),1),2),3),4),5),7))...
+                    min(1/dt, missing ...
                      ./ sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1,1:20)))))))).* Y(:,:,:,:,:,1,1:20);
                 ydot12(:,:,:,:,:,1,1:20) = ydot12(:,:,:,:,:,1,1:20) - ...
-                    min(1/dt, (dem(end,3+prison) - sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1+prison,1:20),1),2),3),4),5),7))...
+                    min(1/dt, missing...
                     ./ sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1,1:20)))))))) .* Y(:,:,:,:,:,1,1:20);
             end
             
+            % remove care cascade and NSP from prison
+            %ydot12(1,:,:,[2,4],:,2:end,1:20) = ydot12(1,:,:,[2,4],:,2:end,1:20) - min(1/dt,12)*Y(1,:,:,[2,4],:,2:end,1:20);
+            ydot12(1,:,:,[1,3],:,2:end,1:20) = ydot12(1,:,:,[1,3],:,2:end,1:20) + ydot12(1,:,:,[2,4],:,2:end,1:20);
+            ydot12(1,:,:,[2,4],:,2:end,1:20) = 0;
+            %ydot12(:,:,:,:,2,:,16:20) = ydot12(:,:,:,:,2,:,16:20) - min(12, 1/dt)*Y(:,:,:,:,2,:,16:20); 
+            ydot12(:,:,:,:,1,:,16:20) = ydot12(:,:,:,:,1,:,16:20) + ydot12(:,:,:,:,2,:,16:20);%min(12, 1/dt)*Y(:,:,:,:,2,:,16:20);
+            ydot12(:,:,:,:,2,:,16:20) = 0;
+            
+            
             %% Combine
-            ydot=real(reshape(ydot1+ydot3+ydot4+ydot5+ydot6+ydot7+ydot8+ydot9+ydot10+ydot11,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1));
+            ydot=real(reshape(ydot1+ydot3+ydot4+ydot5+ydot6+ydot7+ydot8+ydot9+ydot10+ydot11+ydot12,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1));
             %clear Y ydot1 ydot3 ydot4 ydot5 ydot6 ydot7 ydot8 ydot9 ydot10 ydot11 prog MU lambda2 ...
             %    S S1 S2 S3 S4 A T T1 T2 T3 T4 F0 F1 F2 F3 F4 DC HCC LT LT2 F4_transfer Ldeath T_total HCC_transfer T_F4on_total Liver_transplants Inc Cas1 Cas2 Cas3 Cas4 Cas5 Cas6
             
