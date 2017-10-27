@@ -1,6 +1,6 @@
 function loaddata
 
-global mu mu_PWID mu_former exit_IDU r_relapse delta alpha alpha_old alpha_DAA p_complete omega infect target_late prev0 prev0_MSM age_cohort P Tin Run y0_init y0 t0...
+global mu mu_PWID mu_former exit_IDU r_relapse delta alpha alpha_old alpha_DAA p_complete omega infect target_late dem prev0 prev0_MSM age_cohort P Tin Run y0_init y0 t0...
     r_AF0 r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2...
     Q_sens q_svr q_svr_PWID q_treat sens c_daa discount total_PWID PWID0 treat age_mix start_year...
     imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 imported r_inc_up...
@@ -26,7 +26,7 @@ target_late=1; %Proportion of treatments allocated to late liver disease stage (
 treat_projected = [24000,16000,2000]; %capped treatments; third entry is for old regimen
 treat=treat_projected;
 
-
+dem = xlsread('Template.xlsx','demographics');
 
 %% Model setup
 [setup0,setup0_label,setup0_raw] = xlsread('Template.xlsx','structure');
@@ -48,12 +48,12 @@ infect_factor(:,:,1) = [[1,0,0];...
 
 %% Calibration data
 prev0 = xlsread('Template.xlsx','prev_PWID');
-prev0_MSM = xlsread('Template.xlsx','prev_MSM');
+%prev0_MSM = xlsread('Template.xlsx','prev_MSM');
 cascade0 = xlsread('Template.xlsx','cascade_all');
 cascade0_PWID = xlsread('Template.xlsx','cascade_PWID');
-cascade0_MSM = xlsread('Template.xlsx','cascade_MSM');
+%cascade0_MSM = xlsread('Template.xlsx','cascade_MSM');
 disease0 = xlsread('Template.xlsx','disease');
-disease0_HIV = xlsread('Template.xlsx','disease_HIV'); % Rate ratio for disease progression in HIV infected participants
+%disease0_HIV = xlsread('Template.xlsx','disease_HIV'); % Rate ratio for disease progression in HIV infected participants
 cases0 = xlsread('Template.xlsx','cases'); % Antibody + diagnosed cases
 [~,~,intervention_PWID0] = xlsread('Template.xlsx','Interventions_PWID'); % OST coverage
 ost0 = [cell2mat(intervention_PWID0(2:end,1)), cell2mat(intervention_PWID0(2:end,strcmpi('OST',intervention_PWID0(1,:))))];

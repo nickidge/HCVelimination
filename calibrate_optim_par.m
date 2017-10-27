@@ -16,9 +16,11 @@ nvars = length(xp);
 
 lb = max(0.1*xp, 0.001*ones(1,length(xp)));
 lb(1) = 0.2; lb(22) = 0; 
+lb(23) = 0; lb(24) = 0; 
 lb(25) = 0.5; lb(26) = 0; % lower bounds for height of rel_incidence function and epidemic start year
 ub = 10*xp;
 ub(14:21) = 4500; ub(21) = 1000; ub(22) = 0; 
+ub(23) = 0.001; ub(24) = 0.001; % Forcing no NSP or OST
 ub(25) = 5; ub(26) = 30; % upper bounds for height of rel_incidence function and epidemic start year
 
 

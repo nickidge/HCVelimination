@@ -1,7 +1,7 @@
 
 function[TT,y]=DE_track_age(Tin,y0,t0,treat)
 
-global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect total_PWID PWID0 dt...
+global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect total_PWID PWID0 dem dt...
     r_AF0 r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2...
     imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 imported...
     scenario cascade_scale_time age_mix start_year r_inc_up followup ...
@@ -235,6 +235,16 @@ y(1,:) = [y0];
             ydot6(2,1,1,1,2,1,12)=0*import_infections;
             ydot6(2,1,1,1,2,1,1)=(0*import_infections)/max(1,(sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,12:20)))))))/max(1,sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,1:20)))))))))); % keep prevalence constant among former
             ydot6(3,1,1,1,2,1,12)=1*import_infections;
+            
+            if TT > 38 && TT < 66
+                missing = interp1(dem(:,1), dem(:,2), TT+1950)... % population at time TT
+                    - (sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1,1:20),1),2),3),4),5),7) ... % minus total population
+                    + sum(sum(sum(sum(sum(sum(ydot6(:,:,:,:,:,1,1:20),1),2),3),4),5),7)... % correct for other arrivals
+                    + sum(sum(sum(sum(sum(sum(ydot3(:,:,:,:,:,1,1:20),1),2),3),4),5),7)); % correct for deaths
+                ydot6(3,:,:,:,:,1,1:20) = ydot6(3,:,:,:,:,1,1:20) + ...
+                    min(1/dt, missing ...
+                    ./ sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,1,1:20)))))))).* Y(3,:,:,:,:,1,1:20);
+            end
             
             %% Progression in cascade
             if TT > 66 && TT <= 67

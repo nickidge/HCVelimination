@@ -136,7 +136,7 @@ if strcmp(scenario,'rapidRNA') == 1 || strcmp(scenario,'WHO') == 1 || strcmp(sce
     Cas_cost1=sum(sum(sum(y(:,:,:,28),3),2)*c_cascade_rapidRNA.*exp(-discount.*TT)); % i.e. RNA tests
     Cas_cost2 = 0;
 else
-    Cas_cost1=sum(sum(sum(y(:,:,:,28),3),2)*c_cascade1.*exp(-discount.*TT)); % i.e. antibody tests
+    Cas_cost1=sum(sum(y(:,1,1,1:20),4)*c_cascade1.*exp(-discount.*TT)); % i.e. antibody tests
     Cas_cost2=sum(sum(sum(y(:,:,:,29),3),2)*c_cascade2.*exp(-discount.*TT)); % i.e RNA tests
 end
 Cas_cost3=sum(sum(sum(y(:,:,:,30),3),2)*c_cascade3(2).*exp(-discount.*TT)); % i.e assumes no genotype tests, just other workup
