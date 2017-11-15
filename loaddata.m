@@ -7,7 +7,7 @@ global mu mu_PWID mu_former exit_IDU r_relapse delta alpha alpha_old alpha_DAA p
     cascade0 cascade0_PWID cascade0_MSM disease0 disease0_HIV cases0 ost0 nsp0 HCC0 diagnoses0 cascade_target cascade_target_PWID scenario cascade_scale_time care filename ...
     infect_base progression_base treat_projected ...
     num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor progression...
-    ost_enrollment ost_duration nsp_enrollment nsp_duration target_inc target_death 
+    ost_enrollment ost_duration nsp_enrollment nsp_duration target_inc target_death nsp_coverage ost_coverage
 
 
 %% Epi parameters
@@ -64,6 +64,8 @@ nsp0 = nsp0(~isnan(nsp0(:,2)),:);
 HCC0 = xlsread('Template.xlsx','HCC'); % Antibody + diagnosed cases
 diagnoses0 = xlsread('Template.xlsx','diagnoses'); % Antibody + diagnosed cases
 
+ost_coverage = ost0(1,2);
+nsp_coverage = nsp0(1,2);
 %% Transition rates
 [rates0,rates0_label,rates0_raw] = xlsread('Template.xlsx','transition_rates');
 

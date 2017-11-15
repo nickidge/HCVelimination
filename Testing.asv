@@ -9,7 +9,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
     cascade0 cascade0_PWID cascade0_MSM disease0 disease0_HIV cases0 ost0 nsp0 HCC0 diagnoses0 dem infect_factor infect_base progression_base imported... % data and calibration
     ost_duration  nsp_duration treat_projected target_inc target_death cascade_scale_time care RNAtesting... %intervention
     infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment... % calibtation parameters
-    harm_reduction_coverage nsp_coverage ost_coverage
+    harm_reduction_coverage
 
 %Define the output file using variables based on the current
 %working directory or relative paths so that this can work on
@@ -90,10 +90,10 @@ for s=1:sens
         for i = Tin-10:Tin
             prev_HR(i,h) = 100*sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,[6,12:20])))))))./...
                 sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,1:20)))))));
-            inc_HR(i,h) = sum(sum(sum(sum(sum(sum(sum(y1(find(TT1>=i-1,1):find(TT1>=i,1)-1,:,:,:,:,:,:,27))))))));
+            inc_HR(1,h) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=Tin + i-1,1):find(TT2_treat5>=Tin+i,1)-1,:,:,27)))));
         for i = 1:Run
-            inc_HR(i+11,h) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=Tin + i-1,1):find(TT2_treat5>=Tin+i,1)-1,:,:,27)))));
-            prev_HR(i+11,h) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=Tin + i,1),1,:,[6,12:20])))./...
+            inc_HR(i+1,h) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=Tin + i-1,1):find(TT2_treat5>=Tin+i,1)-1,:,:,27)))));
+            prev_HR(i+1,h) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=Tin + i,1),1,:,[6,12:20])))./...
                 sum(sum(ycomb_noage(find(TT2_treat>=Tin + i,1),1,:,1:20)));
         end
         summary_HR(h,:,s) = summary(2,:,s);
