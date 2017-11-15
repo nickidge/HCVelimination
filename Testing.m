@@ -48,16 +48,15 @@ for s=1:sens
     
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(50, 10);
+        calibrate_optim_par(200, 20);
     save('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration2')
-    %load('calibration_data')
+    load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration2')
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo");
     
     infect_base=infect;
     progression_base = progression;
-    
 
     %Run model in prior to 2017
     [TT1,y1]=DE_track_age(Tin,y0,t0,treat);
@@ -72,29 +71,30 @@ for s=1:sens
     
     %% Baseline: Current standard of care with no scaled up treatment
     scenario = 'base'; %Current level of community care
-    harm_reduction_coverage = -1; % Value less than zero indcates no changes to calibrated values
     alpha = alpha_DAA;
-    dt = 1/26; 
+    dt = 1/4; 
     [TT2,y2]=DE_track_age(Run,y1_end,TT1,treat);
     [ycomb_noage, summary(1,:,s), tr, tr_] = gather_outputs(y1,y2,TT2);
     
  
     %%  Scenario 1: Scaled harm reduction
     scenario = 'current'
-    harm_reduction_range = [0,0.06,0.1:0.05:0.5];
+    harm_reduction_range = [0,0.06,0.1:0.1:0.5];
     summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
     for h = 1:length(harm_reduction_range)
-        harm_reduction_coverage = harm_reduction_range(h);
+        nsp_coverage = harm_reduction_range(h)
+        ost_coverage = harm_reduction_range(h);
         [TT2_treat,y2_treat]=DE_track_age(Run,y1_end,TT1,treat);
         [ycomb2_noage, summary(2,:,s), tr2, tr2_] = gather_outputs(y1,y2_treat,TT2_treat);
-        for i = Tin-10:Tin
-            prev_HR(i,h) = 100*sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,[6,12:20])))))))./...
-                sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,1:20)))))));
-            inc_HR(i,h) = sum(sum(sum(sum(sum(sum(sum(y1(find(TT1>=i-1,1):find(TT1>=i,1)-1,:,:,:,:,:,:,27))))))));
-        for i = 1:Run
-            inc_HR(i+11,h) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=Tin + i-1,1):find(TT2_treat5>=Tin+i,1)-1,:,:,27)))));
-            prev_HR(i+11,h) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=Tin + i,1),1,:,[6,12:20])))./...
-                sum(sum(ycomb_noage(find(TT2_treat>=Tin + i,1),1,:,1:20)));
+%         for i = Tin-10:Tin
+%             prev_HR(i,h) = 100*sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,[6,12:20])))))))./...
+%                 sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,1:20)))))));
+%             inc_HR(i,h) = sum(sum(sum(sum(sum(sum(sum(y1(find(TT1>=i-1,1):find(TT1>=i,1)-1,:,:,:,:,:,:,27))))))));
+%         end
+        for i = (Tin-10):(Tin+Run)
+            inc_HR(i-Tin+11,h) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1)-1,:,:,27)))));
+            prev_HR(i-Tin+11,h) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,[6,12:20])))./...
+                sum(sum(ycomb_noage(find(TT2_treat>=i,1),1,:,1:20)));
         end
         summary_HR(h,:,s) = summary(2,:,s);
     end

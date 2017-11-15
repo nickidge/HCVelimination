@@ -23,7 +23,7 @@ mu_former=[mu2024,mu2529,mu3034,mu3544,mu4554,mu5564,mu6574,mu7584,mu85];
 mu_PWID=[mu2024_PWID,mu2529_PWID,mu3034_PWID,mu3544_PWID,mu4554,mu5564,mu6574,mu7584,mu85];
 care = [care__a,care__b];
 target_late=1; %Proportion of treatments allocated to late liver disease stage (set to -1 for proportionally)
-treat_projected = [24000,16000,2000]; %capped treatments; third entry is for old regimen
+treat_projected = [00,00,000]; %capped treatments; third entry is for old regimen
 treat=treat_projected;
 
 dem = xlsread('Template.xlsx','demographics');
