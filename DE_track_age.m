@@ -415,14 +415,30 @@ y(1,:) = [y0];
 
             %% Changes in intervention coverage
             ydot11 = 0*Y;
+            
+            
+            ydot11(1,:,:,1,:,:,1:20) = ydot11(1,:,:,1,:,:,1:20) + ...
+                min(1/dt, ((1-nsp_coverage)*(1-ost_coverage)*sum(Y(1,:,:,:,:,:,1:20),4) - Y(1,:,:,1,:,:,1:20))./sum(Y(1,:,:,:,:,:,1:20),4))...
+                .*Y(1,:,:,1,:,:,1:20);
+            ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + ...
+                min(1/dt, (nsp_coverage*(1-ost_coverage)*sum(Y(1,:,:,:,:,:,1:20),4) - Y(1,:,:,2,:,:,1:20))./sum(Y(1,:,:,:,:,:,1:20),4))...
+                .*Y(1,:,:,2,:,:,1:20);
+            ydot11(1,:,:,3,:,:,1:20) = ydot11(1,:,:,3,:,:,1:20) + ...
+                min(1/dt, ((1-nsp_coverage)*ost_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - Y(1,:,:,3,:,:,1:20))./sum(Y(1,:,:,:,:,:,1:20),4))...
+                .*Y(1,:,:,3,:,:,1:20);
+            ydot11(1,:,:,4,:,:,1:20) = ydot11(1,:,:,4,:,:,1:20) + ...
+                min(1/dt, (nsp_coverage*ost_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - Y(1,:,:,4,:,:,1:20))./sum(Y(1,:,:,:,:,:,1:20),4))...
+                .*Y(1,:,:,4,:,:,1:20);
+
+                
             %OST
-            ydot11(1,:,:,1:2,:,:,1:20) = -min(1/ost_duration, 1/dt) * Y(1,:,:,1:2,:,:,1:20);
-            ydot11(1,:,:,3:4,:,:,1:20) = min(1/ost_duration, 1/dt) * Y(1,:,:,1:2,:,:,1:20);
+            ydot11(1,:,:,1:2,:,:,1:20) = ydot11(1,:,:,1:2,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(1,:,:,1:2,:,:,1:20);
+            ydot11(1,:,:,3:4,:,:,1:20) = ydot11(1,:,:,3:4,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(1,:,:,1:2,:,:,1:20);
             ydot11(1,:,:,3:4,:,:,1:20) = ydot11(1,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
             ydot11(1,:,:,1:2,:,:,1:20) = ydot11(1,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
             
-            ydot11(2:3,:,:,3:4,:,:,1:20) = ydot11(2:3,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20); %former and other can drop out of OST but not recruit
-            ydot11(2:3,:,:,1:2,:,:,1:20) = ydot11(2:3,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20);
+%             ydot11(2:3,:,:,3:4,:,:,1:20) = ydot11(2:3,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20); %former and other can drop out of OST but not recruit
+%             ydot11(2:3,:,:,1:2,:,:,1:20) = ydot11(2:3,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20);
             
             %NSP
             ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) - min(1/nsp_duration, 1/dt) * Y(1,:,:,[1,3],:,:,1:20);
@@ -438,12 +454,6 @@ y(1,:) = [y0];
 %             end
             
 
-            ydot11(1,:,:,1,:,:,1:20) = ydot11(1,:,:,1,:,:,1:20) + min(1/dt,sum((1-nsp_coverage)*(1-ost_coverage)*Y(1,:,:,:,:,:,1:20),4) - Y(1,:,:,1,:,:,1:20));
-            ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + min(1/dt,sum(nsp_coverage*(1-ost_coverage)*Y(1,:,:,:,:,:,1:20),4) - Y(1,:,:,2,:,:,1:20));
-            ydot11(1,:,:,3,:,:,1:20) = ydot11(1,:,:,3,:,:,1:20) + min(1/dt,sum(ost_coverage*(1-nsp_coverage)*Y(1,:,:,:,:,:,1:20),4) - Y(1,:,:,3,:,:,1:20));
-            ydot11(1,:,:,4,:,:,1:20) = ydot11(1,:,:,4,:,:,1:20) + min(1/dt,sum(nsp_coverage*ost_coverage*Y(1,:,:,:,:,:,1:20),4) - Y(1,:,:,4,:,:,1:20));
-
-                
             %% Combine
             ydot=real(reshape(ydot1+ydot3+ydot4+ydot5+ydot6+ydot7+ydot8+ydot9+ydot10+ydot11,num_pops*num_cascade*num_age*num_intervention*num_engagement*num_region*(27+6),1));
             %clear Y ydot1 ydot3 ydot4 ydot5 ydot6 ydot7 ydot8 ydot9 ydot10 ydot11 prog MU lambda2 ...

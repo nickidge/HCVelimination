@@ -24,7 +24,7 @@ filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo2");
 %filename='../../../Desktop/Matlab Sims/Testing/foo';
 
 loaddata
-dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
+dt = 1/12; % six-monthly time steps for burn-in / calibration perio 1950-2015
 sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 followup = 1;
@@ -57,14 +57,14 @@ for s=1:sens
     
     infect_base=infect;
     progression_base = progression;
-
+    dt = 1/12;
     %Run model in prior to 2017
     [TT1,y1]=DE_track_age(Tin,y0,t0,treat);
     y1_end=reshape(y1(end,:,:,:,:,:,:,:), num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,33);
     death2017 = (sum(sum(sum(sum(sum(sum(y1(end,:,:,:,:,:,:,22))))))) - sum(sum(sum(sum(sum(sum(y1(find(TT1>=66,1),:,:,:,:,:,:,22)))))))) / ...
         (TT1(end)-TT1(find(TT1>=66,1)));
     inc2017 = sum(sum(sum(sum(sum(sum(sum(y1(find(TT1>=66,1):end-1,:,:,:,:,:,:,27))))))));%/(TT1(find(TT1>=66,1)-1) - TT1(find(TT1>=65,1)));
-    y1_end(:,:,:,:,:,:,21:(27+6))=0;
+    %y1_end(:,:,:,:,:,:,21:(27+6))=0;
     y1_end(:,6,:,:,:,:,1:20) = y1_end(:,6,:,:,:,:,1:20) + y1_end(:,8,:,:,:,:,1:20) + y1_end(:,10,:,:,:,:,1:20); 
     y1_end(:,8,:,:,:,:,1:20) = 0; y1_end(:,10,:,:,:,:,1:20) = 0; % moving failed to be re-eligible with DAAs
     
@@ -72,7 +72,7 @@ for s=1:sens
     %% Baseline: Current standard of care with no scaled up treatment
     scenario = 'base'; %Current level of community care
     alpha = alpha_DAA;
-    dt = 1/4; 
+     
     [TT2,y2]=DE_track_age(Run,y1_end,TT1,treat);
     [ycomb_noage, summary(1,:,s), tr, tr_] = gather_outputs(y1,y2,TT2);
     
@@ -94,7 +94,7 @@ for s=1:sens
         for i = (Tin-10):(Tin+Run)
             inc_HR(i-Tin+11,h) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1)-1,:,:,27)))));
             prev_HR(i-Tin+11,h) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,[6,12:20])))./...
-                sum(sum(ycomb_noage(find(TT2_treat>=i,1),1,:,1:20)));
+                sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,1:20)));
         end
         summary_HR(h,:,s) = summary(2,:,s);
     end
@@ -279,7 +279,7 @@ for s=1:sens
     Total_HCV_sens(:,:,s) = round(Total_HCV_sens(:,:,s) / 1000);
     
     %inc_year_sens(:,1,s) = [inc2015;inc2015;inc2015;inc2015;inc2015;inc2015];
-    death_year_sens(:,6,s) = [death2015;death2015;death2015;death2015;death2015;death2015];
+    death_year_sens(:,6,s) = [death2017;death2017;death2017;death2017;death2017;death2017];
     total_treat(:,:,s) = [tr; tr2; tr3; tr4; tr5; tr6];
     total_treat_2030(:,:,s) = [tr_; tr2_; tr3_; tr4_; tr5_; tr6_];
     
