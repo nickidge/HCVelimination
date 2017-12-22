@@ -18,13 +18,13 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 %filename = 'C:\Users\Nick\Desktop\Matlab Sims\Testing\foo';
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo2");
+filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo3");
 %relative path method is commented out below because it's less general than
 %the above method.
 %filename='../../../Desktop/Matlab Sims/Testing/foo';
 
 loaddata
-dt = 1/12; % six-monthly time steps for burn-in / calibration perio 1950-2015
+dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
 sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 followup = 1;
@@ -48,16 +48,16 @@ for s=1:sens
     
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(200, 20);
-    save('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration2')
-    load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration2')
+        calibrate_optim_par(50, 16);
+    save('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration3')
+    %load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration2')
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo");
     
     infect_base=infect;
     progression_base = progression;
-    dt = 1/12;
+    dt = 1/4;
     %Run model in prior to 2017
     [TT1,y1]=DE_track_age(Tin,y0,t0,treat);
     y1_end=reshape(y1(end,:,:,:,:,:,:,:), num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,33);
@@ -68,6 +68,7 @@ for s=1:sens
     y1_end(:,6,:,:,:,:,1:20) = y1_end(:,6,:,:,:,:,1:20) + y1_end(:,8,:,:,:,:,1:20) + y1_end(:,10,:,:,:,:,1:20); 
     y1_end(:,8,:,:,:,:,1:20) = 0; y1_end(:,10,:,:,:,:,1:20) = 0; % moving failed to be re-eligible with DAAs
     
+    sum(sum(sum(sum(sum(y1(find(TT1>=Tin-(2016-prev0(1,1)),1),1,:,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y1(find(TT1>=Tin-(2016-prev0(1,1)),1),1,:,:,:,:,1,1:20))))))
     
     %% Baseline: Current standard of care with no scaled up treatment
     scenario = 'base'; %Current level of community care

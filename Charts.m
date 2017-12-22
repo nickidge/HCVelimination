@@ -139,9 +139,9 @@ xlim([1,21]);grid on;
 
 
 %% LIVER DISEASE AND CARE CASCADE PROJECTION AND BURN IN
-scen1=[sum(sum(sum(ycomb2_noage(:,:,:,1:5),2),3),4),sum(sum(ycomb2_noage(:,:,:,6),2),3),sum(sum(sum(ycomb2_noage(:,:,:,7:11),2),3),4),reshape(sum(sum(ycomb2_noage(:,:,:,12:18),2),3),length(ycomb2_noage(:,1,1,1)),7),sum(sum(sum(ycomb2_noage(:,:,:,19:20),2),3),4)];
-prev_PWID_scen1=100*sum(sum(ycomb2_noage(:,1,:,6:20),3),4)./sum(sum(ycomb2_noage(:,1,:,1:20),3),4);
-scen1_cas=[sum(sum(ycomb2_noage(:,:,1,6:20),2),4),sum(sum(ycomb2_noage(:,:,2,6:20),2),4),sum(sum(ycomb2_noage(:,:,3,6:20),2),4),sum(sum(ycomb2_noage(:,:,4,6:20),2),4),sum(sum(ycomb2_noage(:,:,5,6:20),2),4),sum(sum(ycomb2_noage(:,:,6,6:20),2),4),sum(sum(ycomb2_noage(:,:,7,6:20),2),4),sum(sum(ycomb2_noage(:,:,8,6:20),2),4),sum(sum(ycomb2_noage(:,:,9,6:20),2),4),sum(sum(ycomb2_noage(:,:,10,6:20),2),4)];
+scen1=[sum(sum(sum(ycomb_noage(:,:,:,1:5),2),3),4),sum(sum(ycomb_noage(:,:,:,6),2),3),sum(sum(sum(ycomb_noage(:,:,:,7:11),2),3),4),reshape(sum(sum(ycomb_noage(:,:,:,12:18),2),3),length(ycomb_noage(:,1,1,1)),7),sum(sum(sum(ycomb_noage(:,:,:,19:20),2),3),4)];
+prev_PWID_scen1=100*sum(sum(ycomb_noage(:,1,:,6:20),3),4)./sum(sum(ycomb_noage(:,1,:,1:20),3),4);
+scen1_cas=[sum(sum(ycomb_noage(:,:,1,6:20),2),4),sum(sum(ycomb_noage(:,:,2,6:20),2),4),sum(sum(ycomb_noage(:,:,3,6:20),2),4),sum(sum(ycomb_noage(:,:,4,6:20),2),4),sum(sum(ycomb_noage(:,:,5,6:20),2),4),sum(sum(ycomb_noage(:,:,6,6:20),2),4),sum(sum(ycomb_noage(:,:,7,6:20),2),4),sum(sum(ycomb_noage(:,:,8,6:20),2),4),sum(sum(ycomb_noage(:,:,9,6:20),2),4),sum(sum(ycomb_noage(:,:,10,6:20),2),4)];
 
 figure(10)
 subplot(1,2,1)
@@ -158,7 +158,7 @@ xlabel('\fontsize{14}Year'); ylabel({'\fontsize{14} Chronic HCV infections (thou
 [extra,a9__,a9_]=plotyy(TT2_treat,prev_PWID_scen1,TT2_treat,prev_PWID_scen1); 
 set(a9_,'Color','k','LineStyle','--','Linewidth',2); set(a9__,'visible','off');
 set(extra(2), 'XTick',[],'xlim',[0,80],'ylim',[0,65],'YTick',0:10:65,'ycolor','k','FontSize',12);
-set(extra(1), 'xlim',[0,80],'ylim',[0,250000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:50000:250000,'YTickLabel',0:50:250,'ycolor','k');
+set(extra(1), 'xlim',[0,80],'ylim',[0,1200000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:100000:1200000,'YTickLabel',0:100:1200,'ycolor','k');
 set(get(extra(2),'Ylabel'),'String','Prevalence among PWID (%)','fontsize',14);
 leg=legend([a1_,a2_,a3_,a4_,a5_,a6_,a7_,a8_,a9_],{'F0','F1','F2','F3','F4','DC','HCC','LT',['Prevalence among' 10 'current PWID']},'location','Northwest');
 %legpatch=findobj(leg,'type','patch'); hatchfill(legpatch,'single',45,1,'blue');
@@ -176,7 +176,7 @@ xlabel('\fontsize{14}Year'); %ylabel({'\fontsize{14}IDU-acquired infections in l
 [extra,a9__,a9_]=plotyy(TT2_treat,prev_PWID_scen1,TT2_treat,prev_PWID_scen1); 
 set(a9_,'Color','k','LineStyle','--','Linewidth',2); set(a9__,'visible','off');
 set(extra(2), 'XTick',[],'xlim',[0,80],'ylim',[0,65],'YTick',0:10:60,'ycolor','k','FontSize',12);
-set(extra(1), 'xlim',[0,80],'ylim',[0,250000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:50000:250000,'YTickLabel',0:50:250,'ycolor','k');
+set(extra(1), 'xlim',[0,80],'ylim',[0,1200000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:100000:1200000,'YTickLabel',0:100:1200,'ycolor','k');
 set(get(extra(2),'Ylabel'),'String','Prevalence among PWID (%)','fontsize',14);
 %legpatch=findobj(leg,'type','patch'); hatchfill(legpatch,'single',45,1,'blue');
 title({'\fontsize{12}Scenario 1: basic community-based care'}); hold off;

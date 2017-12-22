@@ -1,7 +1,8 @@
 function [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost, output_nsp, output_diagnoses] = calibrate_optim(maxiter, swarmsize)
 global infect prev0 progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 cascade0 cascade0_PWID disease0 cases0 ost0 nsp0 diagnoses0...
     data y0_init t0_init y0 t0 treat Tin infect_base progression_base ost_enrollment nsp_enrollment r_inc_up start_year followup...
-    num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor treat_projected 
+    num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor treat_projected ...
+    r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID
 
 data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0, diagnoses0}; % prevalence, cascade to calibrate to
 lag = 1; % iterations between successive samples
@@ -10,7 +11,8 @@ xp = [10*infect,...
     progression(2,1:4,2,1),... %former PWID first 4 steps
     progression(3,1:4,2,1),... % Other first 4 steps
     imp1, imp2, imp3, imp4, imp5, imp6, imp7, imp8, imp9, ...
-    ost_enrollment, nsp_enrollment,r_inc_up, start_year];
+    ost_enrollment, nsp_enrollment,r_inc_up, start_year,...
+    r_F0F1, r_F1F2, r_F2F3, r_F3F4, r_F0F1_PWID, r_F1F2_PWID, r_F2F3_PWID, r_F3F4_PWID];
 
 nvars = length(xp);
 
@@ -18,11 +20,12 @@ lb = max(0.1*xp, 0.001*ones(1,length(xp)));
 lb(1) = 0.01; lb(22) = 0; 
 lb(23) = 0; lb(24) = 0; 
 lb(25) = 0; lb(26) = 0; % lower bounds for height of rel_incidence function and epidemic start year
+lb(27:34) = 0.5*xp(27:34);
 ub = 10*xp;
-ub(14:21) = 20000; ub(21) = 1000; ub(22) = 0; 
+ub(14:19) = 60000; ub(20:21) = 1000; ub(22) = 0; 
 ub(23) = 0.1; ub(24) = 0.1; % Forcing no NSP or OST
-ub(25) = 5; ub(26) = 25; % upper bounds for height of rel_incidence function and epidemic start year
-
+ub(25) = 5; ub(26) = 30; % upper bounds for height of rel_incidence function and epidemic start year
+ub(27:34) = 1.5*xp(27:34);
 
 %options.UseVectorized = true;
 ms = MultiStart('UseParallel', true);
@@ -30,7 +33,8 @@ options = optimoptions('particleswarm', 'Display', 'iter', 'MaxIter', maxiter,'S
 [x, fval, exitflag, output] = particleswarm(@objective,nvars,lb,ub, options)
 
 [infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9,...
-    ost_enrollment, nsp_enrollment, r_inc_up, start_year] = feval(@assign,x);
+    ost_enrollment, nsp_enrollment, r_inc_up, start_year,...
+    r_F0F1, r_F1F2, r_F2F3, r_F3F4, r_F0F1_PWID, r_F1F2_PWID, r_F2F3_PWID, r_F3F4_PWID] = feval(@assign,x);
 
 Run=16; %Years to run the model
 
@@ -111,6 +115,14 @@ ost_enrollment = x(23);
 nsp_enrollment = x(24);
 r_inc_up = x(25);
 start_year = x(26);
+r_F0F1 = x(27);
+r_F1F2 = x(28);
+r_F2F3 = x(29);
+r_F3F4  = x(30);
+r_F0F1_PWID  = x(31);
+r_F1F2_PWID  = x(32);
+r_F2F3_PWID  = x(33);
+r_F3F4_PWID = x(34);
 
 [TT, y] = DE_track_age(Tin, y0, 0, treat);
 
@@ -124,7 +136,8 @@ start_year = x(26);
         
         %loaddata
         
-        [infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment, r_inc_up, start_year] = feval(@assign,xp);
+        [infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment, r_inc_up, start_year,...
+            r_F0F1, r_F1F2, r_F2F3, r_F3F4, r_F0F1_PWID, r_F1F2_PWID, r_F2F3_PWID, r_F3F4_PWID] = feval(@assign,xp);
         
          
         data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0, diagnoses0}; % prevalence, cascade to calibrate to
@@ -161,6 +174,15 @@ start_year = x(26);
         nsp_enrollment = xp(24);
         r_inc_up = xp(25);
         start_year = xp(26);
+        
+        r_F0F1 = xp(27);
+        r_F1F2 = xp(28);
+        r_F2F3 = xp(29);
+        r_F3F4  = xp(30);
+        r_F0F1_PWID  = xp(31);
+        r_F1F2_PWID  = xp(32);
+        r_F2F3_PWID  = xp(33);
+        r_F3F4_PWID = xp(34);
                 
         probX = 0;
         
@@ -170,11 +192,11 @@ start_year = x(26);
         
         [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y);
 
-        sigma_prev = 0.01*data{1}(:,2:end); %standard deviations for prevalence by year
+        sigma_prev = 0.001*data{1}(:,2:end); %standard deviations for prevalence by year
         sigma_cascade = 0.1*data{2}(:,2:end); %standard deviations for cascade by year
         sigma_cascade_PWID = 0.01*data{3}(:,2:end); %standard deviations for cascade by year
         sigma_disease = 0.5*data{4}(:,2:end); %standard deviations for disease by year
-        sigma_cases = 0.01*data{5}(:,2:end); %standard deviations for cases by year
+        sigma_cases = 0.001*data{5}(:,2:end); %standard deviations for cases by year
         sigma_ost = 0.1*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year
         sigma_nsp = 0.1*data{7}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
         sigma_diagnoses = 0.1*data{8}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
@@ -266,7 +288,8 @@ start_year = x(26);
         end
     end
 
-    function[infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment, r_inc_up, start_year] = assign(x)
+    function[infect, progression, imp1, imp2, imp3, imp4, imp5 ,imp6 ,imp7, imp8, imp9, ost_enrollment, nsp_enrollment, r_inc_up, start_year,...
+            r_F0F1, r_F1F2, r_F2F3, r_F3F4, r_F0F1_PWID, r_F1F2_PWID, r_F2F3_PWID, r_F3F4_PWID] = assign(x)
         %loaddata
         infect = x(1) / 10;
         progression = zeros(num_pops,num_cascade,num_engagement,num_region);
@@ -288,6 +311,15 @@ start_year = x(26);
         nsp_enrollment = x(24);
         r_inc_up = x(25);
         start_year = x(26);
+        
+        r_F0F1 = x(27);
+        r_F1F2 = x(28);
+        r_F2F3 = x(29);
+        r_F3F4  = x(30);
+        r_F0F1_PWID  = x(31);
+        r_F1F2_PWID  = x(32);
+        r_F2F3_PWID  = x(33);
+        r_F3F4_PWID = x(34);
         
     end
 
