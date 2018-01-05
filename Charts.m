@@ -158,7 +158,7 @@ xlabel('\fontsize{14}Year'); ylabel({'\fontsize{14} Chronic HCV infections (thou
 [extra,a9__,a9_]=plotyy(TT2_treat,prev_PWID_scen1,TT2_treat,prev_PWID_scen1); 
 set(a9_,'Color','k','LineStyle','--','Linewidth',2); set(a9__,'visible','off');
 set(extra(2), 'XTick',[],'xlim',[0,80],'ylim',[0,65],'YTick',0:10:65,'ycolor','k','FontSize',12);
-set(extra(1), 'xlim',[0,80],'ylim',[0,1200000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:100000:1200000,'YTickLabel',0:100:1200,'ycolor','k');
+set(extra(1), 'xlim',[0,80],'ylim',[0,100000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:10000:100000,'YTickLabel',0:10:100,'ycolor','k');
 set(get(extra(2),'Ylabel'),'String','Prevalence among PWID (%)','fontsize',14);
 leg=legend([a1_,a2_,a3_,a4_,a5_,a6_,a7_,a8_,a9_],{'F0','F1','F2','F3','F4','DC','HCC','LT',['Prevalence among' 10 'current PWID']},'location','Northwest');
 %legpatch=findobj(leg,'type','patch'); hatchfill(legpatch,'single',45,1,'blue');
@@ -176,7 +176,7 @@ xlabel('\fontsize{14}Year'); %ylabel({'\fontsize{14}IDU-acquired infections in l
 [extra,a9__,a9_]=plotyy(TT2_treat,prev_PWID_scen1,TT2_treat,prev_PWID_scen1); 
 set(a9_,'Color','k','LineStyle','--','Linewidth',2); set(a9__,'visible','off');
 set(extra(2), 'XTick',[],'xlim',[0,80],'ylim',[0,65],'YTick',0:10:60,'ycolor','k','FontSize',12);
-set(extra(1), 'xlim',[0,80],'ylim',[0,1200000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:100000:1200000,'YTickLabel',0:100:1200,'ycolor','k');
+set(extra(1), 'xlim',[0,80],'ylim',[0,100000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:10000:100000,'YTickLabel',0:10:100,'ycolor','k');
 set(get(extra(2),'Ylabel'),'String','Prevalence among PWID (%)','fontsize',14);
 %legpatch=findobj(leg,'type','patch'); hatchfill(legpatch,'single',45,1,'blue');
 title({'\fontsize{12}Scenario 1: basic community-based care'}); hold off;

@@ -136,6 +136,7 @@ Cas4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num
 Cas5=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
 Cas6=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
 
+infected0 = 0.2;
 S(1,1,1,1,2,1)=(1-infected0)*PWID0;
 S(2,1,1,1,2,1)=P-PWID0;
 F0(1,1,1,1,2,1)=infected0*PWID0;

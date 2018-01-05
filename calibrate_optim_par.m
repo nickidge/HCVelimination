@@ -2,7 +2,7 @@ function [output_prev, output_cascade, output_cascade_PWID, output_disease, outp
 global infect prev0 progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 cascade0 cascade0_PWID disease0 cases0 ost0 nsp0 diagnoses0...
     data y0_init t0_init y0 t0 treat Tin infect_base progression_base ost_enrollment nsp_enrollment r_inc_up start_year followup...
     num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor treat_projected ...
-    r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID
+    r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID ost_coverage nsp_coverage
 
 data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0, diagnoses0}; % prevalence, cascade to calibrate to
 lag = 1; % iterations between successive samples
@@ -22,7 +22,7 @@ lb(23) = 0; lb(24) = 0;
 lb(25) = 0; lb(26) = 0; % lower bounds for height of rel_incidence function and epidemic start year
 lb(27:34) = 0.5*xp(27:34);
 ub = 10*xp;
-ub(14:19) = 60000; ub(20:21) = 1000; ub(22) = 0; 
+ub(14:19) = 1000; ub(20:22) = 500; %ub(22) = 0; 
 ub(23) = 0.1; ub(24) = 0.1; % Forcing no NSP or OST
 ub(25) = 5; ub(26) = 30; % upper bounds for height of rel_incidence function and epidemic start year
 ub(27:34) = 1.5*xp(27:34);
@@ -124,6 +124,9 @@ r_F1F2_PWID  = x(32);
 r_F2F3_PWID  = x(33);
 r_F3F4_PWID = x(34);
 
+nsp_coverage = nsp0(1,2);
+ost_coverage = ost0(1,2);
+
 [TT, y] = DE_track_age(Tin, y0, 0, treat);
 
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y)
@@ -142,6 +145,8 @@ r_F3F4_PWID = x(34);
          
         data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0, diagnoses0}; % prevalence, cascade to calibrate to
         
+        nsp_coverage = nsp0(1,2);
+        ost_coverage = ost0(1,2);
         
         for k = 6:13
             if xp(k) < 0.9*xp(k-4)
@@ -194,7 +199,7 @@ r_F3F4_PWID = x(34);
 
         sigma_prev = 0.001*data{1}(:,2:end); %standard deviations for prevalence by year
         sigma_cascade = 0.1*data{2}(:,2:end); %standard deviations for cascade by year
-        sigma_cascade_PWID = 0.01*data{3}(:,2:end); %standard deviations for cascade by year
+        sigma_cascade_PWID = 0.1*data{3}(:,2:end); %standard deviations for cascade by year
         sigma_disease = 0.5*data{4}(:,2:end); %standard deviations for disease by year
         sigma_cases = 0.001*data{5}(:,2:end); %standard deviations for cases by year
         sigma_ost = 0.1*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year
