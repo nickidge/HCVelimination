@@ -9,7 +9,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
     cascade0 cascade0_PWID cascade0_MSM disease0 disease0_HIV cases0 ost0 nsp0 HCC0 diagnoses0 dem infect_factor infect_base progression_base imported... % data and calibration
     ost_duration  nsp_duration treat_projected target_inc target_death cascade_scale_time care RNAtesting... %intervention
     infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment... % calibtation parameters
-    harm_reduction_coverage nsp_coverage ost_coverage
+    harm_reduction_coverage nsp_coverage ost_coverage prop_test
 
 %Define the output file using variables based on the current
 %working directory or relative paths so that this can work on
@@ -18,7 +18,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 %filename = 'C:\Users\Nick\Desktop\Matlab Sims\Testing\foo';
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo3");
+filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo5");
 %relative path method is commented out below because it's less general than
 %the above method.
 %filename='../../../Desktop/Matlab Sims/Testing/foo';
@@ -48,9 +48,9 @@ for s=1:sens
     
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(10, 20);
-    save('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration4')
-    %load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration2')
+        calibrate_optim_par(250, 30);
+    %save('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration5')
+    load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration_good20180107')
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo");
@@ -87,11 +87,11 @@ for s=1:sens
         ost_coverage = harm_reduction_range(h);
         [TT2_treat,y2_treat]=DE_track_age(Run,y1_end,TT1,treat);
         [ycomb2_noage, summary(2,:,s), tr2, tr2_] = gather_outputs(y1,y2_treat,TT2_treat);
-%         for i = Tin-10:Tin
-%             prev_HR(i,h) = 100*sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,[6,12:20])))))))./...
-%                 sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,1:20)))))));
-%             inc_HR(i,h) = sum(sum(sum(sum(sum(sum(sum(y1(find(TT1>=i-1,1):find(TT1>=i,1)-1,:,:,:,:,:,:,27))))))));
-%         end
+        %         for i = Tin-10:Tin
+        %             prev_HR(i,h) = 100*sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,[6,12:20])))))))./...
+        %                 sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,1:20)))))));
+        %             inc_HR(i,h) = sum(sum(sum(sum(sum(sum(sum(y1(find(TT1>=i-1,1):find(TT1>=i,1)-1,:,:,:,:,:,:,27))))))));
+        %         end
         for i = (Tin-10):(Tin+Run)
             inc_HR(i-Tin+11,h) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1)-1,:,:,27)))));
             prev_HR(i-Tin+11,h) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,[6,12:20])))./...
@@ -99,106 +99,143 @@ for s=1:sens
         end
         summary_HR(h,:,s) = summary(2,:,s);
     end
-
-    %%  Scenario 2: Calculate required treatments for incidence target
-    scenario = 'current'
+    
+    %%  Scenario 2: Ab + RNA (standard testing) to reach 90% diagnosed
+    scenario = 'current'; dt = 1/4;
     target_late=0; % Target PWID
     alpha = alpha_DAA;
-    %apply_cascade_rates(scenario, 0);
-    for i =1:num_pops
-        for j =1:6
-            for k =2:num_engagement
-                progression(i,j,k,1) = 50;
-            end
-        end
-    end
-
-    elim_years = [80];
-    if strcmp(scenario,'current') == 1
-        for j = 1:length(elim_years)
-            treat_range = 2000:10000:55000; % Estimate treatments required
-            for i = 1:length(treat_range)
-                i
-                treat(1) = treat_range(i); treat(2) = 0;
-                [TT2_treat5,y2_treat5]=DE_track_age(Run,y1_end,TT1,treat);
-                [ycomb5_noage, summary(5,:,s), tr5, tr5_] = gather_outputs(y1,y2_treat5,TT2_treat5);
-                
-                incred(i,j) = (inc2017 - sum(sum(sum(ycomb5_noage(find(TT2_treat5>=elim_years(j),1):find(TT2_treat5>=elim_years(j)+1,1)-1,:,:,27)))))/ inc2017 ;%...
-                    %(TT2_treat5(find(TT2_treat5>=elim_years(j)+1,1)-1)-TT2_treat5(find(TT2_treat5>=elim_years(j),1)))) / inc2015;
-                if incred(i,j) > target_inc && i > 1
-                    break;
-                end
-            end
-            if incred(i,j) < target_inc
-                treat_scaleup(j,s) = -1;
-            else
-                treat_scaleup(j,s) = interp1(incred(1:i,j), treat_range(1:i), target_inc);
-                treat(1) = treat_scaleup(j,s);
-            end
-        end
-    end
-    treat(1) = treat_scaleup(1,s); treat(2) = 0;
-    [TT2_treat5,y2_treat5]=DE_track_age(Run,y1_end,TT1,treat);
-    [ycomb5_noage, summary(5,:,s), tr5, tr5_] = gather_outputs(y1,y2_treat5,TT2_treat5);
-    
-    
-    %%  Scenario 3:  Eliminate by 2020
-    scenario = 'current'
-    target_late=0; % Target PWID
-    alpha = alpha_DAA;
-    for i =1:num_pops
-        for j =1:6
-            for k =1:num_engagement
-                progression(i,j,k,1) = 50;
-            end
-        end
-    end
-
-    %treat(1) = treat_scaleup(2,s); treat(2) = 0;
-    
-    [TT2_treat6,y2_treat6]=DE_track_age(Run,y1_end,TT1,treat);
-    [ycomb6_noage, summary(6,:,s), tr6, tr6_] = gather_outputs(y1,y2_treat6,TT2_treat6);
-    
-    
-    %%  Scenario 4: antibody testing rates
-    scenario = 'current';
-    progression = progression_base;
-    progression(1,5,2,1) = 1/(30/365); progression(2,5,2,1) = 1/(30/365); progression(3,5,2,1) = 1/(30/365);
-    progression(1,6,2,1) = 1/(30/365); progression(2,6,2,1) = 1/(30/365); progression(3,6,2,1) = 1/(30/365);
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
-    target_late = -0.5;
-    range_test = [-1, 1/2, 2, 1];
-    range_followup = [-1,0:0.2:1];
-    treat = treat_projected; 
+    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_followup = [0.74];
+    prop_test_range = [0.6,0.8,1];
     for i = 1:length(range_test)
         for j = 1:length(range_followup)
-            if range_test(i) > 0
-                temp_rate = (progression_base(1,1,2,1));% - 0.9*0.5) / (0.1);
-                progression(1,1,2,1) = range_test(i);% + 0.1*temp_rate;
-                progression(2,1,2,1) = range_test(i);% + 0.1*temp_rate;
-                %progression(3,1,2,1) = 0.9*range_test(i) + 0.1*temp_rate;
+            for k =1:length(prop_test_range)
+                prop_test = prop_test_range(k);
+                if range_test(i) > 0
+                    progression(1,1,2,1) = range_test(i);
+                    progression(2,1,2,1) = range_test(i);
+                    progression(3,1,2,1) = range_test(i);
+                else
+                    progression(1,1,2,1) = progression_base(1,1,2,1);
+                    progression(2,1,2,1) = progression_base(2,1,2,1);
+                    progression(3,1,2,1) = progression_base(3,1,2,1);
+                    followup = 1;
+                end
+                if range_followup(j) > 0
+                    followup = range_followup(j);%/0.46;
+                    progression(2,2,2,1) = 1/0.25; progression(1,2,2,1) = 1 / 0.25; progression(3,2,2,1) = 1 / 0.25;
+                else
+                    progression(1,2,2,1) = progression_base(1,2,2,1);
+                    progression(2,2,2,1) = progression_base(2,2,2,1);
+                    progression(3,2,2,1) = progression_base(3,2,2,1);
+                    followup = 1;
+                end
+                y1_end_sim = y1_end;
+                y1_end_sim(:,:,:,:,1,:,:) = (1-prop_test)* y1_end(:,:,:,:,2,:,:);
+                y1_end_sim(:,:,:,:,2,:,:) = prop_test * y1_end(:,:,:,:,2,:,:);
+                y1_end_sim(:,1,:,:,1,:,1:20) = y1_end_sim(:,1,:,:,1,:,1:20) + sum(y1_end_sim(:,2:end,:,:,1,:,1:20),2);
+                y1_end_sim(:,2:end,:,:,1,:,1:20) = 0;
+                [TT2_treat5,y2_treat5]=DE_track_age(Run,y1_end_sim,TT1,treat);
+                [ycomb5_noage, summary(5,:,s), tr5, tr5_] = gather_outputs(y1,y2_treat5,TT2_treat5);
+                
+                for t = (Tin-10):(Tin+Run)
+                    inc_test(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t-1,1):find(TT2_treat5>=t,1)-1,:,:,27)))));
+                    prev_test(t-Tin+11,i,j,k) = 100*sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),1,:,[6,12:20])))./...
+                        sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),1,:,1:20)));
+                    diag_test(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,3:end,[6,12:20]))))./...
+                        sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,:,[6,12:20]))));
+                end
+                summary_test(i,j,k,:,s) = summary(5,:,s);
             end
-            if range_followup(j) > 0
-                temp_rate1 = progression_base(1,2,2,1);
-                temp_rate2 = progression_base(2,2,2,1);
-                progression(1,2,2,1) = range_followup(j)*(1/0.25) + (1-range_followup(j))*temp_rate1;
-                progression(2,2,2,1) = range_followup(j)*(1/0.25) + (1-range_followup(j))*temp_rate2;
-            else
-                progression(1,2,2,1) = progression_base(1,2,2,1);
-                progression(2,2,2,1) = progression_base(2,2,2,1);
+        end
+    end
+    
+    %%  Scenario 3:  Serum-based HCVcAg testing
+    scenario = 'DBS_HCVcAg';
+    target_late=0; % Target PWID
+    alpha = alpha_DAA;
+    progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
+    progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
+    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_followup = [0.76]; % 76% sensitivity
+    prop_test_range = [0.6,0.8,1];
+    for i = 1:length(range_test)
+        for j = 1:length(range_followup)
+            for k =1:length(prop_test_range)
+                prop_test = prop_test_range(k);
+                followup = range_followup(j);
+                if range_test(i) > 0
+                    progression(1,1,2,1) = range_test(i);
+                    progression(2,1,2,1) = range_test(i);
+                    progression(3,1,2,1) = range_test(i);
+                else
+                    progression(1,1,2,1) = progression_base(1,1,2,1);
+                    progression(2,1,2,1) = progression_base(2,1,2,1);
+                    progression(3,1,2,1) = progression_base(3,1,2,1);
+                    followup = 1;
+                end
+                y1_end_sim = y1_end;
+                y1_end_sim(:,:,:,:,1,:,:) = (1-prop_test)* y1_end(:,:,:,:,2,:,:);
+                y1_end_sim(:,:,:,:,2,:,:) = prop_test * y1_end(:,:,:,:,2,:,:);
+                y1_end_sim(:,1,:,:,1,:,1:20) = y1_end_sim(:,1,:,:,1,:,1:20) + sum(y1_end_sim(:,2:end,:,:,1,:,1:20),2);
+                y1_end_sim(:,2:end,:,:,1,:,1:20) = 0;
+                [TT2_treat3,y2_treat3]=DE_track_age(Run,y1_end_sim,TT1,treat);
+                [ycomb3_noage, summary(3,:,s), tr3, tr3_] = gather_outputs(y1,y2_treat3,TT2_treat3);
+                
+                for t = (Tin-10):(Tin+Run)
+                    inc_DBS(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t-1,1):find(TT2_treat3>=t,1)-1,:,:,27)))));
+                    prev_DBS(t-Tin+11,i,j,k) = 100*sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),1,:,[6,12:20])))./...
+                        sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),1,:,1:20)));
+                    diag_DBS(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,2:end,[6,12:20]))))./...
+                        sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,:,[6,12:20]))));
+                end
+                summary_DBS(i,j,k,:,s) = summary(3,:,s);
             end
-            
-            [TT2_treat3,y2_treat3]=DE_track_age(Run,y1_end,TT1,treat);
-            [ycomb3_noage, summary(3,:,s), tr3, tr3_] = gather_outputs(y1,y2_treat3,TT2_treat3);
-            
-            for year_elim = 1:Run-2
-                incred_test(i,year_elim) = (inc2017 - sum(sum(sum(ycomb3_noage(find(TT2_treat3>=Tin+year_elim,1):find(TT2_treat3>=Tin+year_elim+1,1)-1,:,:,27)))))/...
-                    (TT2_treat3(find(TT2_treat3>=Tin+year_elim+1,1)-1)-TT2_treat3(find(TT2_treat3>=Tin+year_elim,1))) / inc2017;
-            end
-            if incred_test(i,end) >= 0.8
-                year_elim_test(i,j) = 1950+Tin+find(incred_test(i,:)>=0.8,1);
-            else
-                year_elim_test(i,j) = -1;
+        end
+    end
+
+    
+    %%  Scenario 4: DBS HCVcAg testing
+    scenario = 'serum_HCVcAg';
+    target_late=0; % Target PWID
+    alpha = alpha_DAA;
+    progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
+    progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
+    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_followup = [1]; % 100% sensitivity
+    prop_test_range = [0.6,0.8,1];
+    for i = 1:length(range_test)
+        for j = 1:length(range_followup)
+            for k =1:length(prop_test_range)
+                prop_test = prop_test_range(k);
+                followup = range_followup(j);
+                if range_test(i) > 0
+                    progression(1,1,2,1) = range_test(i);
+                    progression(2,1,2,1) = range_test(i);
+                    progression(3,1,2,1) = range_test(i);
+                else
+                    progression(1,1,2,1) = progression_base(1,1,2,1);
+                    progression(2,1,2,1) = progression_base(2,1,2,1);
+                    progression(3,1,2,1) = progression_base(3,1,2,1);
+                    followup = 1;
+                end
+                y1_end_sim = y1_end;
+                y1_end_sim(:,:,:,:,1,:,:) = (1-prop_test)* y1_end(:,:,:,:,2,:,:);
+                y1_end_sim(:,:,:,:,2,:,:) = prop_test * y1_end(:,:,:,:,2,:,:);
+                y1_end_sim(:,1,:,:,1,:,1:20) = y1_end_sim(:,1,:,:,1,:,1:20) + sum(y1_end_sim(:,2:end,:,:,1,:,1:20),2);
+                y1_end_sim(:,2:end,:,:,1,:,1:20) = 0;
+                [TT2_treat6,y2_treat6]=DE_track_age(Run,y1_end_sim,TT1,treat);
+                [ycomb6_noage, summary(6,:,s), tr6, tr6_] = gather_outputs(y1,y2_treat6,TT2_treat6);
+                
+                for t = (Tin-10):(Tin+Run)
+                    inc_serum(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t-1,1):find(TT2_treat6>=t,1)-1,:,:,27)))));
+                    prev_serum(t-Tin+11,i,j,k) = 100*sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),1,:,[6,12:20])))./...
+                        sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),1,:,1:20)));
+                    diag_serum(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),:,2:end,[6,12:20]))))./...
+                        sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),:,:,[6,12:20]))));
+                end
+                summary_serum(i,j,k,:,s) = summary(6,:,s);
             end
         end
     end
@@ -377,6 +414,38 @@ Charts
 % treat_scaleup_point = struct2array(treat_scaleup_point);
 % total_treat_2030_summary_point = struct2array(total_treat_2030_summary_point);
 % inc_year = struct2array(inc_year); R0_summary_point = struct2array(R0_summary_point);
+
+
+paper = [round(summary_HR(:,1)/10^6,1),...
+    round(summary_HR(:,2)/10^6,1),...
+    round(sum(inc_HR(11:23,:),1)/1000,1)',...
+    round(summary_HR(:,9),0),...
+    round(summary_HR(:,5),0),...
+    round(summary_HR(:,8),0),...
+    round(100*(summary_HR(:,5)-inc_HR(8,:))/inc_HR(8,:),0),...
+    round(100*(summary_HR(:,6)-repmat(death_year_sens(1,6,1),length(summary_HR(:,6)),1))./repmat(death_year_sens(1,6,1),length(summary_HR(:,6)),1),0)];
+    
+    
+paper_text = zeros(length(paper(:,1))+1,1+length(paper(1,:)));
+paper_text = num2cell(paper_text);
+paper_text{1,1} = 'Scenario';
+paper_text{1,2} = 'Total costs 2018-2030 (US$M)';
+paper_text{1,3} = 'Total QALYs 2018-2030 (M)';
+paper_text{1,4} = 'Cumulative incidence 2018-2030 (thousand)';
+paper_text{1,5} = 'Cumulative liver-related deaths 2018-2030';
+paper_text{1,6} = 'Incidence in 2030';
+paper_text{1,7} = 'Prevalence among PWID 2030';
+paper_text{1,8} = 'Incidence reduction relative to 2015';
+paper_text{1,9} = 'Mortality reduction relative to 2015';
+
+
+
+for i = 1:length(paper(:,1))
+    for j = 1:length(paper(1,:))
+        paper_text{i+1,j+1} = [num2str(paper(i,j))];%,' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
+    end
+end
+
 
 paper = round([total_treat_summary([1,2,5,6,4],:,1),...
     total_treat_2030_summary([1,2,5,6,4],4,1),...

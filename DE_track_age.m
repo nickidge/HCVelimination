@@ -275,15 +275,17 @@ y(1,:) = [y0];
                 mult = min(1, 1 - (TT-66) / 4);
                 progress(1,1,2,1) = mult*progression_base(1,1,2,1) + (1-mult)*progression(1,1,2,1);
                 progress(2,1,2,1) = mult*progression_base(2,1,2,1) + (1-mult)*progression(2,1,2,1);
+                progress(3,1,2,1) = mult*progression_base(3,1,2,1) + (1-mult)*progression(3,1,2,1);
                 progress(1,2,2,1) = mult*progression_base(1,2,2,1) + (1-mult)*progression(1,2,2,1);
                 progress(2,2,2,1) = mult*progression_base(2,2,2,1) + (1-mult)*progression(2,2,2,1);
+                progress(3,2,2,1) = mult*progression_base(3,2,2,1) + (1-mult)*progression(3,2,2,1);
             end
             
             %only those in care progress due to zeroes in prog
             prog = permute(reshape(repmat(progress,1,num_age*num_intervention),num_pops,num_cascade,num_age,num_intervention,num_engagement,num_region),[1,2,3,4,5,6]);
             prog = min(1/dt, prog); % need to protect against adding too many people at once if time steps are too large
             
-            prog(1:2,1,:,:,:,:) = (followup) * prog(1:2,1,:,:,:,:);
+            prog(1:3,1,:,:,:,:) = (followup) * prog(1:3,1,:,:,:,:);
             %prog(1,:,:,:,1,:) = 0;
             if strcmp(scenario,'OST_test') == 1
                 prog(1,1,:,1:2,:,:) = 0*prog(1,1,:,1:2,:,:); % In these scenarios don't test people who are not engaged in OST of NSP
@@ -409,10 +411,10 @@ y(1,:) = [y0];
             ydot10(:,:,:,:,1,:,16:20) = -min(12, 1/dt)*Y(:,:,:,:,1,:,16:20); % sick people engaged in care
             ydot10(:,:,:,:,2,:,16:20) = min(12, 1/dt)*Y(:,:,:,:,1,:,16:20);
             
-            ydot10(:,:,:,:,1,:,:) = ydot10(:,:,:,:,1,:,:) - min(1*exit_IDU, 1/dt)*Y(:,:,:,:,1,:,:)...
-                + min(1*exit_IDU, 1/dt)*Y(:,:,:,:,2,:,:); 
-            ydot10(:,:,:,:,2,:,:) = ydot10(:,:,:,:,2,:,:) + min(1*exit_IDU, 1/dt)*Y(:,:,:,:,1,:,:)...
-                - min(1*exit_IDU, 1/dt)*Y(:,:,:,:,2,:,:);
+%             ydot10(:,:,:,:,1,:,:) = ydot10(:,:,:,:,1,:,:) - min(1*exit_IDU, 1/dt)*Y(:,:,:,:,1,:,:)...
+%                 + min(1*exit_IDU, 1/dt)*Y(:,:,:,:,2,:,:); 
+%             ydot10(:,:,:,:,2,:,:) = ydot10(:,:,:,:,2,:,:) + min(1*exit_IDU, 1/dt)*Y(:,:,:,:,1,:,:)...
+%                 - min(1*exit_IDU, 1/dt)*Y(:,:,:,:,2,:,:);
             
 
             %% Changes in intervention coverage

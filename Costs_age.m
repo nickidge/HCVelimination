@@ -1,5 +1,5 @@
 function[c,q,life,tr]=Costs_age(y,TT)
-global Q_sens q_svr q_svr_PWID q_treat sens c_daa discount care cascade_scale_time scenario
+global Q_sens q_svr q_svr_PWID q_treat sens c_daa discount care cascade_scale_time scenario prop_test progression
 
 %% Costs
 [costing0,costing0_label,costing0_raw] = xlsread('Template.xlsx','costs'); 
@@ -135,8 +135,14 @@ if strcmp(scenario,'rapidRNA') == 1 || strcmp(scenario,'WHO') == 1 || strcmp(sce
     c_cascade2 = 163.90; % cost of rapid RNA test
     Cas_cost1=sum(sum(sum(y(:,:,:,28),3),2)*c_cascade_rapidRNA.*exp(-discount.*TT)); % i.e. RNA tests
     Cas_cost2 = 0;
+elseif strcmp(scenario,'serum_HCVcAg') == 1
+    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) * c_cascade2_serum.*exp(-discount.*TT)); % i.e. serum tests only, for all PWID
+    Cas_cost2 = 0;
+elseif strcmp(scenario,'DBS_HCVcAg') == 1
+    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) * c_cascade2_DBS.*exp(-discount.*TT)); % i.e. DBS tests only, for all PWID
+    Cas_cost2 = 0;
 else
-    Cas_cost1=sum(sum(y(:,1,1,1:20),4)*c_cascade1.*exp(-discount.*TT)); % i.e. antibody tests
+    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) * c_cascade1.*exp(-discount.*TT)); % i.e. antibody tests
     Cas_cost2=sum(sum(sum(y(:,:,:,29),3),2)*c_cascade2.*exp(-discount.*TT)); % i.e RNA tests
 end
 Cas_cost3=sum(sum(sum(y(:,:,:,30),3),2)*c_cascade3(2).*exp(-discount.*TT)); % i.e assumes no genotype tests, just other workup
