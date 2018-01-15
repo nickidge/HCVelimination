@@ -110,7 +110,7 @@ for s=1:sens
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
     range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
     range_followup = [0.74];
-    prop_test_range = [0.6,0.8,0.9];
+    prop_test_range = [0.6,0.8,0.];
     for i = 1:length(range_test)
         for j = 1:length(range_followup)
             for k =1:length(prop_test_range)
@@ -207,7 +207,7 @@ for s=1:sens
     progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
     range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
     range_followup = [1]; % 100% sensitivity
-    prop_test_range = [0.6,0.8,0.9];
+    prop_test_range = [0.6,0.8,1];
     for i = 1:length(range_test)
         for j = 1:length(range_followup)
             for k =1:length(prop_test_range)
