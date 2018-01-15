@@ -6,7 +6,7 @@ global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect 
     imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 imported...
     scenario cascade_scale_time age_mix start_year r_inc_up followup ...
     APRI num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor progression progression_base...
-    ost_enrollment ost_duration nsp_enrollment nsp_duration RNAtesting harm_reduction_coverage ost_coverage nsp_coverage
+    ost_enrollment ost_duration nsp_enrollment nsp_duration RNAtesting harm_reduction_coverage ost_coverage nsp_coverage diagnosed_risk_reduction
 
 
 APRI = 1;
@@ -114,7 +114,7 @@ y(1,:) = [y0];
             % reshape to match Y
             lambda2 = permute(reshape(repmat(infect_factor,1,num_age*num_cascade*num_engagement),num_pops,num_intervention, num_region,num_age, num_cascade,num_engagement),[1,5,4,2,6,3]) ...
                 .* permute(reshape(repmat(lambda_age,1,num_cascade*num_engagement*num_intervention),num_pops,num_age,num_region,num_cascade,num_intervention,num_engagement),[1,4,2,5,6,3]);
-            %lambda2 = lambda_age;
+            lambda2(:,3:end,:,:,:,:) = diagnosed_risk_reduction * lambda2(:,3:end,:,:,:,:);
             
             %% Treatment allocation function, f
             
@@ -223,14 +223,14 @@ y(1,:) = [y0];
             ydot6(1,1,1,1,2,1,1)=l_death+mu_arrivals;
             import_infections=0;
             if TT<25 import_infections=imp1;
-            elseif TT>=25 && TT<30 import_infections=imp2;
-            elseif TT>=30 && TT<35 import_infections=imp3;
-            elseif TT>=35 && TT<40 import_infections=imp4;
-            elseif TT>=40 && TT<45 import_infections=imp5;
-            elseif TT>=45 && TT<50 import_infections=imp6;
-            elseif TT>=50 && TT<55 import_infections=imp7;
-            elseif TT>=55 && TT<60 import_infections=imp8;
-            elseif TT>=60 && TT<65 import_infections=imp9;
+            elseif TT>=25 && TT<30 import_infections=imp1*(30-TT)/5 + (TT-25)*imp2/5;
+            elseif TT>=30 && TT<35 import_infections=imp2*(35-TT)/5 + (TT-30)*imp3/5;
+            elseif TT>=35 && TT<40 import_infections=imp3*(40-TT)/5 + (TT-35)*imp4/5;
+            elseif TT>=40 && TT<45 import_infections=imp4*(45-TT)/5 + (TT-40)*imp5/5;
+            elseif TT>=45 && TT<50 import_infections=imp5*(50-TT)/5 + (TT-45)*imp6/5;
+            elseif TT>=50 && TT<55 import_infections=imp6*(55-TT)/5 + (TT-50)*imp7/5;
+            elseif TT>=55 && TT<60 import_infections=imp7*(60-TT)/5 + (TT-55)*imp8/5;
+            elseif TT>=60 && TT<65 import_infections=imp8*(65-TT)/5 + (TT-60)*imp9/5;
             elseif TT>=65 import_infections=imp9; end
             ydot6(2,1,1,1,2,1,12)=0*import_infections;
             ydot6(2,1,1,1,2,1,27)=0*import_infections;

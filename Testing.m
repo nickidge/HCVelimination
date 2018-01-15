@@ -9,7 +9,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
     cascade0 cascade0_PWID cascade0_MSM disease0 disease0_HIV cases0 ost0 nsp0 HCC0 diagnoses0 dem infect_factor infect_base progression_base imported... % data and calibration
     ost_duration  nsp_duration treat_projected target_inc target_death cascade_scale_time care RNAtesting... %intervention
     infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment... % calibtation parameters
-    harm_reduction_coverage nsp_coverage ost_coverage prop_test
+    harm_reduction_coverage nsp_coverage ost_coverage prop_test diagnosed_risk_reduction
 
 %Define the output file using variables based on the current
 %working directory or relative paths so that this can work on
@@ -49,8 +49,8 @@ for s=1:sens
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
         calibrate_optim_par(250, 30);
-    %save('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration5')
-    load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration_good20180107')
+    save('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration6')
+    %load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration_good20180107')
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo");
@@ -73,6 +73,7 @@ for s=1:sens
     %% Baseline: Current standard of care with no scaled up treatment
     scenario = 'base'; %Current level of community care
     alpha = alpha_DAA;
+    prop_test = 1;
      
     [TT2,y2]=DE_track_age(Run,y1_end,TT1,treat);
     [ycomb_noage, summary(1,:,s), tr, tr_] = gather_outputs(y1,y2,TT2);
@@ -241,16 +242,50 @@ for s=1:sens
     end
     
     
-    %%  Scenario 5: RNA testing
-    scenario = 'annualRNA';
-    progression = progression_base;
-    progression(1,5,2,1) = 1/(30/365); progression(2,5,2,1) = 1/(30/365); progression(3,5,2,1) = 1/(30/365);
-    progression(1,6,2,1) = 1/(30/365); progression(2,6,2,1) = 1/(30/365); progression(3,6,2,1) = 1/(30/365);
+    %%  Scenario 5: Diagnosed risk reduction
+    scenario = 'DBC_HCVcAg';
+    target_late=0; % Target PWID
+    alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
-    target_late = -0.5; 
-    treat = treat_projected;
-    [TT2_treat4,y2_treat4]=DE_track_age(Run,y1_end,TT1,treat);
-    [ycomb4_noage, summary(4,:,s), tr4, tr4_] = gather_outputs(y1,y2_treat4,TT2_treat4);
+    progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
+    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_diagnosed_risk_reduction = [0:0.1:0.5]; % risk reduction when diagnosed
+    prop_test_range = [0.6,0.8,1];
+    followup = 0.76; %DBS sensitivity
+    for i = 1:length(range_test)
+        for j = 1:length(range_diagnosed_risk_reduction)
+            for k =1:length(prop_test_range)
+                prop_test = prop_test_range(k);
+                diagnosed_risk_reduction = range_diagnosed_risk_reduction(j);
+                if range_test(i) > 0
+                    progression(1,1,2,1) = range_test(i);
+                    progression(2,1,2,1) = range_test(i);
+                    progression(3,1,2,1) = range_test(i);
+                else
+                    progression(1,1,2,1) = progression_base(1,1,2,1);
+                    progression(2,1,2,1) = progression_base(2,1,2,1);
+                    progression(3,1,2,1) = progression_base(3,1,2,1);
+                    followup = 1;
+                end
+                y1_end_sim = y1_end;
+                y1_end_sim(:,:,:,:,1,:,:) = (1-prop_test)* y1_end(:,:,:,:,2,:,:);
+                y1_end_sim(:,:,:,:,2,:,:) = prop_test * y1_end(:,:,:,:,2,:,:);
+                y1_end_sim(:,1,:,:,1,:,1:20) = y1_end_sim(:,1,:,:,1,:,1:20) + sum(y1_end_sim(:,2:end,:,:,1,:,1:20),2);
+                y1_end_sim(:,2:end,:,:,1,:,1:20) = 0;
+                [TT2_treat4,y2_treat4]=DE_track_age(Run,y1_end_sim,TT1,treat);
+                [ycomb4_noage, summary(4,:,s), tr4, tr4_] = gather_outputs(y1,y2_treat4,TT2_treat4);
+                
+                for t = (Tin-10):(Tin+Run)
+                    inc_DBS_rr(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb4_noage(find(TT2_treat4>=t-1,1):find(TT2_treat4>=t,1)-1,:,:,27)))));
+                    prev_DBS_rr(t-Tin+11,i,j,k) = 100*sum(sum(ycomb4_noage(find(TT2_treat4>=t,1),1,:,[6,12:20])))./...
+                        sum(sum(ycomb4_noage(find(TT2_treat4>=t,1),1,:,1:20)));
+                    diag_DBS_rr(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb4_noage(find(TT2_treat3>=t,1),:,2:end,[6,12:20]))))./...
+                        sum(sum(sum(ycomb4_noage(find(TT2_treat4>=t,1),:,:,[6,12:20]))));
+                end
+                summary_DBS_rr(i,j,k,:,s) = summary(4,:,s);
+            end
+        end
+    end
 
     
    

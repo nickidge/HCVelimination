@@ -2,7 +2,7 @@ function [output_prev, output_cascade, output_cascade_PWID, output_disease, outp
 global infect prev0 progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 cascade0 cascade0_PWID disease0 cases0 ost0 nsp0 diagnoses0...
     data y0_init t0_init y0 t0 treat Tin infect_base progression_base ost_enrollment nsp_enrollment r_inc_up start_year followup...
     num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor treat_projected ...
-    r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID ost_coverage nsp_coverage
+    r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID ost_coverage nsp_coverage 
 
 data = {prev0, cascade0, cascade0_PWID, disease0, cases0, ost0, nsp0, diagnoses0}; % prevalence, cascade to calibrate to
 lag = 1; % iterations between successive samples
@@ -17,7 +17,7 @@ xp = [10*infect,...
 nvars = length(xp);
 
 lb = max(0.1*xp, 0.001*ones(1,length(xp)));
-lb(1) = 0.01; lb(22) = 0; 
+lb(1) = 0.01; lb(14:16) = 1000; lb(22) = 0; 
 lb(23) = 0; lb(24) = 0; 
 lb(25) = 0; lb(26) = 0; % lower bounds for height of rel_incidence function and epidemic start year
 lb(27:34) = 0.5*xp(27:34);
@@ -89,8 +89,10 @@ for k = 6:13
         x(k) = x(k-4);
     end
 end
-if x(14) < 500
-    x(14) = 500;
+for k = 17:22
+    if x(k) > 1.1*x(k-1)
+        x(k) = 1.1*x(k-1);
+    end
 end
 % for k = 15:(length(x)-2)
 %     if x(k)< 0.9*x(k-1)
@@ -153,8 +155,10 @@ ost_coverage = ost0(1,2);
                 xp(k) = xp(k-4);
             end
         end
-        if xp(14) < 500
-            xp(14) = 500;
+        for k = 17:22
+            if xp(k) > 1.1*xp(k-1)
+                xp(k) = 1.1*xp(k-1);
+            end
         end
 %         for k = 15:(length(xp)-2)
 %             if xp(k)< 0.9*xp(k-1)
@@ -179,7 +183,7 @@ ost_coverage = ost0(1,2);
         nsp_enrollment = xp(24);
         r_inc_up = xp(25);
         start_year = xp(26);
-        
+        [imp1, imp2, imp3, imp4, imp5, imp6, imp7, imp8 imp9];
         r_F0F1 = xp(27);
         r_F1F2 = xp(28);
         r_F2F3 = xp(29);
