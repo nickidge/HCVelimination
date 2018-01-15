@@ -52,7 +52,7 @@ set(h(2),'MarkerEdgecolor','b');
 set(gca, 'Ylim',[0,6000],'YTick',0:2000:10000,'YTickLabel',0:2000:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('HCV incidence');
 title({['Impact of harm reduction on projected HCV incidence' 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
-legend([h(1),h(2),h(3:end)],'0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage','location','northwest');
+legend([h(1);h(2);h(3:end)],'0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage','location','northwest');
 hold off;
 
 
