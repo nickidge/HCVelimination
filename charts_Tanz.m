@@ -26,6 +26,37 @@ legend([h(1);h2;h(3:end)],'0% coverage','6% coverage (estimated current)','10% c
 hold off;
 
 
+err_ub = abs((0*[inc_HR(:,:)]))% ...
+    %- inc_HR(:,:)));
+err_lb = abs((-0*[inc_HR(:,:)]))% ...
+    %+ inc_HR(:,:)));
+figure(3)
+% subplot(1,2,1)
+set(gca,'LineStyleOrder',{'o','*','h','^','d','s','p'},'ColorOrder', [0 0 0],'NextPlot','replacechildren','XTick',1:5:100,'XTickLabel',2010:5:2050,'FontSize',12);
+hold on; grid on;
+% for i = 1:length(inc_HR(1,:))
+% if i ~=2 
+%     h(i)=errorbar(1:length(inc_HR(:,1))',inc_HR(:,i)',err_lb(:,i)',err_ub(:,i)', 'MarkerSize',8); 
+% end
+% end
+% h(2)=errorbar(1:length(inc_HR(:,1))',inc_HR(:,2)',err_lb(:,2)',err_ub(:,2)', 'MarkerSize',8); 
+for i = 1:length(inc_HR(1,:))
+if i ~=2 
+    h(i)=plot([-10*inc_HR(1:10,i);inc_HR(11:end,i)], 'Markersize', 8); 
+end
+end
+h(2)=plot(inc_HR(:,2)','Markersize',8); 
+set(h(2),'MarkerEdgecolor','b');
+%h = plot(inc_year_per', 'MarkerSize',8); hold on;
+%h2 = plot(repmat((1-target_inc)*inc_year_per(1,6),length(inc_year_per)),'--k');
+set(gca, 'Ylim',[0,6000],'YTick',0:2000:10000,'YTickLabel',0:2000:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+ylabel('HCV incidence');
+title({['Impact of harm reduction on projected HCV incidence' 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
+legend([h(1),h(2),h(3:end)],'0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage','location','northwest');
+hold off;
+
+
+
 
 %% LIVER DISEASE AND CARE CASCADE PROJECTION AND BURN IN / DISEASE DISTRIBUTION CALIBRATION RESULTS
 scen1=[sum(sum(sum(ycomb_noage(:,:,:,1:5),2),3),4),sum(sum(ycomb_noage(:,:,:,6),2),3),sum(sum(sum(ycomb_noage(:,:,:,7:11),2),3),4),reshape(sum(sum(ycomb_noage(:,:,:,12:18),2),3),length(ycomb_noage(:,1,1,1)),7),sum(sum(sum(ycomb_noage(:,:,:,19:20),2),3),4)];
