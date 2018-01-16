@@ -114,8 +114,9 @@ y(1,:) = [y0];
             % reshape to match Y
             lambda2 = permute(reshape(repmat(infect_factor,1,num_age*num_cascade*num_engagement),num_pops,num_intervention, num_region,num_age, num_cascade,num_engagement),[1,5,4,2,6,3]) ...
                 .* permute(reshape(repmat(lambda_age,1,num_cascade*num_engagement*num_intervention),num_pops,num_age,num_region,num_cascade,num_intervention,num_engagement),[1,4,2,5,6,3]);
-            lambda2(:,3:end,:,:,:,:) = diagnosed_risk_reduction * lambda2(:,3:end,:,:,:,:);
-            
+            frac_diagnosed = sum(sum(sum(sum(sum(sum(sum(Y(:,3:end,:,:,:,:,1:20))))))))/sum(sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,:,1:20))))))));
+            lambda2(:,:,:,:,:,:) = (diagnosed_risk_reduction * frac_diagnosed + (1-frac_diagnosed)) * lambda2(:,:,:,:,:,:);
+
             %% Treatment allocation function, f
             
             f=100*ones(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,20);
@@ -137,7 +138,7 @@ y(1,:) = [y0];
             new2 = (lambda2).*S2;
             new3 = (lambda2).*S3;
             new4 = (lambda2).*S4;
-            
+            sum(sum(sum(sum(sum(sum(sum(sum(new0+new1+new2+new3+new4))))))));
             ydot1 = 0*Y;
             ydot1 = cat(7,delta*r_AF0*A-new0,... %S
                 -new1,... %S1
