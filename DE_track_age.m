@@ -210,9 +210,9 @@ y(1,:) = [y0];
             %% New arrivals
             IDUs=PWID0;
             if TT<50 % TT = 50 is 2000
-                IDUs = (TT-start_year)*(50000-PWID0)/(50-start_year) + PWID0;
+                IDUs = (TT-start_year)*(total_PWID-PWID0)/(50-start_year) + PWID0;
             elseif TT>=50 && TT<55
-                IDUs = 50000 - (TT-50)*(50000 -total_PWID)/5;
+                IDUs = total_PWID - (TT-50)*(total_PWID -total_PWID)/5;
             elseif TT>=55
                 IDUs = total_PWID;
             end

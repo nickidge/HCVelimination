@@ -64,9 +64,9 @@ save(strcat(directory,'double_PLHCV_calibration'));
 %% 70,000 PWID
 loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
-total_PWID = 70,000;
+total_PWID = 70000;
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(250, 30);
 filename=strcat(directory,'70kPWID');
 save(strcat(directory,'70kPWID_calibration'));
 [summary_70kPWID]=sens_func(filename)
@@ -74,9 +74,9 @@ save(strcat(directory,'70kPWID_calibration'));
 %% 30,000 PWID
 loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
-total_PWID = 30,000;
+total_PWID = 30000;
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(250, 30);
 filename=strcat(directory,'30kPWID');
 save(strcat(directory,'30kPWID_calibration'));
 [summary_30kPWID]=sens_func(filename)
