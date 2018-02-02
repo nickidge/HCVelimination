@@ -169,8 +169,8 @@ start_year = x(26);
         [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y);
 
         sigma_prev = 0.01*data{1}(:,2:end); %standard deviations for prevalence by year
-        sigma_cascade = 0.01*data{2}(:,2:end); %standard deviations for cascade by year
-        sigma_cascade_PWID = 0.01*data{3}(:,2:end); %standard deviations for cascade by year
+        sigma_cascade = 0.1*data{2}(:,2:end); %standard deviations for cascade by year
+        sigma_cascade_PWID = 0.1*data{3}(:,2:end); %standard deviations for cascade by year
         sigma_disease = 0.5*data{4}(:,2:end); %standard deviations for disease by year
         sigma_cases = 0.01*data{5}(:,2:end); %standard deviations for cases by year
         sigma_ost = 0.001*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year

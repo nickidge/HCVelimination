@@ -7,7 +7,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
     incarceration_rate prison_length ... %Prison parameters
     cascade0 cascade0_PWID disease0 cases0 ost0 nsp0 HCC0 diagnoses0 infect_factor infect_base progression_base imported... % data and calibration
     ost_duration  nsp_duration treat_projected target_inc target_death cascade_scale_time care RNAtesting... %intervention
-    infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment import_age % calibtation parameters
+    infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment % calibtation parameters
 
 
 %load('C:\Users\Nick\Desktop\Matlab Sims\Testing\cal_vary_rel_start')
@@ -308,7 +308,7 @@ alpha=alpha_old; % calibrate in pre-DAA era
 target_late=1; % target treatments to people with late-liver disease
 infect_base=infect;
 progression_base = progression;
-[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(300, 20);
+[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(50, 20);
 save('C:\Users\Nick\Desktop\Matlab Sims\Testing\half_career')
 exit_IDU = exit_IDU0;
 
@@ -324,7 +324,7 @@ alpha=alpha_old; % calibrate in pre-DAA era
 target_late=1; % target treatments to people with late-liver disease
 infect_base=infect;
 progression_base = progression;
-[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(300, 20);
+[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(20, 20);
 save('C:\Users\Nick\Desktop\Matlab Sims\Testing\0relapse')
 r_relapse = r_relapse0;
 
@@ -340,55 +340,25 @@ alpha=alpha_old; % calibrate in pre-DAA era
 target_late=1; % target treatments to people with late-liver disease
 infect_base=infect;
 progression_base = progression;
-[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(300, 20);
+[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(50, 20);
 save('C:\Users\Nick\Desktop\Matlab Sims\Testing\2relapse')
 r_relapse = r_relapse0;
 
-%% Proportionate mixing
+%% Double relapse
 scenario = 'empty';
 s=1;
 followup = 1;
 loaddata
 dt = 1/4;
 age_mix0 = age_mix;
-age_mix = 1/9;
+age_mix = 0.05;
 alpha=alpha_old; % calibrate in pre-DAA era
 target_late=1; % target treatments to people with late-liver disease
 infect_base=infect;
 progression_base = progression;
-[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(300, 20);
-save('C:\Users\Nick\Desktop\Matlab Sims\Testing\agemix0')
+[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(50, 20);
+save('C:\Users\Nick\Desktop\Matlab Sims\Testing\2relapse')
 age_mix = age_mix0;
 
-%% Assortative mixing
-scenario = 'empty';
-s=1;
-followup = 1;
-loaddata
-dt = 1/4;
-age_mix0 = age_mix;
-age_mix = 1;
-alpha=alpha_old; % calibrate in pre-DAA era
-target_late=1; % target treatments to people with late-liver disease
-infect_base=infect;
-progression_base = progression;
-[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(300, 20);
-save('C:\Users\Nick\Desktop\Matlab Sims\Testing\agemix1')
-age_mix = age_mix0;
 
-%% 30 year old import age
-scenario = 'empty';
-s=1;
-followup = 1;
-loaddata
-dt = 1/4;
-import_age0 = import_age;
-import_age = 3;
-alpha=alpha_old; % calibrate in pre-DAA era
-target_late=1; % target treatments to people with late-liver disease
-infect_base=infect;
-progression_base = progression;
-[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = calibrate_optim_par(300, 20);
-save('C:\Users\Nick\Desktop\Matlab Sims\Testing\oldimport')
-import_age = import_age0;
 
