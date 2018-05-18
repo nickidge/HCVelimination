@@ -6,8 +6,8 @@ for i = 1:length(prev_HR(1,:))
     h(i) = plot(prev_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
 end
 h2 = plot(prev_HR(:,2)', 'color', 'b', 'linewidth',2);
-d1 = scatter([5,8],[42,40],100,'filled','d','k');
-set(gca, 'Ylim',[0,90],'YTick',0:10:90,'YTickLabel',0:10:90, 'Xlim',[0,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+d1 = scatter(8,22,100,'filled','d','k');
+set(gca, 'Ylim',[0,90],'YTick',0:10:90,'YTickLabel',0:10:90, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('HCV prevalence among PWID (%)');
 title({['Impact of harm reduction on projected HCV prevalence among PWID' 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
 legend([d1;h(1);h2;h(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage');
@@ -85,7 +85,7 @@ a5_=area(TT2_treat,sum(scen1(:,8:11),2),'Facecolor',CM(4,:));
 a6_=area(TT2_treat,sum(scen1(:,9:11),2),'Facecolor',CM(3,:));
 a7_=area(TT2_treat,sum(scen1(:,10:11),2),'Facecolor',CM(2,:));
 a8_=area(TT2_treat,sum(scen1(:,11:11),2),'Facecolor',CM(1,:));
-d1 = scatter(65,130000,100,'filled','d','k');
+d1 = scatter(65,60000,100,'filled','d','k');
 xlabel('\fontsize{14}Year'); ylabel({'\fontsize{14} Chronic HCV infections (thousand)'},'Color','k'); 
 %[extra,a9__,a9_]=plotyy(TT2_treat,prev_PWID_scen1,TT2_treat,prev_PWID_scen1); 
 %set(a9_,'Color','k','LineStyle','--','Linewidth',2); set(a9__,'visible','off');

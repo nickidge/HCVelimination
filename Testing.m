@@ -48,9 +48,9 @@ for s=1:sens
     
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(250, 30);
-    save('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration6')
-    %load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration_good20180107')
+        calibrate_optim_par(200, 30);
+    save('calibration_test')
+    %load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration_draftv1')
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo");
