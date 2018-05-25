@@ -18,7 +18,7 @@ hold on; grid on;
 for i = 1:length(inc_HR(1,:))
     h(i) = plot(inc_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
 end
-h2 = plot(inc_HR(:,2)', 'color', 'b', 'linewidth',2);
+h2 = plot(inc_HR(:,2), 'color', 'b', 'linewidth',2);
 set(gca, 'Ylim',[0,10000],'YTick',0:2500:10000,'YTickLabel',0:2500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('HCV incidence');
 title({['Impact of harm reduction on projected HCV incidence' 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
@@ -26,10 +26,31 @@ legend([h(1);h2;h(3:end)],'0% coverage','6% coverage (estimated current)','10% c
 hold off;
 
 
-err_ub = abs((0*[inc_HR(:,:)]));% ...
-    %- inc_HR(:,:)));
-err_lb = abs((-0*[inc_HR(:,:)]));% ...
-    %+ inc_HR(:,:)));
+% err_ub = abs((0*[inc_HR(:,:)]));% ...
+%     %- inc_HR(:,:)));
+% err_lb = abs((-0*[inc_HR(:,:)]));% ...
+%     %+ inc_HR(:,:)));
+%     
+% err_ub = abs(prctile(inc_HR,95,3)...
+%     - prctile(inc_HR,50,3));
+% err_lb = abs(-prctile(inc_HR,5,3)...
+%     + prctile(inc_HR,50,3));
+% figure(4)
+% set(gca,'LineStyleOrder',{'o','*','h','^','d','s','p'},'ColorOrder', [0 0 0],'NextPlot','replacechildren','XTick',1:5:100,'XTickLabel',2010:5:2050,'FontSize',12);
+% h=errorbar(repmat(1:26,7,1)',prctile(inc_HR,50,3),err_lb,err_ub, 'MarkerSize',8); hold on;
+% %h = plot(inc_year_per', 'MarkerSize',8); hold on;
+% h2 = plot(repmat((1-target_inc)*inc_year_per(1,6),length(inc_year_per)),'--k');
+% l = legend([h],'0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage','location','northwest');
+% % l = legend([h(1);h(3);h(2);h(4);h2(1)],{['Scenario 1: DAAs,' 10 'no scale-up'],...
+% %     ['Scenario 2: projected' 10 'uptake'],...
+% %     ['Scenario 3: min. PWID' 10 'treatment requirements'],...    
+% %     ['Scenario 4: projected' 10 'uptake + annual testing'],...
+% %     ['WHO target']});%,...
+% set(l,'fontsize',10);
+% title({['Projected annual HCV incidence in Iceland' 10 '\fontsize{10}For various treatment scenarios']})
+% ylabel('Relative incidence compared to 2015 (%)'); xlabel('Year');
+% xlim([1,21]);grid on;
+
 figure(3)
 % subplot(1,2,1)
 set(gca,'LineStyleOrder',{'o','*','h','^','d','s','p'},'ColorOrder', [0 0 0],'NextPlot','replacechildren','XTick',1:5:100,'XTickLabel',2010:5:2050,'FontSize',12);

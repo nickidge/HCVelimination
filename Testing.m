@@ -24,9 +24,11 @@ filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo5");
 %filename='../../../Desktop/Matlab Sims/Testing/foo';
 
 loaddata
+%load('calibration_test2')
 dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
 sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
+%summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
 followup = 1;
     
 
@@ -34,10 +36,7 @@ followup = 1;
 for s=1:sens
     s
     scenario = 'empty';
-    if sens > 1
-        perturb_parameters
-    end
-    
+
     alpha=alpha_old; % calibrate in pre-DAA era
     target_late=1; % target treatments to people with late-liver disease
 
@@ -49,8 +48,8 @@ for s=1:sens
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
         calibrate_optim_par(200, 30);
-    save('calibration_test')
-    %load('C:\Users\Nick\Desktop\Matlab Sims\Tanzania\calibration_draftv1')
+    save('calibration_test2')
+    %load('calibration_test')
     %filename is stored in calibration_data so have to add here so that we
     %can have multiple users using these files
     %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo");
@@ -70,6 +69,9 @@ for s=1:sens
     
     sum(sum(sum(sum(sum(y1(find(TT1>=Tin-(2016-prev0(1,1)),1),1,:,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y1(find(TT1>=Tin-(2016-prev0(1,1)),1),1,:,:,:,:,1,1:20))))))
     
+    if sens > 1
+        perturb_parameters
+    end
     %% Baseline: Current standard of care with no scaled up treatment
     scenario = 'base'; %Current level of community care
     alpha = alpha_DAA;
@@ -82,7 +84,7 @@ for s=1:sens
     %%  Scenario 1: Scaled harm reduction
     scenario = 'current'
     harm_reduction_range = [0,0.06,0.1:0.1:0.5];
-    summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
+    
     for h = 1:length(harm_reduction_range)
         nsp_coverage = harm_reduction_range(h);
         ost_coverage = harm_reduction_range(h);
@@ -94,8 +96,8 @@ for s=1:sens
         %             inc_HR(i,h) = sum(sum(sum(sum(sum(sum(sum(y1(find(TT1>=i-1,1):find(TT1>=i,1)-1,:,:,:,:,:,:,27))))))));
         %         end
         for i = (Tin-10):(Tin+Run)
-            inc_HR(i-Tin+11,h) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1)-1,:,:,27)))));
-            prev_HR(i-Tin+11,h) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,[6,12:20])))./...
+            inc_HR(i-Tin+11,h,s) = (sum(sum(sum(ycomb2_noage(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1)-1,:,:,27)))));
+            prev_HR(i-Tin+11,h,s) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,[6,12:20])))./...
                 sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,1:20)));
         end
         summary_HR(h,:,s) = summary(2,:,s);
@@ -361,11 +363,11 @@ for s=1:sens
 end
 
 
-inc_year=mean(inc_year_sens(:,:,:)./repmat(inc_year_sens(1,1,:),6,length(years)-1),3);
+inc_year=mean(inc_year_sens(:,:,:),3);%./repmat(inc_year_sens(1,1,:),6,length(years)-1),3);
 %inc_year(5,:)=mean(inc_year_sens(5,:,treat_scaleup(1,:)>=0)./repmat(inc_year_sens(1,1,treat_scaleup(1,:)>=0),1,length(years)-1),3);
 
 %inc_year = mean(inc_year_sens(:,:,:),3);
-inc_year_std=prctile((inc_year_sens(:,:,:)./repmat(inc_year_sens(1,1,:),6,length(years)-1)),[5,95],3);
+inc_year_std=prctile(inc_year_sens(:,:,:),[5,95],3);%./repmat(inc_year_sens(1,1,:),6,length(years)-1)),[5,95],3);
 %inc_year_std(5,:,:)=prctile((inc_year_sens(5,:,treat_scaleup(1,:)>=0)./repmat(inc_year_sens(1,1,treat_scaleup(1,:)>=0),1,length(years)-1)),[5,95],3);
 deaths15_30=mean(sum(death_year_sens(:,[1:15],:),2),3);
 deaths15_30_std=prctile(sum(death_year_sens(:,[1:15],:),2),[5,95],3);
@@ -452,17 +454,49 @@ Charts
 % total_treat_2030_summary_point = struct2array(total_treat_2030_summary_point);
 % inc_year = struct2array(inc_year); R0_summary_point = struct2array(R0_summary_point);
 
+summary_HR_point = struct2array(load('point_estimate','summary_HR'));
+inc_HR_point = struct2array(load('point_estimate','inc_HR'));
+death_year_sens_point = struct2array(load('point_estimate','death_year_sens'));
+paper = [round(summary_HR_point(:,1)/10^6,2),...
+    round(summary_HR_point(:,2)/10^6,1),...
+    round(sum(inc_HR_point(11:23,:),1)/1000,1)',...
+    round(summary_HR_point(:,9),0),...
+    round(summary_HR_point(:,5),0),...
+    round(summary_HR_point(:,8),0),...
+    round(100*(summary_HR_point(:,5)-inc_HR_point(8,:))/inc_HR_point(8,:),0),...
+    round(100*(summary_HR_point(:,6)-repmat(death_year_sens_point(1,6,1),length(summary_HR_point(:,6)),1))./repmat(death_year_sens_point(1,6,1),length(summary_HR_point(:,6)),1),0)];
+    
+% paper = [round(prctile(summary_HR(:,1,:),50,3)/10^6,2),...
+%     round(prctile(summary_HR(:,2,:),50,3)/10^6,1),...
+%     round(prctile(sum(inc_HR(11:23,:,:),1),50,3)/1000,1)',...
+%     round(prctile(summary_HR(:,9,:),50,3),0),...
+%     round(prctile(summary_HR(:,5,:),50,3),0),...
+%     round(prctile(summary_HR(:,8,:),50,3),0),...
+%     round(100*(prctile(summary_HR(:,5,:),50,3)-prctile(inc_HR(8,:,:),50,3))/prctile(inc_HR(8,:,:),50,3),0),...
+%     round(100*(prctile(summary_HR(:,6,:),50,3)-repmat(prctile(death_year_sens(1,6,:),50,3),length(prctile(summary_HR(:,6,:),50,3)),1))./repmat(prctile(death_year_sens(1,6,:),50,3),length(prctile(summary_HR(:,6,:),50,3)),1),0)];
+% 
 
-paper = [round(summary_HR(:,1)/10^6,2),...
-    round(summary_HR(:,2)/10^6,1),...
-    round(sum(inc_HR(11:23,:),1)/1000,1)',...
-    round(summary_HR(:,9),0),...
-    round(summary_HR(:,5),0),...
-    round(summary_HR(:,8),0),...
-    round(100*(summary_HR(:,5)-inc_HR(8,:))/inc_HR(8,:),0),...
-    round(100*(summary_HR(:,6)-repmat(death_year_sens(1,6,1),length(summary_HR(:,6)),1))./repmat(death_year_sens(1,6,1),length(summary_HR(:,6)),1),0)];
-    
-    
+paper_LB = [round(prctile(summary_HR(:,1,:),5,3)/10^6,2),...
+    round(prctile(summary_HR(:,2,:),5,3)/10^6,1),...
+    round(prctile(sum(inc_HR(11:23,:,:),1),5,3)/1000,1)',...
+    round(prctile(summary_HR(:,9,:),5,3),0),...
+    round(prctile(summary_HR(:,5,:),5,3),0),...
+    round(prctile(summary_HR(:,8,:),5,3),0),...
+    round(100*(prctile(summary_HR(:,5,:),5,3)-prctile(inc_HR(8,:,:),5,3))/prctile(inc_HR(8,:,:),5,3),0),...
+    round(100*(prctile(summary_HR(:,6,:),5,3)-repmat(prctile(death_year_sens(1,6,:),5,3),length(prctile(summary_HR(:,6,:),5,3)),1))./repmat(prctile(death_year_sens(1,6,:),5,3),length(prctile(summary_HR(:,6,:),5,3)),1),0)];
+
+
+paper_UB = [round(prctile(summary_HR(:,1,:),95,3)/10^6,2),...
+    round(prctile(summary_HR(:,2,:),95,3)/10^6,1),...
+    round(prctile(sum(inc_HR(11:23,:,:),1),95,3)/1000,1)',...
+    round(prctile(summary_HR(:,9,:),95,3),0),...
+    round(prctile(summary_HR(:,5,:),95,3),0),...
+    round(prctile(summary_HR(:,8,:),95,3),0),...
+    round(100*(prctile(summary_HR(:,5,:),95,3)-prctile(inc_HR(8,:,:),95,3))/prctile(inc_HR(8,:,:),95,3),0),...
+    round(100*(prctile(summary_HR(:,6,:),95,3)-repmat(prctile(death_year_sens(1,6,:),95,3),length(prctile(summary_HR(:,6,:),95,3)),1))./repmat(prctile(death_year_sens(1,6,:),95,3),length(prctile(summary_HR(:,6,:),95,3)),1),0)];
+
+
+
 paper_text = zeros(length(paper(:,1))+1,1+length(paper(1,:)));
 paper_text = num2cell(paper_text);
 paper_text{1,1} = 'Scenario';
@@ -479,27 +513,27 @@ paper_text{1,9} = 'Mortality reduction relative to 2015';
 
 for i = 1:length(paper(:,1))
     for j = 1:length(paper(1,:))
-        paper_text{i+1,j+1} = [num2str(paper(i,j))];%,' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
+        paper_text{i+1,j+1} = [num2str(paper(i,j)),' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
     end
 end
 
 if isempty(find(diag_test(:,1,1,2)>90,1))==1 aa=0; else aa=find(diag_test(:,1,1,2)>90,1); end
 
-paper2 = [round([diag_test(23,1,1,2); diag_serum(23,1,1,2); diag_DBS(23,1,1,3)],0),...
-    [aa+2007;find(diag_serum(:,1,1,2)>90,1)+2007;find(diag_DBS(:,1,1,3)>90,1)+2007],...
-    round([summary_test(1,1,2,1,1); summary_serum(1,1,2,1,1); summary_DBS(1,1,3,1,1)]/10^6,2)];
-paper2_text = zeros(length(paper2(:,1))+1,1+length(paper2(1,:)));
-paper2_text = num2cell(paper2_text);
-paper2_text{1,1} = 'Scenario';
-paper2_text{1,2} = 'Percentage diagnosed in 2030';
-paper2_text{1,3} = 'Year 80% diagnosis target reached';
-paper2_text{1,4} = 'Total cost';
-
-for i = 1:length(paper2(:,1))
-    for j = 1:length(paper2(1,:))
-        paper2_text{i+1,j+1} = [num2str(paper2(i,j))];%,' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
-    end
-end
+% paper2 = [round([diag_test(23,1,1,2); diag_serum(23,1,1,2); diag_DBS(23,1,1,3)],0),...
+%     [aa+2007;find(diag_serum(:,1,1,2)>90,1)+2007;find(diag_DBS(:,1,1,3)>90,1)+2007],...
+%     round([summary_test(1,1,2,1,1); summary_serum(1,1,2,1,1); summary_DBS(1,1,3,1,1)]/10^6,2)];
+% paper2_text = zeros(length(paper2(:,1))+1,1+length(paper2(1,:)));
+% paper2_text = num2cell(paper2_text);
+% paper2_text{1,1} = 'Scenario';
+% paper2_text{1,2} = 'Percentage diagnosed in 2030';
+% paper2_text{1,3} = 'Year 80% diagnosis target reached';
+% paper2_text{1,4} = 'Total cost';
+% 
+% for i = 1:length(paper2(:,1))
+%     for j = 1:length(paper2(1,:))
+%         paper2_text{i+1,j+1} = [num2str(paper2(i,j))];%,' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
+%     end
+% end
 
 
 paper_sens = [round(summary_DBS_rr(1,:,3,1)'/10^6,2),...
@@ -527,7 +561,7 @@ paper3_text{1,9} = 'Mortality reduction relative to 2015';
 
 for i = 1:length(paper_sens(:,1))
     for j = 1:length(paper_sens(1,:))
-        paper3_text{i+1,j+1} = [num2str(paper_sens(i,j))];%,' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
+        paper3_text{i+1,j+1} = [num2str(paper_sens(i,j)),' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
     end
 end
 
