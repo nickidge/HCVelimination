@@ -47,7 +47,7 @@ for s=1:sens
     
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(250, 30);
+        calibrate_optim_par(100, 30);
     save('calibration_test3')
     %load('calibration_test')
     %filename is stored in calibration_data so have to add here so that we
@@ -91,12 +91,14 @@ for s=1:sens
         [TT2_treat,y2_treat]=DE_track_age(Run,y1_end,TT1,treat);
         [ycomb2_noage, summary(2,:,s), tr2, tr2_] = gather_outputs(y1,y2_treat,TT2_treat);
         
-        TT_ = TT2_treat(TT2_treat-(Tin-10)>0)-(Tin-10);
-        y2comb=[y1(1:end-1,:,:,:,:,:,:,:);y2];
         y2_noage=reshape(sum(sum(sum(sum(y2_treat,4),5),6),7),size(y2,1),num_pops, num_cascade,27+6); %Reshape to sum over age stratification, interventions, engagement and region
-        %y2comb_noage=reshape(sum(sum(sum(sum(y2comb,4),5),6),7),size(y2comb,1),num_pops, num_cascade,27+6); %Reshape to sum over age stratification
+ycomb_noage=reshape(sum(sum(sum(sum(ycomb,4),5),6),7),size(ycomb,1),num_pops, num_cascade,27+6); %Reshape to sum over age stratification
 
-        
+Tint=Tin+[0,3,14]; t_val=zeros(1,length(Tint));
+for l=1:length(Tint) %Find times corresponding to years since intervention
+    t_val(l)=find(TT>=(Tint(l)),1);
+end
+TT_=TT(t_val(1):t_val(2))-Tin;
         %         for i = Tin-10:Tin
         %             prev_HR(i,h) = 100*sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,[6,12:20])))))))./...
         %                 sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,1:20)))))));
@@ -107,10 +109,8 @@ for s=1:sens
             prev_HR(i-Tin+11,h,s) = 100*sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,[6,12:20])))./...
                 sum(sum(ycomb2_noage(find(TT2_treat>=i,1),1,:,1:20)));
             death_HR(i-Tin+11,h,s) = (sum(sum(ycomb2_noage(find(TT2_treat>=i,1)-1,:,:,22))) - sum(sum(ycomb2_noage(find(TT2_treat>=i-1,1),:,:,22))))...
-                ./(TT2_treat(find(TT2_treat>=i,1))-TT2_treat(find(TT2_treat>=i-1,1)));
-            [costs_HR(i-Tin+11,h,s),~,~,~] = Costs_age(...
-                y2comb_noage(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1),:,:,:,:,:,:,:),...
-                TT2_treat(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1))-Tin);
+                ./TT2_treat(find(TT2_treat>=i,1))-TT2_treat(find(TT2_treat>=i-1,1));
+            [costs_HR(-Tin+11,h,s),~,~,~] = Costs_age(y2_noage(1:find(TT2_treat>=i,1),:,:,:,:,:,:,:),TT2_treat(find(TT_treat>=Tin,1):find(TT2_treat>=Tin+i,1)))
         end
         summary_HR(h,:,s) = summary(2,:,s);
     end

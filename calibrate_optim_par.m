@@ -24,7 +24,7 @@ lb(27:34) = 0.5*xp(27:34);
 ub = 10*xp;
 ub(14:19) = 5000; ub(20:22) = 1500; %ub(22) = 0; 
 ub(23) = 0.1; ub(24) = 0.1; % Forcing no NSP or OST
-ub(25) = 5; ub(26) = 30; % upper bounds for height of rel_incidence function and epidemic start year
+ub(25) = 5; ub(26) = 40; % upper bounds for height of rel_incidence function and epidemic start year
 ub(27:34) = 1.5*xp(27:34);
 
 %options.UseVectorized = true;
