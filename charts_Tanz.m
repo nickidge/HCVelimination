@@ -1,43 +1,44 @@
 CM = colormap(copper(length(prev_HR(1,:))+3));
 
 figure(1)
-subplot(2,2,1)
+subplot(1,2,1)
 hold on; grid on;
 for i = 1:length(prev_HR(1,:))
     h(i) = plot(prev_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
 end
 h2 = plot(prev_HR(:,2)', 'color', 'b', 'linewidth',2);
 d1 = scatter([5,8],[42,40],100,'filled','d','k');
-set(gca, 'Ylim',[0,90],'YTick',0:10:90,'YTickLabel',0:10:90, 'Xlim',[0,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+%legend([d1,h(1),h2,h(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage');
+set(gca, 'Ylim',[0,90],'YTick',0:10:90,'YTickLabel',0:10:90, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('HCV prevalence among PWID (%)');
 title({['Projected HCV prevalence among PWID']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
-legend([d1;h(1);h2;h(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage');
-hold off;
-subplot(2,2,2)
+subplot(1,2,2)
 hold on; grid on;
 for i = 1:length(inc_HR(1,:))
-    h(i) = plot(inc_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
+    h_inc(i) = plot(inc_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
 end
-h2 = plot(inc_HR(:,2), 'color', 'b', 'linewidth',2);
+h2_inc = plot(inc_HR(:,2), 'color', 'b', 'linewidth',2);
+legend([d1;h_inc(1);h2_inc;h_inc(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage',...
+    'location','southwest');
 set(gca, 'Ylim',[0,10000],'YTick',0:2500:10000,'YTickLabel',0:2500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
-ylabel('HCV incidence');
+ylabel('New HCV infections per year');
 title({['Projected HCV incidence']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
-%legend([h(1);h2;h(3:end)],'0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage');
-hold off;
-subplot(2,2,3)
-hold on; grid on;
-for i = 1:length(death_HR(1,:))
-    h(i) = plot(death_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
-end
-h2 = plot(death_HR(:,2), 'color', 'b', 'linewidth',2);
-set(gca, 'Ylim',[0,10000],'YTick',0:2500:10000,'YTickLabel',0:2500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
-ylabel('HCV incidence');
-title({['Projected HCV-related deaths']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
-%legend([h(1);h2;h(3:end)],'0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage');
 hold off;
 axes('Position',[0 0 1 1],'Visible','off');
 text(0.5,0.98,{'\fontsize{14}Impact of harm reduction on the HCV epidemic in Dar es Salaam'},'HorizontalAlignment','Center')
 hold off;
+% subplot(2,2,3)
+% hold on; grid on;
+% for i = 1:length(death_HR(1,:))
+%     h(i) = plot(death_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
+% end
+% h2 = plot(death_HR(:,2), 'color', 'b', 'linewidth',2);
+% set(gca, 'Ylim',[0,200],'YTick',0:50:250,'YTickLabel',0:50:250, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+% ylabel('HCV incidence');
+% title({['Projected HCV-related deaths']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
+% %legend([h(1);h2;h(3:end)],'0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage');
+% hold off;
+
 
 % err_ub = abs((0*[inc_HR(:,:)]));% ...
 %     %- inc_HR(:,:)));

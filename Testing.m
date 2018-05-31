@@ -11,20 +11,12 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
     infect progression imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 ost_enrollment nsp_enrollment... % calibtation parameters
     harm_reduction_coverage nsp_coverage ost_coverage prop_test diagnosed_risk_reduction
 
-%Define the output file using variables based on the current
-%working directory or relative paths so that this can work on
-%either Nick or Rachel's computer - this will only work if you are in a
-%subdirectory of ..\Users\User not in the shared drives
-%filename = 'C:\Users\Nick\Desktop\Matlab Sims\Testing\foo';
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
 filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo5");
-%relative path method is commented out below because it's less general than
-%the above method.
-%filename='../../../Desktop/Matlab Sims/Testing/foo';
 
 loaddata
-%load('calibration_test2')
+%load('calibration_test3'); infect_base=infect; progression_base = progression;
 dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
 sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
@@ -36,28 +28,17 @@ followup = 1;
 for s=1:sens
     s
     scenario = 'empty';
-
     alpha=alpha_old; % calibrate in pre-DAA era
     target_late=1; % target treatments to people with late-liver disease
 
-    %moved these up because need to use these for calibration if
-    %calibration is running.
-    infect_base=infect;
-    progression_base = progression;
-    
-    
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
         calibrate_optim_par(250, 30);
-    save('calibration_test3')
-    %load('calibration_test')
-    %filename is stored in calibration_data so have to add here so that we
-    %can have multiple users using these files
-    %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo");
+    save('calibration_test3'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
+    %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
-    infect_base=infect;
-    progression_base = progression;
-    dt = 1/4;
-    %Run model in prior to 2017
+    
+    
+ %% Run model in prior to 2017
     [TT1,y1]=DE_track_age(Tin,y0,t0,treat);
     y1_end=reshape(y1(end,:,:,:,:,:,:,:), num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,33);
     death2017 = (sum(sum(sum(sum(sum(sum(y1(end,:,:,:,:,:,:,22))))))) - sum(sum(sum(sum(sum(sum(y1(find(TT1>=66,1),:,:,:,:,:,:,22)))))))) / ...
@@ -109,7 +90,7 @@ for s=1:sens
             death_HR(i-Tin+11,h,s) = (sum(sum(ycomb2_noage(find(TT2_treat>=i,1)-1,:,:,22))) - sum(sum(ycomb2_noage(find(TT2_treat>=i-1,1),:,:,22))))...
                 ./(TT2_treat(find(TT2_treat>=i,1))-TT2_treat(find(TT2_treat>=i-1,1)));
             [costs_HR(i-Tin+11,h,s),~,~,~] = Costs_age(...
-                y2comb_noage(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1),:,:,:,:,:,:,:),...
+                ycomb2_noage(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1),:,:,:,:,:,:,:),...
                 TT2_treat(find(TT2_treat>=i-1,1):find(TT2_treat>=i,1))-Tin);
         end
         summary_HR(h,:,s) = summary(2,:,s);
@@ -118,7 +99,7 @@ for s=1:sens
     ost_coverage = 0.06;
     
     %%  Scenario 2: Ab + RNA (standard testing) to reach 90% diagnosed
-    scenario = 'current'; dt = 1/4;
+    scenario = 'current';
     target_late=0; % Target PWID
     alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
@@ -453,7 +434,7 @@ for i=1:6
     end
 end
 save(filename)
-Charts
+%charts_Tanz
 % %Table for paper
 % margins_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','margins');
 % total_treat_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','total_treat_summary');
@@ -466,9 +447,9 @@ Charts
 % total_treat_2030_summary_point = struct2array(total_treat_2030_summary_point);
 % inc_year = struct2array(inc_year); R0_summary_point = struct2array(R0_summary_point);
 
-summary_HR_point = struct2array(load('point_estimate','summary_HR'));
-inc_HR_point = struct2array(load('point_estimate','inc_HR'));
-death_year_sens_point = struct2array(load('point_estimate','death_year_sens'));
+summary_HR_point = struct2array(load('point_estimate2','summary_HR'));
+inc_HR_point = struct2array(load('point_estimate2','inc_HR'));
+death_year_sens_point = struct2array(load('point_estimate2','death_year_sens'));
 paper = [round(summary_HR_point(:,1)/10^6,2),...
     round(summary_HR_point(:,2)/10^6,1),...
     round(sum(inc_HR_point(11:23,:),1)/1000,1)',...

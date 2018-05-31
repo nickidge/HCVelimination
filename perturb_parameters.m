@@ -3,16 +3,16 @@ global  delta alpha p_complete...
     r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2...
     Q_sens q_svr q_svr_PWID q_treat 
 
-load('calibration_test','delta', 'alpha', 'p_complete',... 
+load('calibration_test3','delta', 'alpha', 'p_complete',... 
     'r_AF0', 'r_F0F1', 'r_F1F2', 'r_F2F3', 'r_F3F4', 'r_F0F1_PWID', 'r_F1F2_PWID', 'r_F2F3_PWID', 'r_F3F4_PWID', ...
     'r_F4DC', 'r_DCHCC', 'r_F4HCC', 'r_DCLT', 'r_DCdeath', 'r_HCCLT', 'r_HCCdeath', 'r_LTdeath1', 'r_LTdeath2', 'r_S4death', 'r_LT1LT2',...
     'Q_sens', 'q_svr', 'q_svr_PWID', 'q_treat')
-variance = 0.05;
+variance = 0.0001;
 
-alpha=random('Uniform',0.9,0.9);
-p_complete=random('Uniform',0.85,0.95);
-r_AF0 = 52/random(makedist('Triangular','a',r_AF0-variance*r_AF0,'b',r_AF0,'c',r_AF0+variance*r_AF0));
-r_F0F1 = random(makedist('Triangular','a',r_F0F1*(1-variance),'b',r_F0F1,'c',r_F0F1*(1+variance)));
+% alpha=random('Uniform',0.9,0.9);
+% p_complete=random('Uniform',0.85,0.95);
+% r_AF0 = 52/random(makedist('Triangular','a',r_AF0-variance*r_AF0,'b',r_AF0,'c',r_AF0+variance*r_AF0));
+% r_F0F1 = random(makedist('Triangular','a',r_F0F1*(1-variance),'b',r_F0F1,'c',r_F0F1*(1+variance)));
 r_F0F1 = -log(1-random(makedist('Triangular','a',1-exp(-r_F0F1*(1-variance)),'b',1-exp(-r_F0F1),'c',1-exp(-r_F0F1*(1+variance)))));
 r_F1F2 = -log(1-random(makedist('Triangular','a',1-exp(-r_F1F2*(1-variance)),'b',1-exp(-r_F1F2),'c',1-exp(-r_F1F2*(1+variance)))));
 r_F2F3 = -log(1-random(makedist('Triangular','a',1-exp(-r_F2F3*(1-variance)),'b',1-exp(-r_F2F3),'c',1-exp(-r_F2F3*(1+variance)))));
