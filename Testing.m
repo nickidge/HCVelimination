@@ -30,7 +30,8 @@ for s=1:sens
     scenario = 'empty';
     alpha=alpha_old; % calibrate in pre-DAA era
     target_late=1; % target treatments to people with late-liver disease
-
+    infect_base = infect; progression_base = progression;
+    
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
         calibrate_optim_par(250, 30);
     save('calibration_test3'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
@@ -434,7 +435,7 @@ for i=1:6
     end
 end
 save(filename)
-%charts_Tanz
+charts_Tanz
 % %Table for paper
 % margins_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','margins');
 % total_treat_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','total_treat_summary');
