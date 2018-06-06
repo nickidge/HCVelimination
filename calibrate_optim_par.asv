@@ -20,12 +20,12 @@ lb = max(0.1*xp, 0.001*ones(1,length(xp)));
 lb(1) = 0.01; lb(14:16) = 1000; lb(22) = 0; 
 lb(23) = 0; lb(24) = 0; 
 lb(25) = 0; lb(26) = 0; % lower bounds for height of rel_incidence function and epidemic start year
-lb(27:34) = 0.75*xp(27:34);
+lb(27:34) = 0.5*xp(27:34);
 ub = 10*xp;
-ub(14:19) = 8000; ub(20:22) = 1000; %ub(22) = 0; 
+ub(14:19) = 10000; ub(20:22) = 1000; %ub(22) = 0; 
 ub(23) = 0.1; ub(24) = 0.1; % Forcing no NSP or OST
 ub(25) = 5; ub(26) = 40; % upper bounds for height of rel_incidence function and epidemic start year
-ub(27:34) = 1.25*xp(27:34);
+ub(27:34) = 1.5*xp(27:34);
 
 %options.UseVectorized = true;
 ms = MultiStart('UseParallel', true);
@@ -205,25 +205,25 @@ ost_coverage = ost0(1,2);
         sigma_cascade = 0.1*data{2}(:,2:end); %standard deviations for cascade by year
         sigma_cascade_PWID = 0.1*data{3}(:,2:end); %standard deviations for cascade by year
         sigma_disease = 0.01*data{4}(:,2:end); %standard deviations for disease by year
-        sigma_cases = 0.01*data{5}(:,2:end); %standard deviations for cases by year
+        sigma_cases = 0.001*data{5}(:,2:end); %standard deviations for cases by year
         sigma_ost = 0.1*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year
         sigma_nsp = 0.1*data{7}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
-        sigma_diagnoses = 0.1*data{8}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
+        sigma_diagnoses = 1*data{8}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
         
         for years = 1:length(output_prev(:,1))
             probX = probX - (-(data{1}(years,2)-output_prev(years))^2/(2*sigma_prev(years)^2)); %*...
             %exp(-(data(2)-output(2))^2/(2*sigma(2)^2))/sigma(2); % Gaussian with SD
         end
-        for years = 1:length(output_cascade(:,1))
-            for vals = 1:length(output_cascade(years,:))
-                probX = probX - (-(data{2}(years,vals+1)-output_cascade(years, vals))^2/(2*sigma_cascade(vals)^2));%/sigma_cascade(vals); %*...
-            end
-        end
-        for years = 1:length(output_cascade_PWID(:,1))
-            for vals = 1:length(output_cascade_PWID(years,:))
-                probX = probX - (-(data{3}(years,vals+1)-output_cascade_PWID(years, vals))^2/(2*sigma_cascade_PWID(vals)^2));%/sigma_cascade(vals); %*...
-            end
-        end
+%         for years = 1:length(output_cascade(:,1))
+%             for vals = 1:length(output_cascade(years,:))
+%                 probX = probX - (-(data{2}(years,vals+1)-output_cascade(years, vals))^2/(2*sigma_cascade(vals)^2));%/sigma_cascade(vals); %*...
+%             end
+%         end
+%         for years = 1:length(output_cascade_PWID(:,1))
+%             for vals = 1:length(output_cascade_PWID(years,:))
+%                 probX = probX - (-(data{3}(years,vals+1)-output_cascade_PWID(years, vals))^2/(2*sigma_cascade_PWID(vals)^2));%/sigma_cascade(vals); %*...
+%             end
+%         end
         if data{4}(1,1) ~= 0
             for years = 1:length(output_disease(:,1))
                 for vals = 1:length(output_disease(years,:))
@@ -240,9 +240,9 @@ ost_coverage = ost0(1,2);
 %         for years = 1:length(output_nsp(:,1))
 %             probX = probX - (-(data{7}(years,2)-output_nsp(years))^2/(2*sigma_nsp(years)^2));%/sigma_cases(years); %*...
 %         end
-        for years = 1:length(output_diagnoses(:,1))
-            probX = probX - (-(data{8}(years,2)-output_diagnoses(years))^2/(2*sigma_diagnoses(years)^2));%/sigma_cases(years); %*...
-        end
+%         for years = 1:length(output_diagnoses(:,1))
+%             probX = probX - (-(data{8}(years,2)-output_diagnoses(years))^2/(2*sigma_diagnoses(years)^2));%/sigma_cases(years); %*...
+%         end
     end
 
     function [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y)

@@ -33,8 +33,8 @@ for s=1:sens
     infect_base = infect; progression_base = progression;
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(250, 30);
-    save('calibration_test3'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
+        calibrate_optim_par(200, 30);
+    save('calibration_test4'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
     
