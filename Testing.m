@@ -16,9 +16,9 @@ drive=extractBefore(pwd,":");
 filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo5");
 
 loaddata
-%load('calibration_test3'); infect_base=infect; progression_base = progression;
+load('calibration_draftv2'); infect_base=infect; progression_base = progression;
 dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
-sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
+sens=100; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 %summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
 followup = 1;
@@ -30,11 +30,12 @@ for s=1:sens
     scenario = 'empty';
     alpha=alpha_old; % calibrate in pre-DAA era
     target_late=1; % target treatments to people with late-liver disease
-    infect_base = infect; progression_base = progression;
+    %infect_base = infect; progression_base = progression;
+    infect = infect_base; progression = progression_base;
     
-    [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(200, 30);
-    save('calibration_test4'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
+    %[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
+    %    calibrate_optim_par(200, 30);
+    %save('calibration_test4'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
     
@@ -64,7 +65,7 @@ for s=1:sens
     
  
     %%  Scenario 1: Scaled harm reduction
-    scenario = 'current'
+    scenario = 'current';
     harm_reduction_range = [0,0.06,0.1:0.1:0.5];
     
     for h = 1:length(harm_reduction_range)
@@ -448,9 +449,9 @@ charts_Tanz
 % total_treat_2030_summary_point = struct2array(total_treat_2030_summary_point);
 % inc_year = struct2array(inc_year); R0_summary_point = struct2array(R0_summary_point);
 
-summary_HR_point = struct2array(load('point_estimate2','summary_HR'));
-inc_HR_point = struct2array(load('point_estimate2','inc_HR'));
-death_year_sens_point = struct2array(load('point_estimate2','death_year_sens'));
+summary_HR_point = struct2array(load('Base_draftv2','summary_HR'));
+inc_HR_point = struct2array(load('Base_draftv2','inc_HR'));
+death_year_sens_point = struct2array(load('Base_draftv2','death_year_sens'));
 paper = [round(summary_HR_point(:,1)/10^6,2),...
     round(summary_HR_point(:,2)/10^6,1),...
     round(sum(inc_HR_point(11:23,:),1)/1000,1)',...
