@@ -18,7 +18,7 @@ filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo5");
 loaddata
 load('calibration_draftv2'); infect_base=infect; progression_base = progression;
 dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
-sens=10; %Number of runs in sensitivity analysis, sens=1 turns off feature
+sens=100; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 %summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
 followup = 1;
@@ -30,7 +30,8 @@ for s=1:sens
     scenario = 'empty';
     alpha=alpha_old; % calibrate in pre-DAA era
     target_late=1; % target treatments to people with late-liver disease
-    infect_base = infect; progression_base = progression;
+    %infect_base = infect; progression_base = progression;
+    infect = infect_base; progression = progression_base;
     
     %[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
     %    calibrate_optim_par(200, 30);
@@ -64,7 +65,7 @@ for s=1:sens
     
  
     %%  Scenario 1: Scaled harm reduction
-    scenario = 'current'
+    scenario = 'current';
     harm_reduction_range = [0,0.06,0.1:0.1:0.5];
     
     for h = 1:length(harm_reduction_range)
@@ -201,9 +202,12 @@ for s=1:sens
     alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
     progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
-    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
-    range_followup = [1]; % 100% sensitivity
-    prop_test_range = [0.6,0.8,0.9];
+%     range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
+%     range_followup = [1]; % 100% sensitivity
+%     prop_test_range = [0.6,0.8,0.9];
+    range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
+    prop_test_range = [0.9];
     for i = 1:length(range_test)
         for j = 1:length(range_followup)
             for k =1:length(prop_test_range)
@@ -246,9 +250,9 @@ for s=1:sens
     alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
     progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
-    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
-    range_diagnosed_risk_reduction = [0:0.1:0.5]; % risk reduction when diagnosed
-    prop_test_range = [0.6,0.8,0.9];
+    range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
+    prop_test_range = [0.9];
     followup = 0.76; %DBS sensitivity
     for i = 1:length(range_test)
         for j = 1:length(range_diagnosed_risk_reduction)

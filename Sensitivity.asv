@@ -35,7 +35,7 @@ loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
 exit_IDU = 1/12;
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(2, 5);
 filename=strcat(directory,'HC');
 save(strcat(directory,'HC_calibration'));
 [summary_HC]=sens_func(filename)
@@ -46,7 +46,7 @@ loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
 prev0(:,2) = 1.5 * prev0(:,2);
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(2, 5);
 filename=strcat(directory,'double_prev');
 save(strcat(directory,'double_prev_calibration'));
 [summary_double_prev]=sens_func(filename)
@@ -56,17 +56,18 @@ loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
 prev0(:,2) = 1.5 * prev0(:,2);
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(2, 5);
 filename=strcat(directory,'double_prev');
 save(strcat(directory,'double_prev_calibration'));
 [summary_double_prev]=sens_func(filename)
+
 
 %% half PLHCV
 loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
 cases0(:,2) = 0.5 * cases0(:,2);
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(2, 5);
 filename=strcat(directory,'half_PLHCV');
 save(strcat(directory,'half_PLHCV_calibration'));
 [summary_double_PLHCV]=sens_func(filename)
@@ -76,7 +77,7 @@ loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
 total_PWID = 70000;
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(2, 5);
 filename=strcat(directory,'70kPWID');
 save(strcat(directory,'70kPWID_calibration'));
 [summary_70kPWID]=sens_func(filename)
@@ -86,7 +87,7 @@ loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
 total_PWID = 30000;
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(2, 5);
 filename=strcat(directory,'30kPWID');
 save(strcat(directory,'30kPWID_calibration'));
 [summary_30kPWID]=sens_func(filename)

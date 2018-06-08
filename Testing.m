@@ -18,7 +18,7 @@ filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo5");
 loaddata
 load('calibration_draftv2'); infect_base=infect; progression_base = progression;
 dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
-sens=100; %Number of runs in sensitivity analysis, sens=1 turns off feature
+sens=200; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 %summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
 followup = 1;
@@ -105,9 +105,13 @@ for s=1:sens
     target_late=0; % Target PWID
     alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
-    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
+%     range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
+%     range_followup = [0.74];
+%     prop_test_range = [0.6,0.8,0.9];
     range_followup = [0.74];
-    prop_test_range = [0.6,0.8,0.9];
+    range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
+    prop_test_range = [0.9];
     for i = 1:length(range_test)
         for j = 1:length(range_followup)
             for k =1:length(prop_test_range)
@@ -157,9 +161,10 @@ for s=1:sens
     alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
     progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
-    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
-    range_followup = [0.76]; % 76% sensitivity
-    prop_test_range = [0.6,0.8,0.9];
+    range_followup = [0.74];
+    range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
+    prop_test_range = [0.9];
     for i = 1:length(range_test)
         for j = 1:length(range_followup)
             for k =1:length(prop_test_range)
@@ -202,9 +207,10 @@ for s=1:sens
     alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
     progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
-    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
-    range_followup = [1]; % 100% sensitivity
-    prop_test_range = [0.6,0.8,0.9];
+    range_followup = [0.74];
+    range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
+    prop_test_range = [0.9];
     for i = 1:length(range_test)
         for j = 1:length(range_followup)
             for k =1:length(prop_test_range)
@@ -247,9 +253,10 @@ for s=1:sens
     alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
     progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
-    range_test = [0.5, 1, 2, 4]*2; % divided by 2 to assume that infection happens midway between tests
-    range_diagnosed_risk_reduction = [0:0.1:0.5]; % risk reduction when diagnosed
-    prop_test_range = [0.6,0.8,0.9];
+    range_followup = [0.74];
+    range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
+    prop_test_range = [0.9];
     followup = 0.76; %DBS sensitivity
     for i = 1:length(range_test)
         for j = 1:length(range_diagnosed_risk_reduction)
@@ -512,7 +519,7 @@ for i = 1:length(paper(:,1))
     end
 end
 
-if isempty(find(diag_test(:,1,1,2)>90,1))==1 aa=0; else aa=find(diag_test(:,1,1,2)>90,1); end
+%if isempty(find(diag_test(:,1,1,2)>90,1))==1 aa=0; else aa=find(diag_test(:,1,1,2)>90,1); end
 
 % paper2 = [round([diag_test(23,1,1,2); diag_serum(23,1,1,2); diag_DBS(23,1,1,3)],0),...
 %     [aa+2007;find(diag_serum(:,1,1,2)>90,1)+2007;find(diag_DBS(:,1,1,3)>90,1)+2007],...
