@@ -46,30 +46,30 @@ loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
 prev0(:,2) = 1.5 * prev0(:,2);
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
+    calibrate_optim_par(250, 30);
 filename=strcat(directory,'double_prev');
 save(strcat(directory,'double_prev_calibration'));
 [summary_double_prev]=sens_func(filename)
 
-%% double prev
+%% half prev
 loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
-prev0(:,2) = 1.5 * prev0(:,2);
+prev0(:,2) = 0.5 * prev0(:,2);
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    calibrate_optim_par(200, 30);
-filename=strcat(directory,'double_prev');
-save(strcat(directory,'double_prev_calibration'));
-[summary_double_prev]=sens_func(filename)
+    calibrate_optim_par(150, 40);
+filename=strcat(directory,'half_prev');
+save(strcat(directory,'half_prev_calibration'));
+[summary_half_prev]=sens_func(filename)
 
-%% half PLHCV
+%% half PLHCV (100,000)
 loaddata;
 dt = 1/4; sens=1; summary=zeros(6,12,sens); followup = 1; alpha=alpha_old; target_late=1; infect_base=infect; progression_base = progression;
-cases0(:,2) = 0.5 * cases0(:,2);
+cases0(:,2) = 0.769 * cases0(:,2);
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
     calibrate_optim_par(200, 30);
 filename=strcat(directory,'half_PLHCV');
 save(strcat(directory,'half_PLHCV_calibration'));
-[summary_double_PLHCV]=sens_func(filename)
+[summary_half_PLHCV]=sens_func(filename)
 
 %% 70,000 PWID
 loaddata;
