@@ -1,13 +1,13 @@
 global  delta alpha p_complete... 
     r_AF0 r_F0F1 r_F1F2 r_F2F3 r_F3F4 r_F0F1_PWID r_F1F2_PWID r_F2F3_PWID r_F3F4_PWID ...
     r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2...
-    Q_sens q_svr q_svr_PWID q_treat 
+    Q_sens q_svr q_svr_PWID q_treat infect_factor
 
 load('calibration_draftv2','delta', 'alpha', 'p_complete',... 
     'r_AF0', 'r_F0F1', 'r_F1F2', 'r_F2F3', 'r_F3F4', 'r_F0F1_PWID', 'r_F1F2_PWID', 'r_F2F3_PWID', 'r_F3F4_PWID', ...
     'r_F4DC', 'r_DCHCC', 'r_F4HCC', 'r_DCLT', 'r_DCdeath', 'r_HCCLT', 'r_HCCdeath', 'r_LTdeath1', 'r_LTdeath2', 'r_S4death', 'r_LT1LT2',...
-    'Q_sens', 'q_svr', 'q_svr_PWID', 'q_treat')
-variance = 0.0001;
+    'Q_sens', 'q_svr', 'q_svr_PWID', 'q_treat','infect_factor')
+variance = 0.1;
 
 % alpha=random('Uniform',0.9,0.9);
 % p_complete=random('Uniform',0.85,0.95);
@@ -32,6 +32,8 @@ r_LTdeath1 = -log(1-random(makedist('Triangular','a',1-exp(-r_LTdeath1 *(1-varia
 r_LTdeath2 = -log(1-random(makedist('Triangular','a',1-exp(-r_LTdeath2 *(1-variance)),'b',1-exp(-r_LTdeath2),'c',1-exp(-r_LTdeath2 *(1+variance)))));
 r_S4death = -log(1-random(makedist('Triangular','a',1-exp(-r_S4death*(1-variance)),'b',1-exp(-r_S4death),'c',1-exp(-r_S4death*(1+variance)))));
 r_LT1LT2=1;
+
+infect_factor(1,2:end) = (1+ random(makedist('Triangular','a',-variance,'b',0,'c',variance))) * infect_factor(1,2:end);
 
 
 % r_F0F1_PWID = random(makedist('Triangular','a',r_F0F1_PWID*(1-variance),'b',r_F0F1_PWID,'c',r_F0F1_PWID*(1+variance)));
