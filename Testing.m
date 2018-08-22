@@ -16,9 +16,9 @@ drive=extractBefore(pwd,":");
 filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo5");
 
 loaddata
-load('calibration_draftv2'); infect_base=infect; progression_base = progression;
+%load('calibration_draftv2'); infect_base=infect; progression_base = progression;
 dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
-sens=200; %Number of runs in sensitivity analysis, sens=1 turns off feature
+sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 %summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
 followup = 1;
@@ -30,12 +30,12 @@ for s=1:sens
     scenario = 'empty';
     alpha=alpha_old; % calibrate in pre-DAA era
     target_late=1; % target treatments to people with late-liver disease
-    %infect_base = infect; progression_base = progression;
-    infect = infect_base; progression = progression_base;
+    infect_base = infect; progression_base = progression;
+    %infect = infect_base; progression = progression_base;
     
-    %[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-    %    calibrate_optim_par(200, 30);
-    %save('calibration_test4'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
+    [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
+        calibrate_optim_par(200, 30);
+    save('calibration_test5'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
     

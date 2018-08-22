@@ -127,7 +127,7 @@ xlabel('\fontsize{14}Year'); ylabel({'\fontsize{14} Chronic HCV infections (thou
 %set(extra(2), 'XTick',[],'xlim',[50,80],'ylim',[0,65],'YTick',0:10:65,'ycolor','k','FontSize',12);
 set(gca, 'xlim',[50,80],'ylim',[0,70000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:10000:150000,'YTickLabel',0:10:150,'ycolor','k');
 %set(get(extra(2),'Ylabel'),'String','Prevalence among PWID (%)','fontsize',14);
-leg=legend([d1,a1_,a2_,a3_,a4_,a5_,a6_,a7_],{'Data','F0','F1','F2','F3','F4','DC','HCC'},'location','Northwest');
+leg=legend([d1,a1_,a2_,a3_,a4_,a5_,a6_,a7_,a8_],{'Data','F0','F1','F2','F3','F4','DC','HCC','LT'},'location','Northwest');
 %legpatch=findobj(leg,'type','patch'); hatchfill(legpatch,'single',45,1,'blue');
 title({'\fontsize{12}Projected people living with HCV,','by liver disease stage'}); hold off;
 subplot(1,2,2)
