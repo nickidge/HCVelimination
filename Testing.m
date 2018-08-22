@@ -13,7 +13,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo5");
+filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo6");
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -538,32 +538,32 @@ end
 % end
 
 
-paper_sens = [round(summary_DBS_rr(1,:,3,1)'/10^6,2),...
-    round(summary_DBS_rr(1,:,3,2)/10^6,1)',...
-    round(reshape(sum(inc_DBS_rr(11:23,1,:,3),1)/1000,length(range_diagnosed_risk_reduction),1),1),...
-    round(summary_DBS_rr(1,:,3,9),0)',...
-    round(summary_DBS_rr(1,:,3,5),0)',...
-    round(summary_DBS_rr(1,:,3,8),0)',...
-    round(100*(summary_DBS_rr(1,:,3,5)'-reshape(inc_DBS_rr(8,1,:,3),length(range_diagnosed_risk_reduction),1))...
-    ./reshape(inc_DBS_rr(8,1,:,3),length(range_diagnosed_risk_reduction),1),0),...
-    round(100*(summary_DBS_rr(1,:,3,6)'-repmat(death_year_sens(1,6,1),length(range_diagnosed_risk_reduction),1))./repmat(death_year_sens(1,6,1),length(range_diagnosed_risk_reduction),1),0)];
- 
-paper3_text = zeros(length(paper_sens(:,1))+1,1+length(paper_sens(1,:)));
-paper3_text = num2cell(paper3_text);
-paper3_text{1,1} = 'Scenario';
-paper3_text{1,2} = 'Total costs 2018-2030 (US$M)';
-paper3_text{1,3} = 'Total QALYs 2018-2030 (M)';
-paper3_text{1,4} = 'Cumulative incidence 2018-2030 (thousand)';
-paper3_text{1,5} = 'Cumulative liver-related deaths 2018-2030';
-paper3_text{1,6} = 'Incidence in 2030';
-paper3_text{1,7} = 'Prevalence among PWID 2030';
-paper3_text{1,8} = 'Incidence reduction relative to 2015';
-paper3_text{1,9} = 'Mortality reduction relative to 2015';
-
-
-for i = 1:length(paper_sens(:,1))
-    for j = 1:length(paper_sens(1,:))
-        paper3_text{i+1,j+1} = [num2str(paper_sens(i,j)),' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
-    end
-end
+% paper_sens = [round(summary_DBS_rr(1,:,3,1)'/10^6,2),...
+%     round(summary_DBS_rr(1,:,3,2)/10^6,1)',...
+%     round(reshape(sum(inc_DBS_rr(11:23,1,:,3),1)/1000,length(range_diagnosed_risk_reduction),1),1),...
+%     round(summary_DBS_rr(1,:,3,9),0)',...
+%     round(summary_DBS_rr(1,:,3,5),0)',...
+%     round(summary_DBS_rr(1,:,3,8),0)',...
+%     round(100*(summary_DBS_rr(1,:,3,5)'-reshape(inc_DBS_rr(8,1,:,3),length(range_diagnosed_risk_reduction),1))...
+%     ./reshape(inc_DBS_rr(8,1,:,3),length(range_diagnosed_risk_reduction),1),0),...
+%     round(100*(summary_DBS_rr(1,:,3,6)'-repmat(death_year_sens(1,6,1),length(range_diagnosed_risk_reduction),1))./repmat(death_year_sens(1,6,1),length(range_diagnosed_risk_reduction),1),0)];
+%  
+% paper3_text = zeros(length(paper_sens(:,1))+1,1+length(paper_sens(1,:)));
+% paper3_text = num2cell(paper3_text);
+% paper3_text{1,1} = 'Scenario';
+% paper3_text{1,2} = 'Total costs 2018-2030 (US$M)';
+% paper3_text{1,3} = 'Total QALYs 2018-2030 (M)';
+% paper3_text{1,4} = 'Cumulative incidence 2018-2030 (thousand)';
+% paper3_text{1,5} = 'Cumulative liver-related deaths 2018-2030';
+% paper3_text{1,6} = 'Incidence in 2030';
+% paper3_text{1,7} = 'Prevalence among PWID 2030';
+% paper3_text{1,8} = 'Incidence reduction relative to 2015';
+% paper3_text{1,9} = 'Mortality reduction relative to 2015';
+% 
+% 
+% for i = 1:length(paper_sens(:,1))
+%     for j = 1:length(paper_sens(1,:))
+%         paper3_text{i+1,j+1} = [num2str(paper_sens(i,j)),' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
+%     end
+% end
 
