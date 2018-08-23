@@ -214,16 +214,16 @@ ost_coverage = ost0(1,2);
             probX = probX - (-(data{1}(years,2)-output_prev(years))^2/(2*sigma_prev(years)^2)); %*...
             %exp(-(data(2)-output(2))^2/(2*sigma(2)^2))/sigma(2); % Gaussian with SD
         end
-%         for years = 1:length(output_cascade(:,1))
-%             for vals = 1:length(output_cascade(years,:))
-%                 probX = probX - (-(data{2}(years,vals+1)-output_cascade(years, vals))^2/(2*sigma_cascade(vals)^2));%/sigma_cascade(vals); %*...
-%             end
-%         end
-%         for years = 1:length(output_cascade_PWID(:,1))
-%             for vals = 1:length(output_cascade_PWID(years,:))
-%                 probX = probX - (-(data{3}(years,vals+1)-output_cascade_PWID(years, vals))^2/(2*sigma_cascade_PWID(vals)^2));%/sigma_cascade(vals); %*...
-%             end
-%         end
+        for years = 1:length(output_cascade(:,1))
+            for vals = 1:length(output_cascade(years,:))
+                probX = probX - (-(data{2}(years,vals+1)-output_cascade(years, vals))^2/(2*sigma_cascade(vals)^2));%/sigma_cascade(vals); %*...
+            end
+        end
+        for years = 1:length(output_cascade_PWID(:,1))
+            for vals = 1:length(output_cascade_PWID(years,:))
+                probX = probX - (-(data{3}(years,vals+1)-output_cascade_PWID(years, vals))^2/(2*sigma_cascade_PWID(vals)^2));%/sigma_cascade(vals); %*...
+            end
+        end
         if data{4}(1,1) ~= 0
             for years = 1:length(output_disease(:,1))
                 for vals = 1:length(output_disease(years,:))

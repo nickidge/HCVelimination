@@ -1,4 +1,4 @@
-function[c,q,life,tr,c_HR]=Costs_age(y,TT,y_large)
+function[c,q,life,tr]=Costs_age(y,TT,y_large)
 global Q_sens q_svr q_svr_PWID q_treat sens c_daa discount care cascade_scale_time scenario prop_test progression ...
     num_pops num_cascade num_age num_intervention 
 
@@ -164,14 +164,13 @@ Cas_retreat=sum((sum(sum(y(:,:,8,[23,25]),4),2)*c_cascade4(3).*exp(-discount.*TT
 c_cascade=(Cas_cost1+Cas_cost2+Cas_cost3+Cas_cost4+Cas_retreat); 
 
 %% Harm reduction
-y2=squeeze(sum(sum(sum(y_large,4),6),7)); %Reshape to sum over age stratification, interventions, engagement and region
+OST = trapz(TT,sum(sum(sum(y(:,2:3,:,1:3),2),3),4).*exp(-discount.*TT))*c_OST;
+y2=reshape(sum(sum(sum(y2,5),6),7),size(y2,1),num_pops, num_cascade, num_intervention, 27+6); %Reshape to sum over age stratification, interventions, engagement and region
 OST = trapz(TT,sum(sum(sum(y2(:,1,:,3:4,1:20),3),4),5).*exp(-discount.*TT))*c_OST;
-NSP = trapz(TT,sum(sum(sum(y2(:,1,:,[2,4],1:20),3),4),5).*exp(-discount.*TT))*c_NSP;
-
-c_HR = OST + NSP;
+NSP = trapz(TT,sum(sum(sum(y2(:,1,:,[2,4],1:20),3),4),5).*exp(-discount.*TT))*c_N;
 
 %% Total
-c=c_PWIDtot+c_formertot+c_cascade+c_HR;
+c=c_PWIDtot+c_formertot+c_cascade;
 q=q_PWID+q_former;
 life=trapz(TT,sum(sum(sum(y(:,:,:,1:20),4),3),2)) / sum(sum(sum(y(1,:,:,1:20))));
 

@@ -130,9 +130,13 @@ y(1,:) = [y0];
                 [f]=treatment_alloc(Y,trea,trea_extra,0);
             end
             if TT>66
-                trea=treat(1);
-                if TT<=67 trea_extra=treat(2); else trea_extra=0; end
-                [f]=treatment_alloc(Y,trea,trea_extra,0);
+                if treat(1)<0
+                    f(:,[6,8],:,:,:,:,12:20) = - treat(1) * Y(:,[6,8],:,:,:,:,12:20);
+                else
+                    trea=treat(1);
+                    if TT<=67 trea_extra=treat(2); else trea_extra=0; end
+                    [f]=treatment_alloc(Y,trea,trea_extra,0);
+                end
             end
             
             %% Infection and disease progression progression
@@ -213,11 +217,11 @@ y(1,:) = [y0];
             
             %% New arrivals
             IDUs=PWID0;
-            if TT<50 % TT = 50 is 2000
-                IDUs = (TT-start_year)*(total_PWID-PWID0)/(50-start_year) + PWID0;
-            elseif TT>=50 && TT<55
-                IDUs = total_PWID - (TT-50)*(total_PWID -total_PWID)/5;
-            elseif TT>=55
+            if TT<60 % TT = 50 is 2000
+                IDUs = (TT-start_year)*(total_PWID-PWID0)/(60-start_year) + PWID0;
+%             elseif TT>=50 && TT<55
+%                 IDUs = total_PWID - (TT-50)*(total_PWID -total_PWID)/5;
+            elseif TT>=60
                 IDUs = total_PWID;
             end
             mu_arrivals = max(IDUs-sum(sum(sum(sum(sum(sum(sum(Y([1],:,:,:,:,:,1:20))))))))...
@@ -288,9 +292,10 @@ y(1,:) = [y0];
             
             %only those in care progress due to zeroes in prog
             prog = permute(reshape(repmat(progress,1,num_age*num_intervention),num_pops,num_cascade,num_age,num_intervention,num_engagement,num_region),[1,2,3,4,5,6]);
+            prog(1:3,1,:,:,:,:) = (followup) * prog(1:3,1,:,:,:,:);
+            prog(1:3,5:6,:,:,2:end,:) = 1/(30/365);
             prog = min(1/dt, prog); % need to protect against adding too many people at once if time steps are too large
             
-            prog(1:3,1,:,:,:,:) = (followup) * prog(1:3,1,:,:,:,:);
             %prog(1,:,:,:,1,:) = 0;
             if strcmp(scenario,'OST_test') == 1
                 prog(1,1,:,1:2,:,:) = 0*prog(1,1,:,1:2,:,:); % In these scenarios don't test people who are not engaged in OST of NSP
@@ -426,40 +431,40 @@ y(1,:) = [y0];
             ydot11 = 0*Y;
             
             %OST
-            ydot11(1,:,:,3:4,:,:,1:20) = ydot11(1,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
-            ydot11(1,:,:,1:2,:,:,1:20) = ydot11(1,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
-            
-%             ydot11(2:3,:,:,3:4,:,:,1:20) = ydot11(2:3,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20); %former and other can drop out of OST but not recruit
-%             ydot11(2:3,:,:,1:2,:,:,1:20) = ydot11(2:3,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20);
-            
-            %NSP
-%             ydot11(1,:,:,[2,4],:,:,1:20) = ydot11(1,:,:,[2,4],:,:,1:20) - min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,:,1:20);
-%             ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) + min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,:,1:20);
+%             ydot11(1,:,:,3:4,:,:,1:20) = ydot11(1,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
+%             ydot11(1,:,:,1:2,:,:,1:20) = ydot11(1,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(1,:,:,3:4,:,:,1:20);
 %             
-%             hr_scale = ((1-nsp_coverage)*(1-ost_coverage)*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,1,:,:,1:20)+ydot11(1,:,:,1,:,:,1:20)))./sum(Y(1,:,:,2:4,:,:,1:20),4); %change in number of people needed, as a percentage of other compartments
-%             ydot11(1,:,:,1,:,:,1:20) = ydot11(1,:,:,1,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,2:4,:,:,1:20),4);
-%             ydot11(1,:,:,2:4,:,:,1:20) = ydot11(1,:,:,2:4,:,:,1:20) - min(1/dt, hr_scale).*Y(1,:,:,2:4,:,:,1:20);
+% %             ydot11(2:3,:,:,3:4,:,:,1:20) = ydot11(2:3,:,:,3:4,:,:,1:20) - min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20); %former and other can drop out of OST but not recruit
+% %             ydot11(2:3,:,:,1:2,:,:,1:20) = ydot11(2:3,:,:,1:2,:,:,1:20) + min(1/ost_duration, 1/dt) * Y(2:3,:,:,3:4,:,:,1:20);
 %             
-%             hr_scale = (nsp_coverage*(1-ost_coverage)*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,2,:,:,1:20)+ydot11(1,:,:,2,:,:,1:20)))./sum(Y(1,:,:,[1,3,4],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments
-%             ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,3,4],:,:,1:20),4);
-%             ydot11(1,:,:,[1,3,4],:,:,1:20) = ydot11(1,:,:,[1,3,4],:,:,1:20) - min(1/dt, hr_scale).*Y(1,:,:,[1,3,4],:,:,1:20);
+%             %NSP
+% %             ydot11(1,:,:,[2,4],:,:,1:20) = ydot11(1,:,:,[2,4],:,:,1:20) - min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,:,1:20);
+% %             ydot11(1,:,:,[1,3],:,:,1:20) = ydot11(1,:,:,[1,3],:,:,1:20) + min(1/nsp_duration, 1/dt) * Y(1,:,:,[2,4],:,:,1:20);
+% %             
+% %             hr_scale = ((1-nsp_coverage)*(1-ost_coverage)*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,1,:,:,1:20)+ydot11(1,:,:,1,:,:,1:20)))./sum(Y(1,:,:,2:4,:,:,1:20),4); %change in number of people needed, as a percentage of other compartments
+% %             ydot11(1,:,:,1,:,:,1:20) = ydot11(1,:,:,1,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,2:4,:,:,1:20),4);
+% %             ydot11(1,:,:,2:4,:,:,1:20) = ydot11(1,:,:,2:4,:,:,1:20) - min(1/dt, hr_scale).*Y(1,:,:,2:4,:,:,1:20);
+% %             
+% %             hr_scale = (nsp_coverage*(1-ost_coverage)*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,2,:,:,1:20)+ydot11(1,:,:,2,:,:,1:20)))./sum(Y(1,:,:,[1,3,4],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments
+% %             ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,3,4],:,:,1:20),4);
+% %             ydot11(1,:,:,[1,3,4],:,:,1:20) = ydot11(1,:,:,[1,3,4],:,:,1:20) - min(1/dt, hr_scale).*Y(1,:,:,[1,3,4],:,:,1:20);
+% %             
+% %             hr_scale = ((1-nsp_coverage)*ost_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,3,:,:,1:20)+ydot11(1,:,:,3,:,:,1:20)))./sum(Y(1,:,:,[1,2,4],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments            ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,3,4],:,:,1:20),4);
+% %             ydot11(1,:,:,3,:,:,1:20) = ydot11(1,:,:,3,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,2,4],:,:,1:20),4);
+% %             ydot11(1,:,:,[1,2,4],:,:,1:20) = ydot11(1,:,:,[1,2,4],:,:,1:20) - min(1/dt, hr_scale).*Y(1,:,:,[1,2,4],:,:,1:20);
+% %             
+% %             hr_scale = (nsp_coverage*ost_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,4,:,:,1:20)+ydot11(1,:,:,4,:,:,1:20)))./sum(Y(1,:,:,[1,2,3],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments            ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,3,4],:,:,1:20),4);
+% %             ydot11(1,:,:,4,:,:,1:20) = ydot11(1,:,:,4,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,2,3],:,:,1:20),4);
+% %             ydot11(1,:,:,[1,2,3],:,:,1:20) = ydot11(1,:,:,[1,2,3],:,:,1:20) - min(1/dt, hr_scale).*Y(1,:,:,[1,2,3],:,:,1:20);
+% %             
+            hr_scale1 = (nsp_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - sum(Y(1,:,:,[2],:,:,1:20),4))./sum(Y(1,:,:,[1],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments
+            hr_scale2 = (ost_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - sum(Y(1,:,:,[3],:,:,1:20),4))./sum(Y(1,:,:,[1],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments
+            hr_scale1(isnan(hr_scale1))=0; hr_scale2(isnan(hr_scale2))=0;
+            ydot11(1,:,:,1,:,:,1:20) = ydot11(1,:,:,1,:,:,1:20) + max(-1/dt,min(1/dt, -hr_scale1-hr_scale2+1/ost_duration)).*Y(1,:,:,1,:,:,1:20);
+            ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + max(-1/dt,min(1/dt, hr_scale1)).*Y(1,:,:,1,:,:,1:20);
+            ydot11(1,:,:,3,:,:,1:20) = ydot11(1,:,:,3,:,:,1:20) + max(-1/dt,min(1/dt, hr_scale2-1/ost_duration)).*Y(1,:,:,1,:,:,1:20);
+            %ydot11(1,:,:,4,:,:,1:20) = ydot11(1,:,:,4,:,:,1:20) + max(-1/dt,min(1/dt, hr_scale1+hr_scale2)).*Y(1,:,:,4,:,:,1:20);
 %             
-%             hr_scale = ((1-nsp_coverage)*ost_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,3,:,:,1:20)+ydot11(1,:,:,3,:,:,1:20)))./sum(Y(1,:,:,[1,2,4],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments            ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,3,4],:,:,1:20),4);
-%             ydot11(1,:,:,3,:,:,1:20) = ydot11(1,:,:,3,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,2,4],:,:,1:20),4);
-%             ydot11(1,:,:,[1,2,4],:,:,1:20) = ydot11(1,:,:,[1,2,4],:,:,1:20) - min(1/dt, hr_scale).*Y(1,:,:,[1,2,4],:,:,1:20);
-%             
-%             hr_scale = (nsp_coverage*ost_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,4,:,:,1:20)+ydot11(1,:,:,4,:,:,1:20)))./sum(Y(1,:,:,[1,2,3],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments            ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,3,4],:,:,1:20),4);
-%             ydot11(1,:,:,4,:,:,1:20) = ydot11(1,:,:,4,:,:,1:20) + min(1/dt, hr_scale).*sum(Y(1,:,:,[1,2,3],:,:,1:20),4);
-%             ydot11(1,:,:,[1,2,3],:,:,1:20) = ydot11(1,:,:,[1,2,3],:,:,1:20) - min(1/dt, hr_scale).*Y(1,:,:,[1,2,3],:,:,1:20);
-%             
-            hr_scale1 = (nsp_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - sum(Y(1,:,:,[2,4],:,:,1:20),4))./sum(Y(1,:,:,[1,3],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments
-            hr_scale2 = (ost_coverage*sum(Y(1,:,:,:,:,:,1:20),4) - sum((1-min(1/ost_duration, 1/dt)*Y(1,:,:,[3,4],:,:,1:20),4)))./sum(Y(1,:,:,[1,2],:,:,1:20),4); %change in number of people needed, as a percentage of other compartments
-            
-            ydot11(1,:,:,1,:,:,1:20) = ydot11(1,:,:,1,:,:,1:20) + min(1/dt, -hr_scale1-hr_scale2).*Y(1,:,:,1,:,:,1:20);
-            ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + min(1/dt, hr_scale1-hr_scale2).*Y(1,:,:,2,:,:,1:20);
-            ydot11(1,:,:,3,:,:,1:20) = ydot11(1,:,:,3,:,:,1:20) + min(1/dt, -hr_scale1+hr_scale2).*Y(1,:,:,3,:,:,1:20);
-            ydot11(1,:,:,4,:,:,1:20) = ydot11(1,:,:,4,:,:,1:20) + min(1/dt, hr_scale1+hr_scale2).*Y(1,:,:,4,:,:,1:20);
-            
             
 %             ydot11(1,:,:,2,:,:,1:20) = ydot11(1,:,:,2,:,:,1:20) + ...
 %                 min(1/dt, (nsp_coverage*(1-ost_coverage)*sum(Y(1,:,:,:,:,:,1:20),4) - (Y(1,:,:,2,:,:,1:20)+ydot11(1,:,:,2,:,:,1:20)))./sum(Y(1,:,:,:,:,:,1:20),4))...

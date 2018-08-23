@@ -78,7 +78,7 @@ for s=1:sens
         y2comb=[y1(1:end-1,:,:,:,:,:,:,:);y2_treat];
         y2_noage=reshape(sum(sum(sum(sum(y2_treat,4),5),6),7),size(y2_treat,1),num_pops, num_cascade,27+6); %Reshape to sum over age stratification, interventions, engagement and region
         
-        squeeze(sum(sum(sum(sum(sum(sum(y2_treat(:,1,:,:,:,:,:,1:20),2),3),4),6),7),8)); %Reshape to sum over age stratification, interventions, engagement and region
+        squeeze(sum(sum(sum(sum(sum(sum(y2_treat(:,1,:,:,:,:,:,1:20),2),3),4),6),7),8)) %Reshape to sum over age stratification, interventions, engagement and region
         
         %         for i = Tin-10:Tin
         %             prev_HR(i,h) = 100*sum(sum(sum(sum(sum(sum(y1(find(TT1>=i,1),1,:,:,:,:,:,[6,12:20])))))))./...
@@ -567,16 +567,12 @@ paper2_text{1,3} = 'Serum-based HCVcAg';
 paper2_text{1,4} = 'Dry Blood Spot HCVcAg';
 
 
-paper2_text{2,1} = 'Percentage diagnosed in 2030';
-paper2_text{3,1} = 'Year 80% diagnosed reached';
-paper2_text{4,1} = 'Total costs 2018-2030 (million US$)';
-paper2_text{5,1} = 'Total treatments 2018-2030 (thousand)';
-paper2_text{6,1} = 'Incidence in 2030';
-paper2_text{7,1} = 'Prevalence in 2030';
-paper2_text{8,1} = 'Incidence reduction in 2030';
-paper2_text{9,1} = 'Prevalence reduction in 2030';
-paper2_text{10,1} = 'Mortality reduction in 2030';
-
+paper2_text{2,1} = 'Percentage diagnosed';
+paper2_text{1,1} = 'Scenario';
+paper2_text{1,1} = 'Scenario';
+paper2_text{1,1} = 'Scenario';
+paper2_text{1,1} = 'Scenario';
+paper2_text{1,1} = 'Scenario';
 
 
 for i = 1:length(paper2(:,1))

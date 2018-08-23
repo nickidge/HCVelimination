@@ -17,12 +17,12 @@ Tint=Tin+[0,1,13]; t_val=zeros(1,length(Tint));
 for l=1:length(Tint) %Find times corresponding to years since intervention
     t_val(l)=find(TT>=(Tint(l)),1);
 end
-TT_=TT(t_val(2):t_val(3))-Tint(2);
-[cost,qaly,life_exp,tr]=Costs_age(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,:,:,:),TT_,y2([t_val(2):t_val(3)]-t_val(1)+1,:,:,:,:,:,:,:));
-tr_(1) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,1,:,[23,25])))); % Total treatments for PWID
-tr_(2) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,2,:,[23,25])))); % Total treatments for former PWID
-tr_(3) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,3,:,[23,25])))); % Total treatments for other
-tr_(4) = sum(sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,:,:,[23,25]))))); % Total treatments
+TT_=TT(t_val(1):t_val(2))-Tin;
+[cost,qaly,life_exp,tr]=Costs_age(y2_noage(t_val(2):t_val(3),:,:,:),TT_,y2(t_val(2):t_val(3),:,:,:,:,:,:,:));
+tr_(1) = sum(sum(sum(y2_noage(t_val(2):t_val(3),1,:,[23,25])))); % Total treatments for PWID
+tr_(2) = sum(sum(sum(y2_noage(t_val(2):t_val(3),2,:,[23,25])))); % Total treatments for former PWID
+tr_(3) = sum(sum(sum(y2_noage(t_val(2):t_val(3),3,:,[23,25])))); % Total treatments for other
+tr_(4) = sum(sum(sum(sum(y2_noage(t_val(2):t_val(3),:,:,[23,25]))))); % Total treatments
 
 %Put a bunch of summary statistics together
 summary = [cost,qaly,tr(4),tr_(4),...
