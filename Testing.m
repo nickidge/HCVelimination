@@ -13,7 +13,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\foo6");
+filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\newanalysis");
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -30,12 +30,12 @@ for s=1:sens
     scenario = 'empty';
     alpha=alpha_old; % calibrate in pre-DAA era
     target_late=1; % target treatments to people with late-liver disease
-    infect_base = infect; progression_base = progression;
+    infect_base = infect; progression_base = progression; treat = [0,0,0];
     %infect = infect_base; progression = progression_base;
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
         calibrate_optim_par(100, 30);
-    save('calibration_test5'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1;
+    save('calibration_test5'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
     
@@ -154,8 +154,8 @@ for s=1:sens
                         sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),1,:,1:20)));
 %                     diag_test(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,3:end,[6,12:20]))))./...
 %                         sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,:,[6,12:20]))));
-                    diag_test(t-Tin+11,i,j,k) = 100*(1 - sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),:,1,[6,12:20]))))./...
-                        sum(sum(sum(ycomb6_noage(find(TT2_treat6>=Tin,1),:,:,[6,12:20]))))); % 1-undiagnosed at time t divided by total in 2015
+                    diag_test(t-Tin+11,i,j,k) = 100*(1 - sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,1,[6,12:20]))))./...
+                        sum(sum(sum(ycomb5_noage(find(TT2_treat5>=Tin,1),:,:,[6,12:20]))))); % 1-undiagnosed at time t divided by total in 2015
                     death_test(t-Tin+11,i,j,k) = (sum(sum(ycomb5_noage(find(TT2_treat5>=t,1)-1,:,:,22))) - sum(sum(ycomb5_noage(find(TT2_treat5>=t-1,1),:,:,22))))...
                         ./(TT2_treat5(find(TT2_treat5>=t,1))-TT2_treat5(find(TT2_treat5>=t-1,1)));
                 end
@@ -208,8 +208,8 @@ for s=1:sens
                         sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),1,:,1:20)));
 %                     diag_DBS(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,2:end,[6,12:20]))))./...
 %                         sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,:,[6,12:20]))));
-                    diag_DBS(t-Tin+11,i,j,k) = 100*(1 - sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),:,1,[6,12:20]))))./...
-                        sum(sum(sum(ycomb6_noage(find(TT2_treat6>=Tin,1),:,:,[6,12:20]))))); % 1-undiagnosed at time t divided by total in 2015
+                    diag_DBS(t-Tin+11,i,j,k) = 100*(1 - sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,1,[6,12:20]))))./...
+                        sum(sum(sum(ycomb3_noage(find(TT2_treat3>=Tin,1),:,:,[6,12:20]))))); % 1-undiagnosed at time t divided by total in 2015
                     death_DBS(t-Tin+11,i,j,k) = (sum(sum(ycomb3_noage(find(TT2_treat3>=t,1)-1,:,:,22))) - sum(sum(ycomb3_noage(find(TT2_treat3>=t-1,1),:,:,22))))...
                         ./(TT2_treat3(find(TT2_treat3>=t,1))-TT2_treat3(find(TT2_treat3>=t-1,1)));
                 end
@@ -546,10 +546,12 @@ for i = 1:length(paper(:,1))
     end
 end
 
-if isempty(find(diag_test(:,2,2,1)>90,1))==1 aa=0; else aa=find(diag_test(:,2,2,1)>90,1); end
+if isempty(find(diag_test(:,2,2,1)>90,1))==1 aa1=0; else aa1=find(diag_test(:,2,2,1)>90,1); end
+if isempty(find(diag_serum(:,2,2,1)>90,1))==1 aa2=0; else aa2=find(diag_serum(:,2,2,1)>90,1); end
+if isempty(find(diag_DBS(:,2,2,1)>90,1))==1 aa3=0; else aa3=find(diag_DBS(:,2,2,1)>90,1); end
 
 paper2 = [round([diag_test(23,2,2,1), diag_serum(23,2,2,1), diag_DBS(23,2,2,1)],0);...
-     [aa+2007,find(diag_serum(:,2,2,1)>90,1)+2007,find(diag_DBS(:,2,2,1)>90,1)+2007];...
+     [aa1+2007,aa2+2007,aa3+2007];...
      round([summary_test(2,2,1,1,1), summary_serum(2,2,1,1,1), summary_DBS(2,2,1,1,1)]/10^6,2);...% Total costs
      round([summary_test(2,2,1,4,1), summary_serum(2,2,1,4,1), summary_DBS(2,2,1,4,1)]/10^3,2);... % total treatments
      round([summary_test(2,2,1,9,1), summary_serum(2,2,1,9,1), summary_DBS(2,2,1,9,1)],0);... % total deaths
