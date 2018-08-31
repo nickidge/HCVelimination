@@ -39,7 +39,7 @@ options = optimoptions('particleswarm', 'Display', 'iter', 'MaxIter', maxiter,'S
 Run=16; %Years to run the model
 
 P=50000; %Population to start the model
-infected0=0.2; % initial proportion of PWID infected (in 1950)
+infected0=0.1; % initial proportion of PWID infected (in 1950)
 PWID0=40000; %Equilibrium proportion of PWID to former PWID
 S=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
 S1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
