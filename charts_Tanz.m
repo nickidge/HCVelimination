@@ -20,7 +20,7 @@ end
 h2_inc = plot(inc_HR(:,2), 'color', 'b', 'linewidth',2);
 legend([d1,h_inc(1),h2_inc,h_inc(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage',...
     'location','southwest');
-set(gca, 'Ylim',[0,5000],'YTick',0:1000:10000,'YTickLabel',0:2500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+set(gca, 'Ylim',[0,5000],'YTick',0:1000:10000,'YTickLabel',0:1000:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('New HCV infections per year');
 title({['Projected HCV incidence']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
 hold off;

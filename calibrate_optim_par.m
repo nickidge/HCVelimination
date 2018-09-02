@@ -24,7 +24,7 @@ lb(27:34) = 0.5*xp(27:34);
 ub = 10*xp;
 ub(14:19) = 10000; ub(20:22) = 5000; %ub(22) = 0; 
 ub(23) = 0.1; ub(24) = 0.1; % Forcing no NSP or OST
-ub(25) = 5; ub(26) = 20; % upper bounds for height of rel_incidence function and epidemic start year
+ub(25) = 5; ub(26) = 40; % upper bounds for height of rel_incidence function and epidemic start year
 ub(27:34) = 1.5*xp(27:34);
 
 %options.UseVectorized = true;
@@ -201,7 +201,7 @@ ost_coverage = ost0(1,2);
         
         [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y);
 
-        sigma_prev = 0.0005*data{1}(:,2:end); %standard deviations for prevalence by year
+        sigma_prev = 0.001*data{1}(:,2:end); %standard deviations for prevalence by year
         sigma_cascade = 0.1*data{2}(:,2:end); %standard deviations for cascade by year
         sigma_cascade_PWID = 0.1*data{3}(:,2:end); %standard deviations for cascade by year
         sigma_disease = 0.01*data{4}(:,2:end); %standard deviations for disease by year

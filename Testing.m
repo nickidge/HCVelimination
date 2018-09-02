@@ -14,6 +14,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
 filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\newanalysis");
+filename2 = "G:\My Drive\Papers\02 Hepatitis C\17 Tanzania\Simulations\latest";
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -34,8 +35,8 @@ for s=1:sens
     %infect = infect_base; progression = progression_base;
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(100, 30);
-    save('calibration_test5'); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
+        calibrate_optim_par(200, 30);
+    save(filename2); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
     
