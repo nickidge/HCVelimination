@@ -84,15 +84,16 @@ ylabel('New HCV infections per year');
 title({['Projected HCV incidence']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
 hold off;
 axes('Position',[0 0 1 1],'Visible','off');
+text(0.5,0.98,{'\fontsize{14}Impact of harm reduction on the HCV epidemic in Dar es Salaam'},'HorizontalAlignment','Center')
 hold off;
 subplot(2,1,2)
 b = bar(1:4,casc(1:4,:)');
-b(1).FaceColor = CML(1,:); b(2).FaceColor = CML(2,:); b(3).FaceColor = CML(3,:); b(4).FaceColor = CML(4,:);
-title({'\fontsize{10}Model projections for the cascade of care in 2030'});%,...
+b(1).FaceColor = CML(1,:); b(2).FaceColor = CML(2,:); b(3).FaceColor = CML(4,:);
+title({'\fontsize{12}Model projections for the cascade of care in 2030'});%,...
 ylabel({'Number of people (thousand)'});
-legend({'No testing/treatment','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg'},'Location', 'Northeast')
+legend({'Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg'},'Location', 'Northeast')
 set(gca,'XTickLabel',{'People with \newlineHCV (2030)', 'Diagnosed \newlineAb+ (2030)','Diagnosed \newlinecAg/RNA+ (2030)', 'Treated with \newlineDAAs (2030)'},...
-    'YTick',0:10000:250000,'YTickLabel',0:10:200, 'ylim',[0,35000], 'ygrid','on','fontsize',10); 
+    'YTick',0:10000:250000,'YTickLabel',0:10:200, 'ylim',[0,35000], 'ygrid','on','fontsize',11); 
 
 % subplot(2,2,3)
 % hold on; grid on;

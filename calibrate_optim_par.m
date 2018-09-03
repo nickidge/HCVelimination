@@ -90,8 +90,8 @@ for k = 6:13
     end
 end
 for k = 17:22
-    if x(k) > 1.1*x(k-1)
-        x(k) = 1.1*x(k-1);
+    if x(k) > 1.4*x(k-1)
+        x(k) = 1.4*x(k-1);
     end
 end
 % for k = 15:(length(x)-2)
@@ -156,8 +156,8 @@ ost_coverage = ost0(1,2);
             end
         end
         for k = 17:22
-            if xp(k) > 1.1*xp(k-1)
-                xp(k) = 1.1*xp(k-1);
+            if xp(k) > 1.4*xp(k-1)
+                xp(k) = 1.4*xp(k-1);
             end
         end
 %         for k = 15:(length(xp)-2)

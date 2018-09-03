@@ -14,7 +14,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
 filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\newanalysis");
-filename2 = "G:\My Drive\Papers\02 Hepatitis C\17 Tanzania\Simulations\latest";
+filename2 = "G:\My Drive\Papers\02 Hepatitis C\17 Tanzania\Simulations\latest100";
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -35,7 +35,7 @@ for s=1:sens
     %infect = infect_base; progression = progression_base;
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(200, 30);
+        calibrate_optim_par(50, 30);
     save(filename2); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
@@ -100,8 +100,8 @@ for s=1:sens
         end
         summary_HR(h,:,s) = summary(2,:,s);
     end
-    nsp_coverage = 0.06;
-    ost_coverage = 0.06;
+    nsp_coverage = 0.01;
+    ost_coverage = 0.1;
     
     %%  Scenario 2: Ab + RNA (standard testing) to reach 90% diagnosed
     scenario = 'current';
@@ -276,13 +276,13 @@ for s=1:sens
     
     
     %%  Scenario 5: Diagnosed risk reduction
-    scenario = 'DBC_HCVcAg';
+    scenario = 'DBS_HCVcAg';
     target_late=0; % Target PWID
     alpha = alpha_DAA;
     progression(1,3,2,1) = 50; progression(2,3,2,1) = 50; progression(3,3,2,1) = 50; % remove genotype
     progression(1,2,2,1) = 50; progression(2,2,2,1) = 50; progression(3,2,2,1) = 50; % perfect "RNA" followup
     range_followup = [0.74];
-    range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
+    range_test = [0,0.5]; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.9];
     followup = 0.76; %DBS sensitivity
