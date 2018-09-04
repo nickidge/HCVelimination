@@ -31,9 +31,9 @@ text(0.5,0.98,{'\fontsize{14}Impact of harm reduction on the HCV epidemic in Dar
 hold off;
 
 
-inc_testing = [inc_test(:,1,2,1),inc_test(:,2,2,1),inc_serum(:,2,2,1),inc_DBS(:,2,2,1)];
-prev_testing = [prev_test(:,1,2,1),prev_test(:,2,2,1),prev_serum(:,2,2,1),prev_DBS(:,2,2,1)];
-death_testing = [death_test(:,1,2,1),death_test(:,2,2,1),death_serum(:,2,2,1),death_DBS(:,2,2,1)];
+inc_testing = [inc_test(:,1,2,2),inc_test(:,2,2,2),inc_serum(:,2,2,2),inc_DBS(:,2,2,2)];
+prev_testing = [prev_test(:,1,2,2),prev_test(:,2,2,2),prev_serum(:,2,2,2),prev_DBS(:,2,2,2)];
+death_testing = [death_test(:,1,2,2),death_test(:,2,2,2),death_serum(:,2,2,2),death_DBS(:,2,2,2)];
 analysis_year = 2030;
 dat = cascade0(1,2:end);
 PLHCV2016 =  sum(sum(sum(ycomb2_noage(find(TT2_treat>=Tin,1),1:3,1:10,6:20))));

@@ -18,14 +18,14 @@ for l=1:length(Tint) %Find times corresponding to years since intervention
     t_val(l)=find(TT>=(Tint(l)),1);
 end
 TT_=TT(t_val(2):t_val(3))-Tint(2);
-[cost,qaly,life_exp,tr]=Costs_age(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,:,:,:),TT_,y2([t_val(2):t_val(3)]-t_val(1)+1,:,:,:,:,:,:,:));
+[cost,DALY,life_exp,tr]=Costs_age(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,:,:,:),TT_,y2([t_val(2):t_val(3)]-t_val(1)+1,:,:,:,:,:,:,:));
 tr_(1) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,1,:,[23,25])))); % Total treatments for PWID
 tr_(2) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,2,:,[23,25])))); % Total treatments for former PWID
 tr_(3) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,3,:,[23,25])))); % Total treatments for other
 tr_(4) = sum(sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,:,:,[23,25]))))); % Total treatments
 
 %Put a bunch of summary statistics together
-summary = [cost,qaly,tr(4),tr_(4),...
+summary = [cost,DALY,tr(4),tr_(4),...
     sum(sum(sum(ycomb_noage(find(TT>=80,1)+1:find(TT>=81,1),:,:,27))))/(TT(find(TT>=81,1))-TT(find(TT>=80,1))),... %Incidence in 2030
     (sum(sum(ycomb_noage(find(TT>=81,1),1:3,:,22)))-sum(sum(ycomb_noage(find(TT>=80,1),1:3,:,22))))...
     /(TT(find(TT>=81,1))-TT(find(TT>=80,1))),... %Liver related deaths in 2030

@@ -21,10 +21,11 @@ lb(1) = 0.01; lb(14:16) = 100; lb(22) = 0;
 lb(23) = 0; lb(24) = 0; 
 lb(25) = 0; lb(26) = 0; % lower bounds for height of rel_incidence function and epidemic start year
 lb(27:34) = 0.5*xp(27:34);
+lb(14:19) = 0;
 ub = 10*xp;
 ub(14:19) = 10000; ub(20:22) = 5000; %ub(22) = 0; 
 ub(23) = 0.1; ub(24) = 0.1; % Forcing no NSP or OST
-ub(25) = 5; ub(26) = 40; % upper bounds for height of rel_incidence function and epidemic start year
+ub(25) = 5; ub(26) = 30; % upper bounds for height of rel_incidence function and epidemic start year
 ub(27:34) = 1.5*xp(27:34);
 
 %options.UseVectorized = true;
@@ -205,7 +206,7 @@ ost_coverage = ost0(1,2);
         sigma_cascade = 0.1*data{2}(:,2:end); %standard deviations for cascade by year
         sigma_cascade_PWID = 0.1*data{3}(:,2:end); %standard deviations for cascade by year
         sigma_disease = 0.01*data{4}(:,2:end); %standard deviations for disease by year
-        sigma_cases = 0.001*data{5}(:,2:end); %standard deviations for cases by year
+        sigma_cases = 0.0005*data{5}(:,2:end); %standard deviations for cases by year
         sigma_ost = 0.1*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year
         sigma_nsp = 0.1*data{7}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
         sigma_diagnoses = 1*data{8}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year

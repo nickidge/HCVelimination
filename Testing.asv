@@ -14,7 +14,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
 filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\newanalysis");
-filename2 = "G:\My Drive\Papers\02 Hepatitis C\17 Tanzania\Simulations\latest200";
+filename2 = "G:\My Drive\Papers\02 Hepatitis C\17 Tanzania\Simulations\latest80";
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -35,7 +35,7 @@ for s=1:sens
     %infect = infect_base; progression = progression_base;
     
     [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(200, 30);
+        calibrate_optim_par(80, 30);
     save(filename2); infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
@@ -585,7 +585,7 @@ paper2_0HR = [round([0, diag_test(23,2,2,1), diag_serum(23,2,2,1), diag_DBS(23,2
      round([summary_HR(1,1,1), summary_test(2,2,1,1,1), summary_serum(2,2,1,1,1), summary_DBS(2,2,1,1,1)]/10^6,2);...% Total costs
      round([summary_HR(1,4,1), summary_test(2,2,1,4,1), summary_serum(2,2,1,4,1), summary_DBS(2,2,1,4,1)]/10^3,2);... % total treatments
      round([summary_HR(1,9,1), summary_test(2,2,1,9,1), summary_serum(2,2,1,9,1), summary_DBS(2,2,1,9,1)],0);... % total deaths
-     round([summary_HR(1,2,1), summary_test(2,2,1,2,1), summary_serum(2,2,1,2,1), summary_DBS(2,2,1,2,1)]/10^5,0)/10;... % total DALYs
+     round([summary_HR(1,2,1), summary_test(2,2,1,2,1), summary_serum(2,2,1,2,1), summary_DBS(2,2,1,2,1)],0);... % total DALYs
      round([summary_HR(1,5,1), summary_test(2,2,1,5,1), summary_serum(2,2,1,5,1), summary_DBS(2,2,1,5,1)],0);... % incidence in 2030
      round([summary_HR(1,8,1), summary_test(2,2,1,8,1), summary_serum(2,2,1,8,1), summary_DBS(2,2,1,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(1,5,1), summary_test(2,2,1,5,1), summary_serum(2,2,1,5,1), summary_DBS(2,2,1,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -595,7 +595,6 @@ paper2_currentHR = [round([0, diag_test(23,2,2,2), diag_serum(23,2,2,2), diag_DB
      round([summary_HR(2,1,1), summary_test(2,2,2,1,1), summary_serum(2,2,2,1,1), summary_DBS(2,2,2,1,1)]/10^6,2);...% Total costs
      round([summary_HR(2,4,1), summary_test(2,2,2,4,1), summary_serum(2,2,2,4,1), summary_DBS(2,2,2,4,1)]/10^3,2);... % total treatments
      round([summary_HR(2,9,1), summary_test(2,2,2,9,1), summary_serum(2,2,2,9,1), summary_DBS(2,2,2,9,1)],0);... % total deaths
-     round([summary_HR(2,2,1), summary_test(2,2,2,2,1), summary_serum(2,2,2,2,1), summary_DBS(2,2,2,2,1)]/10^5,0)/10;... % total DALYs
      round([summary_HR(2,5,1), summary_test(2,2,2,5,1), summary_serum(2,2,2,5,1), summary_DBS(2,2,2,5,1)],0);... % incidence in 2030
      round([summary_HR(2,8,1), summary_test(2,2,2,8,1), summary_serum(2,2,2,8,1), summary_DBS(2,2,2,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(2,5,1), summary_test(2,2,2,5,1), summary_serum(2,2,2,5,1), summary_DBS(2,2,2,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -605,7 +604,6 @@ paper2_10HR = [round([0, diag_test(23,2,2,3), diag_serum(23,2,2,3), diag_DBS(23,
      round([summary_HR(3,1,1), summary_test(2,2,3,1,1), summary_serum(2,2,3,1,1), summary_DBS(2,2,3,1,1)]/10^6,2);...% Total costs
      round([summary_HR(3,4,1), summary_test(2,2,3,4,1), summary_serum(2,2,3,4,1), summary_DBS(2,2,3,4,1)]/10^3,2);... % total treatments
      round([summary_HR(3,9,1), summary_test(2,2,3,9,1), summary_serum(2,2,3,9,1), summary_DBS(2,2,3,9,1)],0);... % total deaths
-     round([summary_HR(3,2,1), summary_test(2,2,3,2,1), summary_serum(2,2,3,2,1), summary_DBS(2,2,3,2,1)]/10^5,0)/10;... % total DALYs
      round([summary_HR(3,5,1), summary_test(2,2,3,5,1), summary_serum(2,2,3,5,1), summary_DBS(2,2,3,5,1)],0);... % incidence in 2030
      round([summary_HR(3,8,1), summary_test(2,2,3,8,1), summary_serum(2,2,3,8,1), summary_DBS(2,2,3,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(3,5,1), summary_test(2,2,3,5,1), summary_serum(2,2,3,5,1), summary_DBS(2,2,3,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -615,7 +613,6 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round([summary_HR(4,1,1), summary_test(2,2,4,1,1), summary_serum(2,2,4,1,1), summary_DBS(2,2,4,1,1)]/10^6,2);...% Total costs
      round([summary_HR(4,4,1), summary_test(2,2,4,4,1), summary_serum(2,2,4,4,1), summary_DBS(2,2,4,4,1)]/10^3,2);... % total treatments
      round([summary_HR(4,9,1), summary_test(2,2,4,9,1), summary_serum(2,2,4,9,1), summary_DBS(2,2,4,9,1)],0);... % total deaths
-     round([summary_HR(4,2,1), summary_test(2,2,4,2,1), summary_serum(2,2,4,2,1), summary_DBS(2,2,4,2,1)]/10^5,0)/10;... % total DALYs
      round([summary_HR(4,5,1), summary_test(2,2,4,5,1), summary_serum(2,2,4,5,1), summary_DBS(2,2,4,5,1)],0);... % incidence in 2030
      round([summary_HR(4,8,1), summary_test(2,2,4,8,1), summary_serum(2,2,4,8,1), summary_DBS(2,2,4,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(4,5,1), summary_test(2,2,4,5,1), summary_serum(2,2,4,5,1), summary_DBS(2,2,4,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -625,7 +622,6 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round([summary_HR(5,1,1), summary_test(2,2,5,1,1), summary_serum(2,2,5,1,1), summary_DBS(2,2,5,1,1)]/10^6,2);...% Total costs
      round([summary_HR(5,4,1), summary_test(2,2,5,4,1), summary_serum(2,2,5,4,1), summary_DBS(2,2,5,4,1)]/10^3,2);... % total treatments
      round([summary_HR(5,9,1), summary_test(2,2,5,9,1), summary_serum(2,2,5,9,1), summary_DBS(2,2,5,9,1)],0);... % total deaths
-     round([summary_HR(5,2,1), summary_test(2,2,5,2,1), summary_serum(2,2,5,2,1), summary_DBS(2,2,5,2,1)]/10^5,0)/10;... % total DALYs
      round([summary_HR(5,5,1), summary_test(2,2,5,5,1), summary_serum(2,2,5,5,1), summary_DBS(2,2,5,5,1)],0);... % incidence in 2030
      round([summary_HR(5,8,1), summary_test(2,2,5,8,1), summary_serum(2,2,5,8,1), summary_DBS(2,2,5,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(5,5,1), summary_test(2,2,5,5,1), summary_serum(2,2,5,5,1), summary_DBS(2,2,5,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -635,7 +631,6 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round([summary_HR(6,1,1), summary_test(2,2,6,1,1), summary_serum(2,2,6,1,1), summary_DBS(2,2,6,1,1)]/10^6,2);...% Total costs
      round([summary_HR(6,4,1), summary_test(2,2,6,4,1), summary_serum(2,2,6,4,1), summary_DBS(2,2,6,4,1)]/10^3,2);... % total treatments
      round([summary_HR(6,9,1), summary_test(2,2,6,9,1), summary_serum(2,2,6,9,1), summary_DBS(2,2,6,9,1)],0);... % total deaths
-     round([summary_HR(6,2,1), summary_test(2,2,6,2,1), summary_serum(2,2,6,2,1), summary_DBS(2,2,6,2,1)]/10^5,0)/10;... % total DALYs
      round([summary_HR(6,5,1), summary_test(2,2,6,5,1), summary_serum(2,2,6,5,1), summary_DBS(2,2,6,5,1)],0);... % incidence in 2030
      round([summary_HR(6,8,1), summary_test(2,2,6,8,1), summary_serum(2,2,6,8,1), summary_DBS(2,2,6,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(6,5,1), summary_test(2,2,6,5,1), summary_serum(2,2,6,5,1), summary_DBS(2,2,6,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -645,15 +640,14 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round([summary_HR(7,1,1), summary_test(2,2,7,1,1), summary_serum(2,2,7,1,1), summary_DBS(2,2,7,1,1)]/10^6,2);...% Total costs
      round([summary_HR(7,4,1), summary_test(2,2,7,4,1), summary_serum(2,2,7,4,1), summary_DBS(2,2,7,4,1)]/10^3,2);... % total treatments
      round([summary_HR(7,9,1), summary_test(2,2,7,9,1), summary_serum(2,2,7,9,1), summary_DBS(2,2,7,9,1)],0);... % total deaths
-     round([summary_HR(7,2,1), summary_test(2,2,7,2,1), summary_serum(2,2,7,2,1), summary_DBS(2,2,7,2,1)]/10^5,0)/10;... % total DALYs
      round([summary_HR(7,5,1), summary_test(2,2,7,5,1), summary_serum(2,2,7,5,1), summary_DBS(2,2,7,5,1)],0);... % incidence in 2030
      round([summary_HR(7,8,1), summary_test(2,2,7,8,1), summary_serum(2,2,7,8,1), summary_DBS(2,2,7,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(7,5,1), summary_test(2,2,7,5,1), summary_serum(2,2,7,5,1), summary_DBS(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(7,6,1), summary_test(2,2,7,6,1), summary_serum(2,2,7,6,1), summary_DBS(2,2,7,6,1)])/death2017,0)]; % mortality reduction in 2030
 
-paper2 = [paper2_0HR; zeros(1,4); paper2_currentHR; zeros(1,4); paper2_10HR; zeros(1,4); paper2_20HR; zeros(1,4); paper2_30HR; zeros(1,4); paper2_40HR; zeros(1,4); paper2_50HR];
+ paper2 = [paper2_0HR; paper2_currentHR; paper2_10HR; paper2_20HR; paper2_30HR; paper2_40HR; paper2_50HR];
  
-paper2_text = zeros(length(paper2(:,1))+7,1+length(paper2(1,:)));
+paper2_text = zeros(length(paper2(:,1))+1,1+length(paper2(1,:)));
 paper2_text = num2cell(paper2_text);
 paper2_text{1,1} = 'Scenario';
 paper2_text{1,2} = 'No testting/treatment';
@@ -666,77 +660,70 @@ paper2_text{3,1} = 'Year 80% diagnosed reached';
 paper2_text{4,1} = 'Total costs 2018-2030 (million US$)';
 paper2_text{5,1} = 'Total treatments 2018-2030 (thousand)';
 paper2_text{6,1} = 'Total HCV-related deaths 2018-2030';
-paper2_text{7,1} = 'Total DALYs 2018-2030 (million)';
-paper2_text{8,1} = 'Incidence in 2030';
-paper2_text{9,1} = 'Prevalence in 2030';
-paper2_text{10,1} = 'Incidence reduction in 2030';
-paper2_text{11,1} = 'Mortality reduction in 2030';
+paper2_text{7,1} = 'Incidence in 2030';
+paper2_text{8,1} = 'Prevalence in 2030';
+paper2_text{9,1} = 'Incidence reduction in 2030';
+paper2_text{10,1} = 'Mortality reduction in 2030';
 
-paper2_text{13,1} = 'Percentage diagnosed in 2030';
-paper2_text{14,1} = 'Year 80% diagnosed reached';
-paper2_text{15,1} = 'Total costs 2018-2030 (million US$)';
-paper2_text{16,1} = 'Total treatments 2018-2030 (thousand)';
-paper2_text{17,1} = 'Total HCV-related deaths 2018-2030';
-paper2_text{18,1} = 'Total DALYs 2018-2030';
-paper2_text{19,1} = 'Incidence in 2030';
-paper2_text{20,1} = 'Prevalence in 2030';
-paper2_text{21,1} = 'Incidence reduction in 2030';
-paper2_text{22,1} = 'Mortality reduction in 2030';
+paper2_text{11,1} = 'Percentage diagnosed in 2030';
+paper2_text{12,1} = 'Year 80% diagnosed reached';
+paper2_text{13,1} = 'Total costs 2018-2030 (million US$)';
+paper2_text{14,1} = 'Total treatments 2018-2030 (thousand)';
+paper2_text{15,1} = 'Total HCV-related deaths 2018-2030';
+paper2_text{16,1} = 'Incidence in 2030';
+paper2_text{17,1} = 'Prevalence in 2030';
+paper2_text{18,1} = 'Incidence reduction in 2030';
+paper2_text{19,1} = 'Mortality reduction in 2030';
 
-paper2_text{24,1} = 'Percentage diagnosed in 2030';
-paper2_text{25,1} = 'Year 80% diagnosed reached';
-paper2_text{26,1} = 'Total costs 2018-2030 (million US$)';
-paper2_text{27,1} = 'Total treatments 2018-2030 (thousand)';
-paper2_text{28,1} = 'Total HCV-related deaths 2018-2030';
-paper2_text{29,1} = 'Total DALYs 2018-2030';
-paper2_text{30,1} = 'Incidence in 2030';
-paper2_text{31,1} = 'Prevalence in 2030';
-paper2_text{32,1} = 'Incidence reduction in 2030';
-paper2_text{33,1} = 'Mortality reduction in 2030';
+paper2_text{20,1} = 'Percentage diagnosed in 2030';
+paper2_text{21,1} = 'Year 80% diagnosed reached';
+paper2_text{22,1} = 'Total costs 2018-2030 (million US$)';
+paper2_text{23,1} = 'Total treatments 2018-2030 (thousand)';
+paper2_text{24,1} = 'Total HCV-related deaths 2018-2030';
+paper2_text{25,1} = 'Incidence in 2030';
+paper2_text{26,1} = 'Prevalence in 2030';
+paper2_text{27,1} = 'Incidence reduction in 2030';
+paper2_text{28,1} = 'Mortality reduction in 2030';
 
-paper2_text{35,1} = 'Percentage diagnosed in 2030';
-paper2_text{36,1} = 'Year 80% diagnosed reached';
-paper2_text{37,1} = 'Total costs 2018-2030 (million US$)';
-paper2_text{38,1} = 'Total treatments 2018-2030 (thousand)';
-paper2_text{39,1} = 'Total HCV-related deaths 2018-2030';
-paper2_text{40,1} = 'Total DALYs 2018-2030';
-paper2_text{41,1} = 'Incidence in 2030';
-paper2_text{42,1} = 'Prevalence in 2030';
-paper2_text{43,1} = 'Incidence reduction in 2030';
-paper2_text{44,1} = 'Mortality reduction in 2030';
+paper2_text{29,1} = 'Percentage diagnosed in 2030';
+paper2_text{30,1} = 'Year 80% diagnosed reached';
+paper2_text{31,1} = 'Total costs 2018-2030 (million US$)';
+paper2_text{32,1} = 'Total treatments 2018-2030 (thousand)';
+paper2_text{33,1} = 'Total HCV-related deaths 2018-2030';
+paper2_text{34,1} = 'Incidence in 2030';
+paper2_text{35,1} = 'Prevalence in 2030';
+paper2_text{36,1} = 'Incidence reduction in 2030';
+paper2_text{37,1} = 'Mortality reduction in 2030';
 
-paper2_text{46,1} = 'Percentage diagnosed in 2030';
-paper2_text{47,1} = 'Year 80% diagnosed reached';
-paper2_text{48,1} = 'Total costs 2018-2030 (million US$)';
-paper2_text{49,1} = 'Total treatments 2018-2030 (thousand)';
-paper2_text{50,1} = 'Total HCV-related deaths 2018-2030';
-paper2_text{51,1} = 'Total DALYs 2018-2030';
+paper2_text{38,1} = 'Percentage diagnosed in 2030';
+paper2_text{39,1} = 'Year 80% diagnosed reached';
+paper2_text{40,1} = 'Total costs 2018-2030 (million US$)';
+paper2_text{41,1} = 'Total treatments 2018-2030 (thousand)';
+paper2_text{42,1} = 'Total HCV-related deaths 2018-2030';
+paper2_text{43,1} = 'Incidence in 2030';
+paper2_text{44,1} = 'Prevalence in 2030';
+paper2_text{45,1} = 'Incidence reduction in 2030';
+paper2_text{46,1} = 'Mortality reduction in 2030';
+
+paper2_text{47,1} = 'Percentage diagnosed in 2030';
+paper2_text{48,1} = 'Year 80% diagnosed reached';
+paper2_text{49,1} = 'Total costs 2018-2030 (million US$)';
+paper2_text{50,1} = 'Total treatments 2018-2030 (thousand)';
+paper2_text{51,1} = 'Total HCV-related deaths 2018-2030';
 paper2_text{52,1} = 'Incidence in 2030';
 paper2_text{53,1} = 'Prevalence in 2030';
 paper2_text{54,1} = 'Incidence reduction in 2030';
 paper2_text{55,1} = 'Mortality reduction in 2030';
 
-paper2_text{57,1} = 'Percentage diagnosed in 2030';
-paper2_text{58,1} = 'Year 80% diagnosed reached';
-paper2_text{59,1} = 'Total costs 2018-2030 (million US$)';
-paper2_text{60,1} = 'Total treatments 2018-2030 (thousand)';
-paper2_text{61,1} = 'Total HCV-related deaths 2018-2030';
-paper2_text{62,1} = 'Total DALYs 2018-2030';
-paper2_text{63,1} = 'Incidence in 2030';
-paper2_text{64,1} = 'Prevalence in 2030';
-paper2_text{65,1} = 'Incidence reduction in 2030';
-paper2_text{66,1} = 'Mortality reduction in 2030';
-
-paper2_text{68,1} = 'Percentage diagnosed in 2030';
-paper2_text{69,1} = 'Year 80% diagnosed reached';
-paper2_text{70,1} = 'Total costs 2018-2030 (million US$)';
-paper2_text{71,1} = 'Total treatments 2018-2030 (thousand)';
-paper2_text{72,1} = 'Total HCV-related deaths 2018-2030';
-paper2_text{73,1} = 'Total DALYs 2018-2030';
-paper2_text{74,1} = 'Incidence in 2030';
-paper2_text{75,1} = 'Prevalence in 2030';
-paper2_text{76,1} = 'Incidence reduction in 2030';
-paper2_text{77,1} = 'Mortality reduction in 2030';
+paper2_text{56,1} = 'Percentage diagnosed in 2030';
+paper2_text{57,1} = 'Year 80% diagnosed reached';
+paper2_text{58,1} = 'Total costs 2018-2030 (million US$)';
+paper2_text{59,1} = 'Total treatments 2018-2030 (thousand)';
+paper2_text{60,1} = 'Total HCV-related deaths 2018-2030';
+paper2_text{61,1} = 'Incidence in 2030';
+paper2_text{62,1} = 'Prevalence in 2030';
+paper2_text{63,1} = 'Incidence reduction in 2030';
+paper2_text{64,1} = 'Mortality reduction in 2030';
 
 for i = 1:length(paper2(:,1))
     for j = 1:length(paper2(1,:))

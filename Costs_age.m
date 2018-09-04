@@ -1,4 +1,4 @@
-function[c,q,life,tr,c_HR]=Costs_age(y,TT,y_large)
+function[c,DALY,life,tr,c_HR]=Costs_age(y,TT,y_large)
 global Q_sens q_svr q_svr_PWID q_treat sens c_daa discount care cascade_scale_time scenario prop_test progression ...
     num_pops num_cascade num_age num_intervention 
 
@@ -52,11 +52,11 @@ C1b=trapz(TT,sum(y(:,1,:,4),3).*exp(-discount.*TT))*c_svr_pa(2);
 C1c=trapz(TT,sum(y(:,1,:,5),3).*exp(-discount.*TT))*c_svr_pa(3);
 C2a=sum((sum(y(:,1,:,23),3)*(c_daa(1)+c_PWID)+sum(y(:,1,:,23),3)*0.9*c_svr0(1)).*exp(-discount.*TT)); %Cost of treatment from the F0-F3 stages
 C2b=sum((sum(y(:,1,:,25),3)*(c_daa(2)+c_PWID)+sum(y(:,1,:,25),3)*0.9*c_svr0(2)).*exp(-discount.*TT)); %Cost of treatment from the F4 stage onwards
-C3=trapz(TT,sum(y(:,1,2:10,6),3).*exp(-discount.*TT))*c_A; %Cost of diagnosis (measured in acute state). ONLY IF DIAGNOSED
-C4=trapz(TT,sum(y(:,1,2:10,12),3).*exp(-discount.*TT))*c_F012; %Cost of F0 state (integral under curve. ONLY IF DIAGNOSED
-C5=trapz(TT,sum(y(:,1,2:10,13),3).*exp(-discount.*TT))*c_F012;
-C6=trapz(TT,sum(y(:,1,2:10,14),3).*exp(-discount.*TT))*c_F012;
-C7=trapz(TT,sum(y(:,1,2:10,15),3).*exp(-discount.*TT))*c_F3;
+C3=trapz(TT,sum(y(:,1,1:10,6),3).*exp(-discount.*TT))*c_A; %Cost of diagnosis (measured in acute state). ONLY IF DIAGNOSED
+C4=trapz(TT,sum(y(:,1,1:10,12),3).*exp(-discount.*TT))*c_F012; %Cost of F0 state (integral under curve. ONLY IF DIAGNOSED
+C5=trapz(TT,sum(y(:,1,1:10,13),3).*exp(-discount.*TT))*c_F012;
+C6=trapz(TT,sum(y(:,1,1:10,14),3).*exp(-discount.*TT))*c_F012;
+C7=trapz(TT,sum(y(:,1,1:10,15),3).*exp(-discount.*TT))*c_F3;
 C8=trapz(TT,sum(y(:,1,:,16),3).*exp(-discount.*TT))*c_F4;
 C9=trapz(TT,sum(y(:,1,:,17),3).*exp(-discount.*TT))*c_DC;
 C10=trapz(TT,sum(y(:,1,:,18),3).*exp(-discount.*TT))*c_HCC_pa;
@@ -85,6 +85,14 @@ Q11=trapz(TT,sum(y(:,1,:,18),3).*exp(-discount.*TT))*q_HCC;
 Q12=trapz(TT,sum(y(:,1,:,19),3).*exp(-discount.*TT))*q_LT1;
 Q13=trapz(TT,sum(y(:,1,:,20),3).*exp(-discount.*TT))*q_LT2;
 
+for i=2:size(y,1) %Make sure these are the additional treatments/HCC transfers/LTs/liver transplants/incidence, rather than total
+    y(i,:,:,22)=max(y(i,:,:,22)-y(i-1,:,:,22),0);
+end
+DALY1=trapz(TT,sum(y(:,1,:,17),3).*exp(-discount.*TT))*DALY_DC;
+DALY2=trapz(TT,sum(y(:,1,:,18),3).*exp(-discount.*TT))*DALY_HCC;
+DALY3=trapz(TT,sum(y(:,1,:,22),3).*exp(-discount.*TT))*DALY_death;
+
+DALY_PWID = (DALY1+DALY2+DALY3);
 
 q_PWID=(Q1a+Q1b+Q1c+Q3+Q4a+Q4b+Q4c+Q5+Q6+Q7+Q8+Q9+Q10+Q11+Q12+Q13); 
 
@@ -96,11 +104,11 @@ C1b=trapz(TT,sum(sum(y(:,2:3,:,4),2),3).*exp(-discount.*TT))*c_svr_pa(2);
 C1c=trapz(TT,sum(sum(y(:,2:3,:,5),2),3).*exp(-discount.*TT))*c_svr_pa(3);
 C2a=sum((sum(sum(y(:,2:3,:,23),2),3)*(c_daa(1)+c_formerPWID)+sum(sum(y(:,2:3,:,23),2),3)*0.9*c_svr0(1)).*exp(-discount.*TT)); %Cost of treatment from the F0-F3 stages
 C2b=sum((sum(sum(y(:,2:3,:,25),2),3)*(c_daa(2)+c_formerPWID)+sum(sum(y(:,2:3,:,25),2),3)*0.9*c_svr0(2)).*exp(-discount.*TT)); %Cost of treatment from the F4 stage onwards
-C3=trapz(TT,sum(sum(y(:,2:3,2:10,6),2),3).*exp(-discount.*TT))*c_A; %Cost of diagnosis (measured in acute state). ONLY IF DIAGNOSED
-C4=trapz(TT,sum(sum(y(:,2:3,2:10,12),2),3).*exp(-discount.*TT))*c_F012; %Cost of F0 state (integral under curve)
-C5=trapz(TT,sum(sum(y(:,2:3,2:10,13),2),3).*exp(-discount.*TT))*c_F012;
-C6=trapz(TT,sum(sum(y(:,2:3,2:10,14),2),3).*exp(-discount.*TT))*c_F012;
-C7=trapz(TT,sum(sum(y(:,2:3,2:10,15),2),3).*exp(-discount.*TT))*c_F3;
+C3=trapz(TT,sum(sum(y(:,2:3,1:10,6),2),3).*exp(-discount.*TT))*c_A; %Cost of diagnosis (measured in acute state). ONLY IF DIAGNOSED
+C4=trapz(TT,sum(sum(y(:,2:3,1:10,12),2),3).*exp(-discount.*TT))*c_F012; %Cost of F0 state (integral under curve)
+C5=trapz(TT,sum(sum(y(:,2:3,1:10,13),2),3).*exp(-discount.*TT))*c_F012;
+C6=trapz(TT,sum(sum(y(:,2:3,1:10,14),2),3).*exp(-discount.*TT))*c_F012;
+C7=trapz(TT,sum(sum(y(:,2:3,1:10,15),2),3).*exp(-discount.*TT))*c_F3;
 C8=trapz(TT,sum(sum(y(:,2:3,:,16),2),3).*exp(-discount.*TT))*c_F4;
 C9=trapz(TT,sum(sum(y(:,2:3,:,17),2),3).*exp(-discount.*TT))*c_DC;
 C10=trapz(TT,sum(sum(y(:,2:3,:,18),2),3).*exp(-discount.*TT))*c_HCC_pa;
@@ -128,6 +136,12 @@ Q11=trapz(TT,sum(sum(y(:,2:3,:,18),2),3).*exp(-discount.*TT))*q_HCC;
 Q12=trapz(TT,sum(sum(y(:,2:3,:,19),2),3).*exp(-discount.*TT))*q_LT1;
 Q13=trapz(TT,sum(sum(y(:,2:3,:,20),2),3).*exp(-discount.*TT))*q_LT2;
 
+
+DALY1=trapz(TT,sum(sum(y(:,2:3,:,17),3),2).*exp(-discount.*TT))*DALY_DC;
+DALY2=trapz(TT,sum(sum(y(:,2:3,:,18),3),2).*exp(-discount.*TT))*DALY_HCC;
+DALY3=trapz(TT,sum(sum(y(:,2:3,:,22),3),2).*exp(-discount.*TT))*DALY_death;
+
+DALY_other = (DALY1+DALY2+DALY3);
 
 q_former=(Q1a+Q1b+Q1c+Q3+Q4a+Q4b+Q4c+Q5+Q6+Q7+Q8+Q9+Q10+Q11+Q12+Q13); 
 
@@ -175,7 +189,7 @@ c_HR = OST + NSP;
 c=c_PWIDtot+c_formertot+c_cascade+c_HR;
 q=q_PWID+q_former;
 life=trapz(TT,sum(sum(sum(y(:,:,:,1:20),4),3),2)) / sum(sum(sum(y(1,:,:,1:20))));
-
+DALY = DALY_PWID+DALY_other;
 %%treatments
 
 tr(1) = sum(sum(sum(y(:,1,:,[23,25]))));
