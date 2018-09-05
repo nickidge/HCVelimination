@@ -90,11 +90,11 @@ for k = 6:13
         x(k) = x(k-4);
     end
 end
-for k = 17:22
-    if x(k) > 1.4*x(k-1)
-        x(k) = 1.4*x(k-1);
-    end
-end
+% for k = 17:22
+%     if x(k) > 1.4*x(k-1)
+%         x(k) = 1.4*x(k-1);
+%     end
+% end
 % for k = 15:(length(x)-2)
 %     if x(k)< 0.9*x(k-1)
 %         x(k) = x(k-1);
@@ -156,11 +156,11 @@ ost_coverage = ost0(1,2);
                 xp(k) = xp(k-4);
             end
         end
-        for k = 17:22
-            if xp(k) > 1.4*xp(k-1)
-                xp(k) = 1.4*xp(k-1);
-            end
-        end
+%         for k = 17:22
+%             if xp(k) > 1.4*xp(k-1)
+%                 xp(k) = 1.4*xp(k-1);
+%             end
+%         end
 %         for k = 15:(length(xp)-2)
 %             if xp(k)< 0.9*xp(k-1)
 %                 xp(k) = xp(k-1);
@@ -202,11 +202,11 @@ ost_coverage = ost0(1,2);
         
         [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y);
 
-        sigma_prev = 0.001*data{1}(:,2:end); %standard deviations for prevalence by year
+        sigma_prev = 0.005*data{1}(:,2:end); %standard deviations for prevalence by year
         sigma_cascade = 0.1*data{2}(:,2:end); %standard deviations for cascade by year
         sigma_cascade_PWID = 0.1*data{3}(:,2:end); %standard deviations for cascade by year
-        sigma_disease = 0.01*data{4}(:,2:end); %standard deviations for disease by year
-        sigma_cases = 0.0005*data{5}(:,2:end); %standard deviations for cases by year
+        sigma_disease = 0.1*data{4}(:,2:end); %standard deviations for disease by year
+        sigma_cases = 0.00005*data{5}(:,2:end); %standard deviations for cases by year
         sigma_ost = 0.1*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year
         sigma_nsp = 0.1*data{7}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
         sigma_diagnoses = 1*data{8}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year

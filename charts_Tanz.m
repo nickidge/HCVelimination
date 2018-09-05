@@ -179,7 +179,7 @@ mod = casc';
 figure(20)
 subplot(1,2,1)
 grid on; hold on;
-a1_=area(TT2_treat,sum(scen1(:,4:11),2),'Facecolor',CM(8,:));
+a1_=area(TT2_treat,sum(scen1(:,2:11),2),'Facecolor',CM(8,:));
 a2_=area(TT2_treat,sum(scen1(:,5:11),2),'Facecolor',CM(7,:));
 a3_=area(TT2_treat,sum(scen1(:,6:11),2),'Facecolor',CM(6,:));
 a4_=area(TT2_treat,sum(scen1(:,7:11),2),'Facecolor',CM(5,:));

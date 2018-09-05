@@ -14,7 +14,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
 filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\newanalysis");
-filename2 = "G:\My Drive\Papers\02 Hepatitis C\17 Tanzania\Simulations\latest200";
+filename2 = "G:\My Drive\Papers\02 Hepatitis C\17 Tanzania\Simulations\superPLHCV";
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -585,7 +585,7 @@ paper2_0HR = [round([0, diag_test(23,2,2,1), diag_serum(23,2,2,1), diag_DBS(23,2
      round([summary_HR(1,1,1), summary_test(2,2,1,1,1), summary_serum(2,2,1,1,1), summary_DBS(2,2,1,1,1)]/10^6,2);...% Total costs
      round([summary_HR(1,4,1), summary_test(2,2,1,4,1), summary_serum(2,2,1,4,1), summary_DBS(2,2,1,4,1)]/10^3,2);... % total treatments
      round([summary_HR(1,9,1), summary_test(2,2,1,9,1), summary_serum(2,2,1,9,1), summary_DBS(2,2,1,9,1)],0);... % total deaths
-     round([summary_HR(1,2,1), summary_test(2,2,1,2,1), summary_serum(2,2,1,2,1), summary_DBS(2,2,1,2,1)]/10^5,0)/10;... % total DALYs
+     round([summary_HR(1,2,1), summary_test(2,2,1,2,1), summary_serum(2,2,1,2,1), summary_DBS(2,2,1,2,1)]/10^3,0);... % total DALYs
      round([summary_HR(1,5,1), summary_test(2,2,1,5,1), summary_serum(2,2,1,5,1), summary_DBS(2,2,1,5,1)],0);... % incidence in 2030
      round([summary_HR(1,8,1), summary_test(2,2,1,8,1), summary_serum(2,2,1,8,1), summary_DBS(2,2,1,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(1,5,1), summary_test(2,2,1,5,1), summary_serum(2,2,1,5,1), summary_DBS(2,2,1,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -595,7 +595,7 @@ paper2_currentHR = [round([0, diag_test(23,2,2,2), diag_serum(23,2,2,2), diag_DB
      round([summary_HR(2,1,1), summary_test(2,2,2,1,1), summary_serum(2,2,2,1,1), summary_DBS(2,2,2,1,1)]/10^6,2);...% Total costs
      round([summary_HR(2,4,1), summary_test(2,2,2,4,1), summary_serum(2,2,2,4,1), summary_DBS(2,2,2,4,1)]/10^3,2);... % total treatments
      round([summary_HR(2,9,1), summary_test(2,2,2,9,1), summary_serum(2,2,2,9,1), summary_DBS(2,2,2,9,1)],0);... % total deaths
-     round([summary_HR(2,2,1), summary_test(2,2,2,2,1), summary_serum(2,2,2,2,1), summary_DBS(2,2,2,2,1)]/10^5,0)/10;... % total DALYs
+     round([summary_HR(2,2,1), summary_test(2,2,2,2,1), summary_serum(2,2,2,2,1), summary_DBS(2,2,2,2,1)]/10^3,0);... % total DALYs
      round([summary_HR(2,5,1), summary_test(2,2,2,5,1), summary_serum(2,2,2,5,1), summary_DBS(2,2,2,5,1)],0);... % incidence in 2030
      round([summary_HR(2,8,1), summary_test(2,2,2,8,1), summary_serum(2,2,2,8,1), summary_DBS(2,2,2,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(2,5,1), summary_test(2,2,2,5,1), summary_serum(2,2,2,5,1), summary_DBS(2,2,2,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -605,7 +605,7 @@ paper2_10HR = [round([0, diag_test(23,2,2,3), diag_serum(23,2,2,3), diag_DBS(23,
      round([summary_HR(3,1,1), summary_test(2,2,3,1,1), summary_serum(2,2,3,1,1), summary_DBS(2,2,3,1,1)]/10^6,2);...% Total costs
      round([summary_HR(3,4,1), summary_test(2,2,3,4,1), summary_serum(2,2,3,4,1), summary_DBS(2,2,3,4,1)]/10^3,2);... % total treatments
      round([summary_HR(3,9,1), summary_test(2,2,3,9,1), summary_serum(2,2,3,9,1), summary_DBS(2,2,3,9,1)],0);... % total deaths
-     round([summary_HR(3,2,1), summary_test(2,2,3,2,1), summary_serum(2,2,3,2,1), summary_DBS(2,2,3,2,1)]/10^5,0)/10;... % total DALYs
+     round([summary_HR(3,2,1), summary_test(2,2,3,2,1), summary_serum(2,2,3,2,1), summary_DBS(2,2,3,2,1)]/10^3,0);... % total DALYs
      round([summary_HR(3,5,1), summary_test(2,2,3,5,1), summary_serum(2,2,3,5,1), summary_DBS(2,2,3,5,1)],0);... % incidence in 2030
      round([summary_HR(3,8,1), summary_test(2,2,3,8,1), summary_serum(2,2,3,8,1), summary_DBS(2,2,3,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(3,5,1), summary_test(2,2,3,5,1), summary_serum(2,2,3,5,1), summary_DBS(2,2,3,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -615,7 +615,7 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round([summary_HR(4,1,1), summary_test(2,2,4,1,1), summary_serum(2,2,4,1,1), summary_DBS(2,2,4,1,1)]/10^6,2);...% Total costs
      round([summary_HR(4,4,1), summary_test(2,2,4,4,1), summary_serum(2,2,4,4,1), summary_DBS(2,2,4,4,1)]/10^3,2);... % total treatments
      round([summary_HR(4,9,1), summary_test(2,2,4,9,1), summary_serum(2,2,4,9,1), summary_DBS(2,2,4,9,1)],0);... % total deaths
-     round([summary_HR(4,2,1), summary_test(2,2,4,2,1), summary_serum(2,2,4,2,1), summary_DBS(2,2,4,2,1)]/10^5,0)/10;... % total DALYs
+     round([summary_HR(4,2,1), summary_test(2,2,4,2,1), summary_serum(2,2,4,2,1), summary_DBS(2,2,4,2,1)]/10^3,0);... % total DALYs
      round([summary_HR(4,5,1), summary_test(2,2,4,5,1), summary_serum(2,2,4,5,1), summary_DBS(2,2,4,5,1)],0);... % incidence in 2030
      round([summary_HR(4,8,1), summary_test(2,2,4,8,1), summary_serum(2,2,4,8,1), summary_DBS(2,2,4,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(4,5,1), summary_test(2,2,4,5,1), summary_serum(2,2,4,5,1), summary_DBS(2,2,4,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -625,7 +625,7 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round([summary_HR(5,1,1), summary_test(2,2,5,1,1), summary_serum(2,2,5,1,1), summary_DBS(2,2,5,1,1)]/10^6,2);...% Total costs
      round([summary_HR(5,4,1), summary_test(2,2,5,4,1), summary_serum(2,2,5,4,1), summary_DBS(2,2,5,4,1)]/10^3,2);... % total treatments
      round([summary_HR(5,9,1), summary_test(2,2,5,9,1), summary_serum(2,2,5,9,1), summary_DBS(2,2,5,9,1)],0);... % total deaths
-     round([summary_HR(5,2,1), summary_test(2,2,5,2,1), summary_serum(2,2,5,2,1), summary_DBS(2,2,5,2,1)]/10^5,0)/10;... % total DALYs
+     round([summary_HR(5,2,1), summary_test(2,2,5,2,1), summary_serum(2,2,5,2,1), summary_DBS(2,2,5,2,1)]/10^3,0);... % total DALYs
      round([summary_HR(5,5,1), summary_test(2,2,5,5,1), summary_serum(2,2,5,5,1), summary_DBS(2,2,5,5,1)],0);... % incidence in 2030
      round([summary_HR(5,8,1), summary_test(2,2,5,8,1), summary_serum(2,2,5,8,1), summary_DBS(2,2,5,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(5,5,1), summary_test(2,2,5,5,1), summary_serum(2,2,5,5,1), summary_DBS(2,2,5,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -635,7 +635,7 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round([summary_HR(6,1,1), summary_test(2,2,6,1,1), summary_serum(2,2,6,1,1), summary_DBS(2,2,6,1,1)]/10^6,2);...% Total costs
      round([summary_HR(6,4,1), summary_test(2,2,6,4,1), summary_serum(2,2,6,4,1), summary_DBS(2,2,6,4,1)]/10^3,2);... % total treatments
      round([summary_HR(6,9,1), summary_test(2,2,6,9,1), summary_serum(2,2,6,9,1), summary_DBS(2,2,6,9,1)],0);... % total deaths
-     round([summary_HR(6,2,1), summary_test(2,2,6,2,1), summary_serum(2,2,6,2,1), summary_DBS(2,2,6,2,1)]/10^5,0)/10;... % total DALYs
+     round([summary_HR(6,2,1), summary_test(2,2,6,2,1), summary_serum(2,2,6,2,1), summary_DBS(2,2,6,2,1)]/10^3,0);... % total DALYs
      round([summary_HR(6,5,1), summary_test(2,2,6,5,1), summary_serum(2,2,6,5,1), summary_DBS(2,2,6,5,1)],0);... % incidence in 2030
      round([summary_HR(6,8,1), summary_test(2,2,6,8,1), summary_serum(2,2,6,8,1), summary_DBS(2,2,6,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(6,5,1), summary_test(2,2,6,5,1), summary_serum(2,2,6,5,1), summary_DBS(2,2,6,5,1)])/inc2017,0);... % incidence reduction in 2030
@@ -645,7 +645,7 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round([summary_HR(7,1,1), summary_test(2,2,7,1,1), summary_serum(2,2,7,1,1), summary_DBS(2,2,7,1,1)]/10^6,2);...% Total costs
      round([summary_HR(7,4,1), summary_test(2,2,7,4,1), summary_serum(2,2,7,4,1), summary_DBS(2,2,7,4,1)]/10^3,2);... % total treatments
      round([summary_HR(7,9,1), summary_test(2,2,7,9,1), summary_serum(2,2,7,9,1), summary_DBS(2,2,7,9,1)],0);... % total deaths
-     round([summary_HR(7,2,1), summary_test(2,2,7,2,1), summary_serum(2,2,7,2,1), summary_DBS(2,2,7,2,1)]/10^5,0)/10;... % total DALYs
+     round([summary_HR(7,2,1), summary_test(2,2,7,2,1), summary_serum(2,2,7,2,1), summary_DBS(2,2,7,2,1)]/10^3,0);... % total DALYs
      round([summary_HR(7,5,1), summary_test(2,2,7,5,1), summary_serum(2,2,7,5,1), summary_DBS(2,2,7,5,1)],0);... % incidence in 2030
      round([summary_HR(7,8,1), summary_test(2,2,7,8,1), summary_serum(2,2,7,8,1), summary_DBS(2,2,7,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(7,5,1), summary_test(2,2,7,5,1), summary_serum(2,2,7,5,1), summary_DBS(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030

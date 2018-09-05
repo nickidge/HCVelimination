@@ -148,17 +148,17 @@ q_former=(Q1a+Q1b+Q1c+Q3+Q4a+Q4b+Q4c+Q5+Q6+Q7+Q8+Q9+Q10+Q11+Q12+Q13);
 %% Cascade costs
 if strcmp(scenario,'rapidRNA') == 1 || strcmp(scenario,'WHO') == 1 || strcmp(scenario,'WHO1') == 1 || strcmp(scenario,'current') == 1
     c_cascade2 = 163.90; % cost of rapid RNA test
-    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) * c_cascade2_ab.*exp(-discount.*TT)); % ab testing, for all PWID
+    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) /2 * c_cascade2_ab.*exp(-discount.*TT)); % ab testing, for all PWID. Divide by two becuase progression rate is doube the testing (diagnosis iassumed to be in between tests)
     Cas_cost2=sum(sum(sum(y(:,:,:,29),3),2)*c_cascade2_RNA.*exp(-discount.*TT)); % i.e. RNA tests
     
 elseif strcmp(scenario,'serum_HCVcAg') == 1
-    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) * c_cascade2_serum.*exp(-discount.*TT)); % i.e. serum tests only, for all PWID
+    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) /2 * c_cascade2_serum.*exp(-discount.*TT)); % i.e. serum tests only, for all PWID
     Cas_cost2 = 0;
 elseif strcmp(scenario,'DBS_HCVcAg') == 1
-    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) * c_cascade2_DBS.*exp(-discount.*TT)); % i.e. DBS tests only, for all PWID
+    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1)/2 * c_cascade2_DBS.*exp(-discount.*TT)); % i.e. DBS tests only, for all PWID
     Cas_cost2 = 0;
 else
-    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) * c_cascade1.*exp(-discount.*TT)); % i.e. antibody tests
+    Cas_cost1=sum(sum(y(:,1,1,1:20),4)* prop_test * progression(1,1,2,1) /2 * c_cascade1.*exp(-discount.*TT)); % i.e. antibody tests
     Cas_cost2=sum(sum(sum(y(:,:,:,29),3),2)*c_cascade2.*exp(-discount.*TT)); % i.e RNA tests
 end
 Cas_cost3=sum(sum(sum(y(:,:,:,30),3),2)*c_cascade3(2).*exp(-discount.*TT)); % i.e assumes no genotype tests, just other workup
