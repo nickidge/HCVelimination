@@ -202,11 +202,11 @@ ost_coverage = ost0(1,2);
         
         [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y);
 
-        sigma_prev = 0.005*data{1}(:,2:end); %standard deviations for prevalence by year
+        sigma_prev = 0.001*data{1}(:,2:end); %standard deviations for prevalence by year
         sigma_cascade = 0.1*data{2}(:,2:end); %standard deviations for cascade by year
         sigma_cascade_PWID = 0.1*data{3}(:,2:end); %standard deviations for cascade by year
-        sigma_disease = 0.1*data{4}(:,2:end); %standard deviations for disease by year
-        sigma_cases = 0.00005*data{5}(:,2:end); %standard deviations for cases by year
+        sigma_disease = 1*data{4}(:,2:end); %standard deviations for disease by year
+        sigma_cases = 0.0001*data{5}(:,2:end); %standard deviations for cases by year
         sigma_ost = 0.1*data{6}(:,2:end); %standard deviations for proportion of PWID on ost by year
         sigma_nsp = 0.1*data{7}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
         sigma_diagnoses = 1*data{8}(:,2:end); %standard deviations for proportion of PWID accessing NSP by year
