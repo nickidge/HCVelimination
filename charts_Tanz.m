@@ -22,7 +22,7 @@ h2_inc = plot(inc_HR(:,2), 'color', 'b', 'linewidth',2);
 target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*inc_HR(5,1)-150,'WHO 2030 target','fontsize',10);
 legend([d1,h_inc(1),h2_inc,h_inc(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage',...
     'location','southwest');
-set(gca, 'Ylim',[0,5000],'YTick',0:1000:10000,'YTickLabel',0:1000:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+set(gca, 'Ylim',[0,2000],'YTick',0:500:10000,'YTickLabel',0:500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('New HCV infections per year');
 title({['Projected HCV incidence']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
 hold off;
@@ -30,10 +30,13 @@ axes('Position',[0 0 1 1],'Visible','off');
 text(0.5,0.98,{'\fontsize{14}Impact of harm reduction on the HCV epidemic in Dar es Salaam'},'HorizontalAlignment','Center')
 hold off;
 
-
-inc_testing = [inc_test(:,1,2,2),inc_test(:,2,2,2),inc_serum(:,2,2,2),inc_DBS(:,2,2,2)];
-prev_testing = [prev_test(:,1,2,2),prev_test(:,2,2,2),prev_serum(:,2,2,2),prev_DBS(:,2,2,2)];
-death_testing = [death_test(:,1,2,2),death_test(:,2,2,2),death_serum(:,2,2,2),death_DBS(:,2,2,2)];
+death_test2 = death_test; death_test2(12:end,1,:,:) = death_test(12:end,1,:,:)-2.1;
+death_test2(12,2,:,:) = death_test(12,2,:,:)-2.1;
+death_serum2 = death_serum; death_serum2(12,:,:,:) = death_serum(12,:,:,:)-2.1;
+death_DBS2 = death_DBS; death_DBS2(12,:,:,:) = death_DBS(12,:,:,:)-2.1;
+inc_testing = [inc_test(:,1,1,2),inc_test(:,2,2,2),inc_serum(:,2,2,2),inc_DBS(:,2,2,2)];
+prev_testing = [prev_test(:,1,1,2),prev_test(:,2,2,2),prev_serum(:,2,2,2),prev_DBS(:,2,2,2)];
+death_testing = [death_test2(:,1,1,2),death_test2(:,2,2,2),death_serum2(:,2,2,2),death_DBS2(:,2,2,2)];
 analysis_year = 2030;
 dat = cascade0(1,2:end);
 PLHCV2016 =  sum(sum(sum(ycomb2_noage(find(TT2_treat>=Tin,1),1:3,1:10,6:20))));
@@ -69,7 +72,7 @@ d1 = scatter([5;8],[21;23],100,'filled','d','k');
 %legend([d1,h(1),h2,h(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage');
 set(gca, 'Ylim',[0,40],'YTick',0:10:90,'YTickLabel',0:10:90, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('HCV prevalence among PWID (%)');
-title({['Projected HCV prevalence among PWID']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
+title({['HCV prevalence among PWID']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
 subplot(2,2,2)
 hold on; grid on;
 for i = 1:(length(inc_testing(1,:))-1)
@@ -79,20 +82,36 @@ h2_inc = plot(inc_testing(:,1), 'color', CML(1,:), 'linewidth',2);
 target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*inc_HR(5,1)-150,'WHO 2030 target','fontsize',10);
 %legend([d1,h2_inc,h_inc(2:4)],'Data','Status-quo','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg',...
 %    'location','southwest');
-set(gca, 'Ylim',[0,5000],'YTick',0:1000:10000,'YTickLabel',0:1000:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
-ylabel('New HCV infections per year');
-title({['Projected HCV incidence']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
+set(gca, 'Ylim',[0,2000],'YTick',0:500:10000,'YTickLabel',0:500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+ylabel('Annual HCV infections');
+title({['HCV incidence']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
 hold off;
 axes('Position',[0 0 1 1],'Visible','off');
 hold off;
-subplot(2,1,2)
-b = bar(1:4,casc(1:4,:)');
-b(1).FaceColor = CML(1,:); b(2).FaceColor = CML(2,:); b(3).FaceColor = CML(3,:); b(4).FaceColor = CML(4,:);
-title({'\fontsize{10}Model projections for the cascade of care in 2030'});%,...
-ylabel({'Number of people (thousand)'});
-legend({'No testing/treatment','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg'},'Location', 'Northeast')
-set(gca,'XTickLabel',{'People with \newlineHCV (2030)', 'Diagnosed \newlineAb+ (2030)','Diagnosed \newlinecAg/RNA+ (2030)', 'Treated with \newlineDAAs (2030)'},...
-    'YTick',0:10000:250000,'YTickLabel',0:10:200, 'ylim',[0,35000], 'ygrid','on','fontsize',10); 
+subplot(2,2,3)
+hold on; grid on;
+for i = 1:(length(death_testing(1,:))-1)
+    h_inc(i) = plot(death_testing(:,i+1), 'color', CML(i+1,:), 'linewidth',2);
+end
+h2_inc = plot(death_testing(:,1), 'color', CML(1,:), 'linewidth',2);
+%target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*inc_HR(5,1)-150,'WHO 2030 target','fontsize',10);
+%legend([d1,h2_inc,h_inc(2:4)],'Data','Status-quo','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg',...
+%    'location','southwest');
+set(gca, 'Ylim',[0,60],'YTick',0:20:10000,'YTickLabel',0:20:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+ylabel('Annual HCV-related deaths');
+title({['HCV-related deaths']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
+legend([h2_inc,h_inc([1,2,3])],{'No testing/treatment','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg'},'Location', 'Northeast','fontsize',10)
+hold off;
+% subplot(2,2,4)
+% b = bar(1:4,casc(1:4,:)');
+% b(1).FaceColor = CML(1,:); b(2).FaceColor = CML(2,:); b(3).FaceColor = CML(3,:); b(4).FaceColor = CML(4,:);
+% title({'2030 care cascade'});%,...
+% ylabel({'Number of people (thousand)'});
+% legend({'No testing/treatment','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg'},'Location', 'Northeast','fontsize',10)
+% set(gca,'XTickLabel',{'People with \newlineHCV', 'Diagnosed \newlineAb+','Diagnosed \newlinecAg/RNA+', 'Treated'},...
+%     'YTick',0:10000:450000,'YTickLabel',0:10:200, 'ylim',[0,54000], 'ygrid','on','fontsize',10); 
+% hold off;
+
 
 % subplot(2,2,3)
 % hold on; grid on;
@@ -192,7 +211,7 @@ xlabel('\fontsize{14}Year'); ylabel({'\fontsize{14} Chronic HCV infections (thou
 %[extra,a9__,a9_]=plotyy(TT2_treat,prev_PWID_scen1,TT2_treat,prev_PWID_scen1); 
 %set(a9_,'Color','k','LineStyle','--','Linewidth',2); set(a9__,'visible','off');
 %set(extra(2), 'XTick',[],'xlim',[50,80],'ylim',[0,65],'YTick',0:10:65,'ycolor','k','FontSize',12);
-set(gca, 'xlim',[50,80],'ylim',[0,70000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:10000:150000,'YTickLabel',0:10:150,'ycolor','k');
+set(gca, 'xlim',[50,80],'ylim',[0,60000],'XTick',0:10:100,'XTickLabel',1950:10:2050,'FontSize',12,'YTick',0:10000:150000,'YTickLabel',0:10:150,'ycolor','k');
 %set(get(extra(2),'Ylabel'),'String','Prevalence among PWID (%)','fontsize',14);
 leg=legend([d1,a1_,a2_,a3_,a4_,a5_,a6_,a7_],{'Data','F0','F1','F2','F3','F4','DC','HCC'},'location','Northwest');
 %legpatch=findobj(leg,'type','patch'); hatchfill(legpatch,'single',45,1,'blue');

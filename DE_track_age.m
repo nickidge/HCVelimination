@@ -6,7 +6,7 @@ global mu_PWID mu_former exit_IDU r_relapse delta alpha p_complete omega infect 
     imp1 imp2 imp3 imp4 imp5 imp6 imp7 imp8 imp9 imported...
     scenario cascade_scale_time age_mix start_year r_inc_up followup ...
     APRI num_pops num_cascade num_age num_intervention num_engagement num_region infect_factor progression progression_base...
-    ost_enrollment ost_duration nsp_enrollment nsp_duration RNAtesting harm_reduction_coverage ost_coverage nsp_coverage diagnosed_risk_reduction
+    ost_enrollment ost_duration nsp_enrollment nsp_duration RNAtesting harm_reduction_coverage ost_coverage nsp_coverage diagnosed_risk_reduction output_cases
 
 
 APRI = 1;
@@ -237,10 +237,10 @@ y(1,:) = [y0];
             elseif TT>=35 && TT<40 import_infections=imp3*(40-TT)/5 + (TT-35)*imp4/5;
             elseif TT>=40 && TT<45 import_infections=imp4*(45-TT)/5 + (TT-40)*imp5/5;
             elseif TT>=45 && TT<50 import_infections=imp5*(50-TT)/5 + (TT-45)*imp6/5;
-            elseif TT>=50 && TT<55 import_infections=imp6*(55-TT)/5 + (TT-50)*imp7/5;
-            elseif TT>=55 && TT<60 import_infections=imp7*(60-TT)/5 + (TT-55)*imp8/5;
-            elseif TT>=60 && TT<65 import_infections=imp8*(65-TT)/5 + (TT-60)*imp9/5;
-            elseif TT>=65 import_infections=imp9; end
+            elseif TT>=50 && TT<55 import_infections=(imp6*(55-TT)/5 + (TT-50)*imp7/5);
+            elseif TT>=55 && TT<60 import_infections=(imp7*(60-TT)/5 + (TT-55)*imp8/5);
+            elseif TT>=60 && TT<65 import_infections=(imp8*(65-TT)/5 + (TT-60)*imp9/5);
+            elseif TT>=65 import_infections=imp9*max((68-TT)/3,0) + min((TT-65)/3,1)*imp9 * sum(sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,:,6:20))))))))/ output_cases(1) ; end
             ydot6(2,1,1,1,2,1,12)=0*import_infections;
             ydot6(2,1,1,1,2,1,27)=0*import_infections;
             ydot6(2,1,1,1,2,1,1)=(0*import_infections)/max(1,(sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,12:20)))))))/max(1,sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,1:20)))))))))); % keep prevalence constant among former

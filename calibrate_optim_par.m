@@ -21,7 +21,7 @@ lb(1) = 0.01; lb(14:16) = 100; lb(22) = 0;
 lb(23) = 0; lb(24) = 0; 
 lb(25) = 0; lb(26) = 0; % lower bounds for height of rel_incidence function and epidemic start year
 lb(27:34) = 0.5*xp(27:34);
-lb(14:19) = 0;
+lb(14:19) = 150;
 ub = 10*xp;
 ub(14:19) = 10000; ub(20:22) = 5000; %ub(22) = 0; 
 ub(23) = 0.1; ub(24) = 0.1; % Forcing no NSP or OST
@@ -39,51 +39,51 @@ options = optimoptions('particleswarm', 'Display', 'iter', 'MaxIter', maxiter,'S
 
 Run=16; %Years to run the model
 
-P=50000; %Population to start the model
-infected0=0.1; % initial proportion of PWID infected (in 1950)
-PWID0=40000; %Equilibrium proportion of PWID to former PWID
-S=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-S1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-S2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-S3=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-S4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-A=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-T=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-T1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-T2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-T3=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-T4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-F0=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-F1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-F2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-F3=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-F4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-DC=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-HCC=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-LT=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-LT2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-F4_transfer=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Ldeath=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-T_total=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-HCC_transfer=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-T_F4on_total=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Liver_transplants=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Inc=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Cas1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Cas2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Cas3=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Cas4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Cas5=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-Cas6=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
-
-S(1,1,1,1,2,1)=(1-infected0)*PWID0;
-S(2,1,1,1,2,1)=P-PWID0;
-F0(1,1,1,1,2,1)=infected0*PWID0;
-
-
-y0=reshape(cat(7,S,S1,S2,S3,S4,A,T,T1,T2,T3,T4,F0,F1,F2,F3,F4,DC,HCC,LT,LT2,F4_transfer,Ldeath,T_total,HCC_transfer,T_F4on_total,Liver_transplants,Inc,Cas1,Cas2,Cas3,Cas4,Cas5,Cas6),...
-    num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,33);
-t0=0;
+% P=50000; %Population to start the model
+% infected0=0.1; % initial proportion of PWID infected (in 1950)
+% PWID0=40000; %Equilibrium proportion of PWID to former PWID
+% S=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% S1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% S2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% S3=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% S4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% A=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% T=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% T1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% T2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% T3=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% T4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% F0=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% F1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% F2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% F3=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% F4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% DC=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% HCC=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% LT=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% LT2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% F4_transfer=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Ldeath=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% T_total=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% HCC_transfer=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% T_F4on_total=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Liver_transplants=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Inc=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Cas1=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Cas2=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Cas3=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Cas4=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Cas5=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% Cas6=zeros(num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region);
+% 
+% S(1,1,1,1,2,1)=(1-infected0)*PWID0;
+% S(2,1,1,1,2,1)=P-PWID0;
+% F0(1,1,1,1,2,1)=infected0*PWID0;
+% 
+% 
+% y0=reshape(cat(7,S,S1,S2,S3,S4,A,T,T1,T2,T3,T4,F0,F1,F2,F3,F4,DC,HCC,LT,LT2,F4_transfer,Ldeath,T_total,HCC_transfer,T_F4on_total,Liver_transplants,Inc,Cas1,Cas2,Cas3,Cas4,Cas5,Cas6),...
+%     num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,33);
+% t0=0;
 
 for k = 6:13
     if x(k) < 0.9*x(k-4)
@@ -129,8 +129,8 @@ r_F3F4_PWID = x(34);
 
 nsp_coverage = nsp0(1,2);
 ost_coverage = ost0(1,2);
-
-[TT, y] = DE_track_age(Tin, y0, 0, treat);
+[TT, y] = DE_track_age(Tin, y0_init, 0, treat);
+%[TT, y] = DE_track_age(Tin, y0, 0, treat);
 
 [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases, output_ost, output_nsp, output_diagnoses] = model_vals(TT,y)
 

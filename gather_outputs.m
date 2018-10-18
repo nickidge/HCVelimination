@@ -1,4 +1,4 @@
-function [ycomb_noage, summary, tr, tr_] = gather_outputs(y1,y2,TT)
+function [ycomb_noage, summary, tr, tr_,c_treat_total] = gather_outputs(y1,y2,TT)
 global Tin num_pops num_cascade num_age num_intervention num_engagement num_region
 
 ycomb=[y1(1:end-1,:,:,:,:,:,:,:);y2];
@@ -18,7 +18,7 @@ for l=1:length(Tint) %Find times corresponding to years since intervention
     t_val(l)=find(TT>=(Tint(l)),1);
 end
 TT_=TT(t_val(2):t_val(3))-Tint(2);
-[cost,DALY,life_exp,tr]=Costs_age(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,:,:,:),TT_,y2([t_val(2):t_val(3)]-t_val(1)+1,:,:,:,:,:,:,:));
+[cost,DALY,life_exp,tr,c_HR,c_treat_total]=Costs_age(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,:,:,:),TT_,y2([t_val(2):t_val(3)]-t_val(1)+1,:,:,:,:,:,:,:));
 tr_(1) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,1,:,[23,25])))); % Total treatments for PWID
 tr_(2) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,2,:,[23,25])))); % Total treatments for former PWID
 tr_(3) = sum(sum(sum(y2_noage([t_val(2):t_val(3)]-t_val(1)+1,3,:,[23,25])))); % Total treatments for other
