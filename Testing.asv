@@ -40,7 +40,7 @@ for s=1:sens
     %load(filename2); %infect = 0.1066; imp6=3*imp6; imp7=3.4*imp9; imp8=3.4*imp9; imp9=3.4*imp9;
     infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
-    %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\unc_5variance");
+    filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\unc_5variance");
     
     
  %% Run model in prior to 2017

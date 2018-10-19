@@ -240,7 +240,7 @@ y(1,:) = [y0];
             elseif TT>=50 && TT<55 import_infections=(imp6*(55-TT)/5 + (TT-50)*imp7/5);
             elseif TT>=55 && TT<60 import_infections=(imp7*(60-TT)/5 + (TT-55)*imp8/5);
             elseif TT>=60 && TT<65 import_infections=(imp8*(65-TT)/5 + (TT-60)*imp9/5);
-            elseif TT>=65 import_infections=imp9*max((68-TT)/3,0) + min((TT-65)/3,1)*imp9 * sum(sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,:,6:20))))))))/ output_cases(1) ; end
+            elseif TT>=65 import_infections=imp9*max((68-TT)/3,0) + min((TT-65)/3,1)*imp9 * sum(sum(sum(sum(sum(sum(sum(Y(:,:,:,:,:,:,6:20)))))))); end%/ output_cases(1) ; end
             ydot6(2,1,1,1,2,1,12)=0*import_infections;
             ydot6(2,1,1,1,2,1,27)=0*import_infections;
             ydot6(2,1,1,1,2,1,1)=(0*import_infections)/max(1,(sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,12:20)))))))/max(1,sum(sum(sum(sum(sum(sum(Y(2,:,:,:,:,:,1:20)))))))))); % keep prevalence constant among former
