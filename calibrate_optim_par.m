@@ -90,14 +90,14 @@ for k = 6:13
         x(k) = x(k-4);
     end
 end
-% for k = 17:22
-%     if x(k) > 1.4*x(k-1)
-%         x(k) = 1.4*x(k-1);
-%     end
-% end
+for k = 17:22
+    if x(k) > 1.4*x(k-1)
+        x(k) = 1.4*x(k-1);
+    end
+end
 % for k = 15:(length(x)-2)
-%     if x(k)< 0.9*x(k-1)
-%         x(k) = x(k-1);
+%     if x(k)< 0.75*x(k-1)
+%         x(k) = 0.75*x(k-1);
 %     end
 % end
 
@@ -156,14 +156,14 @@ ost_coverage = ost0(1,2);
                 xp(k) = xp(k-4);
             end
         end
-%         for k = 17:22
-%             if xp(k) > 1.4*xp(k-1)
-%                 xp(k) = 1.4*xp(k-1);
-%             end
-%         end
+        for k = 17:22
+            if xp(k) > 1.4*xp(k-1)
+                xp(k) = 1.4*xp(k-1);
+            end
+        end
 %         for k = 15:(length(xp)-2)
-%             if xp(k)< 0.9*xp(k-1)
-%                 xp(k) = xp(k-1);
+%             if xp(k)< 0.75*xp(k-1)
+%                 xp(k) = 0.75*xp(k-1);
 %             end
 %         end
         

@@ -34,10 +34,10 @@ for s=1:sens
     infect_base = infect; progression_base = progression; treat = [0,0,0];
     %infect = infect_base; progression = progression_base;
     
-    [output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
-        calibrate_optim_par(200, 30);
-    save(filename2); 
-    %load(filename2); %infect = 0.1066; imp6=3*imp6; imp7=3.4*imp9; imp8=3.4*imp9; imp9=3.4*imp9;
+    %[output_prev, output_cascade, output_cascade_PWID, output_disease, output_cases,output_ost,output_nsp, output_diagnoses] = ...
+    %    calibrate_optim_par(200, 30);
+    %save(filename2); 
+    load(filename2); imp9=imp8;  imp7 = imp7*1.2; infect = 0.9*infect; %infect = 0.1066; imp6=3*imp6; imp7=3.4*imp9; imp8=3.4*imp9; imp9=3.4*imp9;
     infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     %filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\unc_5variance");
