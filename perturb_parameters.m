@@ -3,11 +3,11 @@
 %     r_F4DC r_DCHCC r_F4HCC r_DCLT r_DCdeath r_HCCLT r_HCCdeath r_LTdeath1 r_LTdeath2 r_S4death r_LT1LT2...
 %     Q_sens q_svr q_svr_PWID q_treat infect_factor infect exit_IDU
 
-load('calibration.mat','delta', 'alpha', 'p_complete',... 
+load('calibration_oct.mat','delta', 'alpha', 'p_complete',... 
     'r_AF0', 'r_F0F1', 'r_F1F2', 'r_F2F3', 'r_F3F4', 'r_F0F1_PWID', 'r_F1F2_PWID', 'r_F2F3_PWID', 'r_F3F4_PWID', ...
     'r_F4DC', 'r_DCHCC', 'r_F4HCC', 'r_DCLT', 'r_DCdeath', 'r_HCCLT', 'r_HCCdeath', 'r_LTdeath1', 'r_LTdeath2', 'r_S4death', 'r_LT1LT2',...
-    'Q_sens', 'q_svr', 'q_svr_PWID', 'q_treat','infect_factor','infect', 'exit_IDU')
-variance = 0.05;
+    'Q_sens', 'q_svr', 'q_svr_PWID', 'q_treat','infect_factor','infect', 'exit_IDU', 'total_PWID','imp4','imp5','imp6','imp7','imp8','imp9')
+variance = 0.10;
 
 % alpha=random('Uniform',0.9,0.9);
 % p_complete=random('Uniform',0.85,0.95);
@@ -32,9 +32,17 @@ r_LTdeath1 = -log(1-random(makedist('Triangular','a',1-exp(-r_LTdeath1 *(1-varia
 r_LTdeath2 = -log(1-random(makedist('Triangular','a',1-exp(-r_LTdeath2 *(1-variance)),'b',1-exp(-r_LTdeath2),'c',1-exp(-r_LTdeath2 *(1+variance)))));
 r_S4death = -log(1-random(makedist('Triangular','a',1-exp(-r_S4death*(1-variance)),'b',1-exp(-r_S4death),'c',1-exp(-r_S4death*(1+variance)))));
 
-exit_IDU = 1/((1+ random(makedist('Triangular','a',-variance,'b',0,'c',variance))) * (1/exit_IDU));
+exit_IDU = 1/random(makedist('Triangular','a',4,'b',6,'c',10));
 infect = (1+ random(makedist('Triangular','a',-variance,'b',0,'c',variance))) * infect;
 r_LT1LT2=1;
+% total_PWID = random(makedist('Triangular','a',9000,'b',12000,'c',15000));
+% PLHCV_var = random(makedist('Triangular','a',33600,'b',48000,'c',57600))/48000;
+% imp4 = PLHCV_var * imp4;
+% imp5 = PLHCV_var * imp5;
+% imp6 = PLHCV_var * imp6;
+% imp7 = PLHCV_var * imp7;
+% imp8 = PLHCV_var * imp8;
+% imp9 = PLHCV_var * imp9;
 
 infect_factor(1,2:end) = (1+ random(makedist('Triangular','a',-variance,'b',0,'c',variance))) * infect_factor(1,2:end);
 

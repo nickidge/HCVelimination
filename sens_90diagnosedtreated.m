@@ -12,7 +12,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-filename2 = "calibration";
+filename2 = "calibration_oct";
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -73,8 +73,8 @@ for s=1:sens
     progression(1,1,2,1) = 0; progression(2,1,2,1) = 0; progression(3,1,2,1) = 0;
     for h = 1:length(harm_reduction_range)
         if harm_reduction_range(h)<0
-            nsp_coverage = 0.01;
-            ost_coverage = 0.1;
+            nsp_coverage = 0.04;
+            ost_coverage = 0.42;
         else
             nsp_coverage = harm_reduction_range(h);
             ost_coverage = harm_reduction_range(h);
@@ -108,8 +108,8 @@ for s=1:sens
         end
         summary_HR(h,:,s) = summary(2,:,s);
     end
-    nsp_coverage = 0.01;
-    ost_coverage = 0.1;
+    nsp_coverage = 0.04;
+    ost_coverage = 0.42;
     
     %%  Scenario 2: Ab + RNA (standard testing) to reach 90% diagnosed
     scenario = 'current';
@@ -131,8 +131,8 @@ for s=1:sens
             for k =1:length(harm_reduction_range)
                 prop_test = prop_test_range(1);
                 if harm_reduction_range(k)<0
-                    nsp_coverage = 0.01;
-                    ost_coverage = 0.1;
+                    nsp_coverage = 0.04;
+                    ost_coverage = 0.42;
                 else
                     nsp_coverage = harm_reduction_range(k);
                     ost_coverage = harm_reduction_range(k);
@@ -203,8 +203,8 @@ for s=1:sens
                 prop_test = prop_test_range(1);
                 followup = range_followup(1);
                 if harm_reduction_range(k)<0
-                    nsp_coverage = 0.01;
-                    ost_coverage = 0.1;
+                    nsp_coverage = 0.04;
+                    ost_coverage = 0.42;
                 else
                     nsp_coverage = harm_reduction_range(k);
                     ost_coverage = harm_reduction_range(k);
@@ -267,8 +267,8 @@ for s=1:sens
                 prop_test = prop_test_range(1);
                 followup = range_followup(1);
                 if harm_reduction_range(k)<0
-                    nsp_coverage = 0.01;
-                    ost_coverage = 0.1;
+                    nsp_coverage = 0.04;
+                    ost_coverage = 0.42;
                 else
                     nsp_coverage = harm_reduction_range(k);
                     ost_coverage = harm_reduction_range(k);

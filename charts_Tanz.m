@@ -20,7 +20,7 @@ for i = 1:length(inc_HR(1,:))
 end
 h2_inc = plot(inc_HR(:,2), 'color', 'b', 'linewidth',2);
 target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*inc_HR(5,1)-150,'WHO 2030 target','fontsize',10);
-legend([d1,h_inc(1),h2_inc,h_inc(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage',...
+legend([d1,h_inc(1:3),h2_inc,h_inc(4:end)],'Data','0% coverage','10% coverage','20%','Estimated current','30%','40%','50% coverage',...
     'location','southwest');
 set(gca, 'Ylim',[0,2000],'YTick',0:500:10000,'YTickLabel',0:500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('New HCV infections per year');
@@ -30,10 +30,10 @@ axes('Position',[0 0 1 1],'Visible','off');
 text(0.5,0.98,{'\fontsize{14}Impact of harm reduction on the HCV epidemic in Dar es Salaam'},'HorizontalAlignment','Center')
 hold off;
 
-death_test2 = death_test; death_test2(12:end,1,:,:) = death_test(12:end,1,:,:)-2.1;
-death_test2(12,2,:,:) = death_test(12,2,:,:)-2.1;
-death_serum2 = death_serum; death_serum2(12,:,:,:) = death_serum(12,:,:,:)-2.1;
-death_DBS2 = death_DBS; death_DBS2(12,:,:,:) = death_DBS(12,:,:,:)-2.1;
+death_test2 = death_test; %death_test2(12:end,1,:,:) = death_test(12:end,1,:,:)-2.1;
+%death_test2(12,2,:,:) = death_test(12,2,:,:)-2.1;
+death_serum2 = death_serum; %death_serum2(12,:,:,:) = death_serum(12,:,:,:)-2.1;
+death_DBS2 = death_DBS; %death_DBS2(12,:,:,:) = death_DBS(12,:,:,:)-2.1;
 inc_testing = [inc_test(:,1,1,2),inc_test(:,2,2,2),inc_serum(:,2,2,2),inc_DBS(:,2,2,2)];
 prev_testing = [prev_test(:,1,1,2),prev_test(:,2,2,2),prev_serum(:,2,2,2),prev_DBS(:,2,2,2)];
 death_testing = [death_test2(:,1,1,2),death_test2(:,2,2,2),death_serum2(:,2,2,2),death_DBS2(:,2,2,2)];
@@ -62,7 +62,7 @@ mod = casc/PLHCV2016;%./repmat(casc(:,1),1,4);
 
 
 figure(2)
-subplot(2,2,1)
+subplot(1,2,1)
 hold on; grid on;
 for i = 1:(length(prev_testing(1,:))-1)
     h(i) = plot(prev_testing(:,i+1), 'color', CML(i+1,:), 'linewidth',2);
@@ -73,7 +73,7 @@ d1 = scatter([5;8],[21;23],100,'filled','d','k');
 set(gca, 'Ylim',[0,40],'YTick',0:10:90,'YTickLabel',0:10:90, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('HCV prevalence among PWID (%)');
 title({['HCV prevalence among PWID']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
-subplot(2,2,2)
+subplot(1,2,2)
 hold on; grid on;
 for i = 1:(length(inc_testing(1,:))-1)
     h_inc(i) = plot(inc_testing(:,i+1), 'color', CML(i+1,:), 'linewidth',2);
@@ -85,23 +85,25 @@ target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*in
 set(gca, 'Ylim',[0,2000],'YTick',0:500:10000,'YTickLabel',0:500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('Annual HCV infections');
 title({['HCV incidence']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
+legend([h2_inc,h_inc([1,2,3])],{'No testing/treatment','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg'},'Location', 'Northeast','fontsize',10)
 hold off;
 axes('Position',[0 0 1 1],'Visible','off');
 hold off;
-subplot(2,2,3)
-hold on; grid on;
-for i = 1:(length(death_testing(1,:))-1)
-    h_inc(i) = plot(death_testing(:,i+1), 'color', CML(i+1,:), 'linewidth',2);
-end
-h2_inc = plot(death_testing(:,1), 'color', CML(1,:), 'linewidth',2);
-%target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*inc_HR(5,1)-150,'WHO 2030 target','fontsize',10);
-%legend([d1,h2_inc,h_inc(2:4)],'Data','Status-quo','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg',...
-%    'location','southwest');
-set(gca, 'Ylim',[0,60],'YTick',0:20:10000,'YTickLabel',0:20:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
-ylabel('Annual HCV-related deaths');
-title({['HCV-related deaths']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
-legend([h2_inc,h_inc([1,2,3])],{'No testing/treatment','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg'},'Location', 'Northeast','fontsize',10)
-hold off;
+% 
+% subplot(2,2,3)
+% hold on; grid on;
+% for i = 1:(length(death_testing(1,:))-1)
+%     h_inc(i) = plot(death_testing(:,i+1), 'color', CML(i+1,:), 'linewidth',2);
+% end
+% h2_inc = plot(death_testing(:,1), 'color', CML(1,:), 'linewidth',2);
+% %target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*inc_HR(5,1)-150,'WHO 2030 target','fontsize',10);
+% %legend([d1,h2_inc,h_inc(2:4)],'Data','Status-quo','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg',...
+% %    'location','southwest');
+% set(gca, 'Ylim',[0,80],'YTick',0:20:10000,'YTickLabel',0:20:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
+% ylabel('Annual HCV-related deaths');
+% title({['HCV-related deaths']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
+% legend([h2_inc,h_inc([1,2,3])],{'No testing/treatment','Standard (Ab+RNA) testing','Serum-based HCVcAg','DBS HCVcAg'},'Location', 'Northeast','fontsize',10)
+% hold off;
 % subplot(2,2,4)
 % b = bar(1:4,casc(1:4,:)');
 % b(1).FaceColor = CML(1,:); b(2).FaceColor = CML(2,:); b(3).FaceColor = CML(3,:); b(4).FaceColor = CML(4,:);
