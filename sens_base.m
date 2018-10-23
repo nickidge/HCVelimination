@@ -663,8 +663,8 @@ paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,
      round(100*(inc2017 - [summary_HR(7,5,1), summary_test(2,2,7,5,1), summary_serum(2,2,7,5,1), summary_DBS(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(7,6,1), summary_test(2,2,7,6,1), summary_serum(2,2,7,6,1), summary_DBS(2,2,7,6,1)])/death2017,0)]; % mortality reduction in 2030
 
-paper2 = [paper2_0HR; zeros(1,4); paper2_currentHR; zeros(1,4); paper2_10HR; zeros(1,4); paper2_20HR; zeros(1,4); paper2_30HR; zeros(1,4); paper2_40HR; zeros(1,4); paper2_50HR];
- 
+paper2 = [paper2_0HR; zeros(1,4); paper2_10HR; zeros(1,4); paper2_20HR; zeros(1,4); paper2_currentHR; zeros(1,4); paper2_30HR; zeros(1,4); paper2_40HR; zeros(1,4); paper2_50HR];
+
 paper2_text = zeros(length(paper2(:,1))+7,1+length(paper2(1,:)));
 paper2_text = num2cell(paper2_text);
 paper2_text{1,1} = 'Scenario';
