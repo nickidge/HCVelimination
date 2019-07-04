@@ -13,8 +13,8 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\base_oct");
-filename2 = "calibration_oct";
+filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\base_R1");
+filename2 = "calibration_R1";
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -38,6 +38,7 @@ for s=1:sens
     %    calibrate_optim_par(200, 30);
     %save(filename2); 
     load(filename2); %imp8 = 1.15*imp8; imp9=imp8;  imp7 = imp8; imp6 = imp8; infect = 0.82*infect; %infect = 0.1066; imp6=3*imp6; imp7=3.4*imp9; imp8=3.4*imp9; imp9=3.4*imp9;
+    %imp1 = 0; imp2 = 0; imp3 = 0; imp4 = 0; imp5 = 0; imp6 = 0; imp7 = 0; imp8 = 0; imp9 =0;
     infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     filename=strcat("C:\Users\nick.scott\Desktop\Matlab Sims\Tanzania\new");
@@ -71,15 +72,17 @@ for s=1:sens
  
     %%  Scenario 1: Scaled harm reduction
     scenario = 'current'; cal = 0;
-    harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    %harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
     progression(1,1,2,1) = 0; progression(2,1,2,1) = 0; progression(3,1,2,1) = 0;
-    for h = 1:length(harm_reduction_range)
+    for h = 1:length(harm_reduction_range(1,:))
         if harm_reduction_range(h)<0
             nsp_coverage = 0.04;
             ost_coverage = 0.42;
         else
-            nsp_coverage = harm_reduction_range(h);
-            ost_coverage = harm_reduction_range(h);
+            nsp_coverage = harm_reduction_range(1,h);
+            ost_coverage = harm_reduction_range(2,h);
         end
         [TT2_treat,y2_treat]=DE_track_age(Run,y1_end,TT1,treat);
         [ycomb2_noage, summary(2,:,s), tr2, tr2_,c_treat_HR] = gather_outputs(y1,y2_treat,TT2_treat);
@@ -127,17 +130,19 @@ for s=1:sens
     %range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.7]; % 80% coverage
-    harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    %harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
-            for k =1:length(harm_reduction_range)
+            for k =1:length(harm_reduction_range(1,:))
                 prop_test = prop_test_range(1);
                 if harm_reduction_range(k)<0
                     nsp_coverage = 0.04;
                     ost_coverage = 0.42;
                 else
-                    nsp_coverage = harm_reduction_range(k);
-                    ost_coverage = harm_reduction_range(k);
+                    nsp_coverage = harm_reduction_range(1,k);
+                    ost_coverage = harm_reduction_range(2,k);
                 end
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
@@ -198,18 +203,20 @@ for s=1:sens
     range_test = [0,0.5]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.9];
-    harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    %harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
-            for k =1:length(harm_reduction_range)
+            for k =1:length(harm_reduction_range(1,:))
                 prop_test = prop_test_range(1);
                 followup = range_followup(1);
                 if harm_reduction_range(k)<0
                     nsp_coverage = 0.04;
                     ost_coverage = 0.42;
                 else
-                    nsp_coverage = harm_reduction_range(k);
-                    ost_coverage = harm_reduction_range(k);
+                    nsp_coverage = harm_reduction_range(1,k);
+                    ost_coverage = harm_reduction_range(2,k);
                 end
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
@@ -262,18 +269,20 @@ for s=1:sens
     range_test = [0,0.5]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.7];
-    harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    %harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
-            for k =1:length(harm_reduction_range)
+            for k =1:length(harm_reduction_range(1,:))
                 prop_test = prop_test_range(1);
                 followup = range_followup(1);
                 if harm_reduction_range(k)<0
                     nsp_coverage = 0.04;
                     ost_coverage = 0.42;
                 else
-                    nsp_coverage = harm_reduction_range(k);
-                    ost_coverage = harm_reduction_range(k);
+                    nsp_coverage = harm_reduction_range(1,k);
+                    ost_coverage = harm_reduction_range(2,k);
                 end
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
@@ -584,7 +593,7 @@ summary(1:6,6,:)= 100*(summary(1:6,6,:)- repmat(death_year_sens(1,1,:),[6,1]))./
 %     end
 % end
 
-cost_summary = round([c_treat_base', c_treat_test(:,2,2,2,1), c_treat_serum(:,2,2,2,1), c_treat_DBS(:,2,2,2,1)]/10^6,2);
+cost_summary = round([c_treat_base', c_treat_test(:,2,2,4,1), c_treat_serum(:,2,2,4,1), c_treat_DBS(:,2,2,4,1)]/10^6,2);
 
 if isempty(find(diag_test(:,2,2,1)>90,1))==1 aa1=0; else aa1=find(diag_test(:,2,2,1)>90,1); end
 if isempty(find(diag_serum(:,2,2,1)>90,1))==1 aa2=0; else aa2=find(diag_serum(:,2,2,1)>90,1); end
@@ -668,7 +677,7 @@ paper2_20HR = [round([0, diag_test(23,2,2,4,1), diag_serum(23,2,2,4,1), diag_DBS
      round(100*(inc2017 - [summary_HR(7,5,1), summary_test(2,2,7,5,1), summary_serum(2,2,7,5,1), summary_DBS(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(7,6,1), summary_test(2,2,7,6,1), summary_serum(2,2,7,6,1), summary_DBS(2,2,7,6,1)])/death2017,0)]; % mortality reduction in 2030
 
-paper2 = [paper2_0HR; zeros(1,4); paper2_10HR; zeros(1,4); paper2_20HR; zeros(1,4); paper2_currentHR; zeros(1,4); paper2_30HR; zeros(1,4); paper2_40HR; zeros(1,4); paper2_50HR];
+paper2 = [paper2_0HR; zeros(1,4); paper2_currentHR; zeros(1,4); paper2_10HR; zeros(1,4); paper2_20HR; zeros(1,4); paper2_30HR; zeros(1,4); paper2_40HR; zeros(1,4); paper2_50HR];
  
 paper2_text = zeros(length(paper2(:,1))+7,1+length(paper2(1,:)));
 paper2_text = num2cell(paper2_text);
@@ -875,7 +884,7 @@ paper2_20HR_LB = [round([0, diag_test_LB(23,2,2,4,1), diag_serum_LB(23,2,2,4,1),
      round(100*(inc2017 - [summary_HR_LB(7,5,1), summary_test_LB(2,2,7,5,1), summary_serum_LB(2,2,7,5,1), summary_DBS_LB(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR_LB(7,6,1), summary_test_LB(2,2,7,6,1), summary_serum_LB(2,2,7,6,1), summary_DBS_LB(2,2,7,6,1)])/death2017,0)]; % mortality reduction in 2030
 
-paper2_LB = [paper2_0HR_LB; zeros(1,4); paper2_10HR_LB; zeros(1,4); paper2_20HR_LB; zeros(1,4); paper2_currentHR_LB; zeros(1,4); paper2_30HR_LB; zeros(1,4); paper2_40HR_LB; zeros(1,4); paper2_50HR_LB];
+paper2_LB = [paper2_0HR_LB; zeros(1,4); paper2_currentHR_LB; zeros(1,4); paper2_10HR_LB; zeros(1,4); paper2_20HR_LB; zeros(1,4); paper2_30HR_LB; zeros(1,4); paper2_40HR_LB; zeros(1,4); paper2_50HR_LB];
  
 paper2_text_LB = zeros(length(paper2(:,1))+7,1+length(paper2(1,:)));
 paper2_text_LB = num2cell(paper2_text);
@@ -1049,7 +1058,7 @@ paper2_20HR_UB = [round([0, diag_test_UB(23,2,2,4,1), diag_serum_UB(23,2,2,4,1),
      round(100*(inc2017 - [summary_HR_UB(7,5,1), summary_test_UB(2,2,7,5,1), summary_serum_UB(2,2,7,5,1), summary_DBS_UB(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR_UB(7,6,1), summary_test_UB(2,2,7,6,1), summary_serum_UB(2,2,7,6,1), summary_DBS_UB(2,2,7,6,1)])/death2017,0)]; % mortality reduction in 2030
 
-paper2_UB = [paper2_0HR_UB; zeros(1,4); paper2_10HR_UB; zeros(1,4); paper2_20HR_UB; zeros(1,4); paper2_currentHR_UB; zeros(1,4); paper2_30HR_UB; zeros(1,4); paper2_40HR_UB; zeros(1,4); paper2_50HR_UB];
+paper2_UB = [paper2_0HR_UB; zeros(1,4); paper2_currentHR_UB; zeros(1,4); paper2_10HR_UB; zeros(1,4); paper2_20HR_UB; zeros(1,4); paper2_30HR_UB; zeros(1,4); paper2_40HR_UB; zeros(1,4); paper2_50HR_UB];
  
 paper2_text_UB = zeros(length(paper2(:,1))+7,1+length(paper2(1,:)));
 paper2_text_UB = num2cell(paper2_text);

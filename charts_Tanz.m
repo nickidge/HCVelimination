@@ -1,13 +1,15 @@
 CM = colormap(copper(length(prev_HR(1,:))+3));
 CML = colormap(lines(5));
 
+CML2 = colormap(lines(6));
+
 figure(1)
 subplot(1,2,1)
 hold on; grid on;
-for i = 1:length(prev_HR(1,:))
-    h(i) = plot(prev_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
+for i = 1:(length(prev_HR(1,:))-1)
+    h(i) = plot(prev_HR(:,i), 'color', CML2(i,:), 'linewidth',2);
 end
-h2 = plot(prev_HR(:,2)', 'color', 'b', 'linewidth',2);
+h2 = plot(prev_HR(:,4)', 'color', 'k', 'linewidth',2);
 d1 = scatter([5;8],[21;23],100,'filled','d','k');
 %legend([d1,h(1),h2,h(3:end)],'Data','0% coverage','6% coverage (estimated current)','10% coverage','20%','30%','40%','50% coverage');
 set(gca, 'Ylim',[0,40],'YTick',0:10:90,'YTickLabel',0:10:90, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
@@ -15,12 +17,12 @@ ylabel('HCV prevalence among PWID (%)');
 title({['Projected HCV prevalence among PWID']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
 subplot(1,2,2)
 hold on; grid on;
-for i = 1:length(inc_HR(1,:))
-    h_inc(i) = plot(inc_HR(:,i), 'color', CM(i+2,:), 'linewidth',2);
+for i = 1:(length(inc_HR(1,:))-1)
+    h_inc(i) = plot(inc_HR(:,i), 'color', CML2(i,:), 'linewidth',2);
 end
-h2_inc = plot(inc_HR(:,2), 'color', 'b', 'linewidth',2);
+h2_inc = plot(inc_HR(:,4), 'color', 'k', 'linewidth',2);
 target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*inc_HR(5,1)-150,'WHO 2030 target','fontsize',10);
-legend([d1,h_inc(1:3),h2_inc,h_inc(4:end)],'Data','0% coverage','10% coverage','20%','Estimated current','30%','40%','50% coverage',...
+legend([d1,h_inc(1:3),h2_inc,h_inc(5:6)],'Data','No harm reduction','Existing NSP only (4%)','Existing OST only (42%)','Existing NSP + OST','NSP increased to 50%','NSP + OST both increased to 50%',...
     'location','southwest');
 set(gca, 'Ylim',[0,2000],'YTick',0:500:10000,'YTickLabel',0:500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('New HCV infections per year');
@@ -34,9 +36,9 @@ death_test2 = death_test; %death_test2(12:end,1,:,:) = death_test(12:end,1,:,:)-
 %death_test2(12,2,:,:) = death_test(12,2,:,:)-2.1;
 death_serum2 = death_serum; %death_serum2(12,:,:,:) = death_serum(12,:,:,:)-2.1;
 death_DBS2 = death_DBS; %death_DBS2(12,:,:,:) = death_DBS(12,:,:,:)-2.1;
-inc_testing = [inc_test(:,1,1,2),inc_test(:,2,2,2),inc_serum(:,2,2,2),inc_DBS(:,2,2,2)];
-prev_testing = [prev_test(:,1,1,2),prev_test(:,2,2,2),prev_serum(:,2,2,2),prev_DBS(:,2,2,2)];
-death_testing = [death_test2(:,1,1,2),death_test2(:,2,2,2),death_serum2(:,2,2,2),death_DBS2(:,2,2,2)];
+inc_testing = [inc_test(:,1,1,4),inc_test(:,2,2,4),inc_serum(:,2,2,4),inc_DBS(:,2,2,4)];
+prev_testing = [prev_test(:,1,1,4),prev_test(:,2,2,4),prev_serum(:,2,2,4),prev_DBS(:,2,2,4)];
+death_testing = [death_test2(:,1,1,4),death_test2(:,2,2,4),death_serum2(:,2,2,4),death_DBS2(:,2,2,4)];
 analysis_year = 2030;
 dat = cascade0(1,2:end);
 PLHCV2016 =  sum(sum(sum(ycomb2_noage(find(TT2_treat>=Tin,1),1:3,1:10,6:20))));

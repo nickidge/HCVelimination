@@ -12,7 +12,7 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-filename2 = "calibration_oct";
+filename2 = "calibration_R1";
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
@@ -45,6 +45,7 @@ for s=1:sens
  %% Run model in prior to 2017
     progression(1,1,2,1) = 0; progression(2,1,2,1) = 0; progression(3,1,2,1) = 0;
     [TT1,y1]=DE_track_age(Tin,y0,t0,treat);
+    %output_cases(1) = sum(sum(sum(sum(sum(sum(sum(y1(find(TT1>=Tin-(2016-2015),1),:,1:10,:,:,:,:,[6:20]))))))));
     y1_end=reshape(y1(end,:,:,:,:,:,:,:), num_pops, num_cascade, num_age, num_intervention, num_engagement, num_region,33);
     death2017 = (sum(sum(sum(sum(sum(sum(y1(end,:,:,:,:,:,:,22))))))) - sum(sum(sum(sum(sum(sum(y1(find(TT1>=66,1),:,:,:,:,:,:,22)))))))) / ...
         (TT1(end)-TT1(find(TT1>=66,1)));
@@ -55,32 +56,32 @@ for s=1:sens
     
     sum(sum(sum(sum(sum(y1(find(TT1>=Tin-(2016-prev0(1,1)),1),1,:,:,:,:,1,6:20))))))./sum(sum(sum(sum(sum(y1(find(TT1>=Tin-(2016-prev0(1,1)),1),1,:,:,:,:,1,1:20))))))
     
-    if sens > 1
-        perturb_parameters
-    end
+    
     %% Baseline: Current standard of care with no scaled up treatment
     scenario = 'base'; %Current level of community care
     alpha = alpha_DAA;
     prop_test = 1;
     progression(1,1,2,1) = 0; progression(2,1,2,1) = 0; progression(3,1,2,1) = 0;
     [TT2,y2]=DE_track_age(Run,y1_end,TT1,treat);
-    [ycomb_noage, summary(1,:,s), tr, tr_] = gather_outputs(y1,y2,TT2);
+    [ycomb_noage, summary(1,:,s), tr, tr_,c_treat_base] = gather_outputs(y1,y2,TT2);
     
  
     %%  Scenario 1: Scaled harm reduction
     scenario = 'current'; cal = 0;
-    harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    %harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
     progression(1,1,2,1) = 0; progression(2,1,2,1) = 0; progression(3,1,2,1) = 0;
-    for h = 1:length(harm_reduction_range)
+    for h = 1:length(harm_reduction_range(1,:))
         if harm_reduction_range(h)<0
             nsp_coverage = 0.04;
             ost_coverage = 0.42;
         else
-            nsp_coverage = harm_reduction_range(h);
-            ost_coverage = harm_reduction_range(h);
+            nsp_coverage = harm_reduction_range(1,h);
+            ost_coverage = harm_reduction_range(2,h);
         end
         [TT2_treat,y2_treat]=DE_track_age(Run,y1_end,TT1,treat);
-        [ycomb2_noage, summary(2,:,s), tr2, tr2_] = gather_outputs(y1,y2_treat,TT2_treat);
+        [ycomb2_noage, summary(2,:,s), tr2, tr2_,c_treat_HR] = gather_outputs(y1,y2_treat,TT2_treat);
         
         TT_ = TT2_treat(TT2_treat-(Tin-10)>0)-(Tin-10);
         y2comb=[y1(1:end-1,:,:,:,:,:,:,:);y2_treat];
@@ -125,17 +126,19 @@ for s=1:sens
     %range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.8]; % 80% coverage
-    harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    %harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
-            for k =1:length(harm_reduction_range)
+            for k =1:length(harm_reduction_range(1,:))
                 prop_test = prop_test_range(1);
                 if harm_reduction_range(k)<0
                     nsp_coverage = 0.04;
                     ost_coverage = 0.42;
                 else
-                    nsp_coverage = harm_reduction_range(k);
-                    ost_coverage = harm_reduction_range(k);
+                    nsp_coverage = harm_reduction_range(1,k);
+                    ost_coverage = harm_reduction_range(2,k);
                 end
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
@@ -163,18 +166,18 @@ for s=1:sens
                 y1_end_sim(:,1,:,:,1,:,1:20) = y1_end_sim(:,1,:,:,1,:,1:20) + sum(y1_end_sim(:,2:end,:,:,1,:,1:20),2);
                 y1_end_sim(:,2:end,:,:,1,:,1:20) = 0;
                 [TT2_treat5,y2_treat5]=DE_track_age(Run,y1_end_sim,TT1,treat_no);
-                [ycomb5_noage, summary(5,:,s), tr5, tr5_] = gather_outputs(y1,y2_treat5,TT2_treat5);
+                [ycomb5_noage, summary(5,:,s), tr5, tr5_, c_treat_test(:,i,j,k,s)] = gather_outputs(y1,y2_treat5,TT2_treat5);
                 
                 for t = (Tin-10):(Tin+Run)
-                    inc_test(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t-1,1):find(TT2_treat5>=t,1)-1,:,:,27)))));
-                    inc_test_PWID(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t-1,1):find(TT2_treat5>=t,1)-1,1,:,27)))));
-                    prev_test(t-Tin+11,i,j,k) = 100*sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),1,:,[6,12:20])))./...
+                    inc_test(t-Tin+11,i,j,k,s) = (sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t-1,1):find(TT2_treat5>=t,1)-1,:,:,27)))));
+                    inc_test_PWID(t-Tin+11,i,j,k,s) = (sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t-1,1):find(TT2_treat5>=t,1)-1,1,:,27)))));
+                    prev_test(t-Tin+11,i,j,k,s) = 100*sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),1,:,[6,12:20])))./...
                         sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),1,:,1:20)));
 %                     diag_test(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,3:end,[6,12:20]))))./...
 %                         sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,:,[6,12:20]))));
-                    diag_test(t-Tin+11,i,j,k) = 100*(1 - sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,1,[6,12:20]))))./...
+                    diag_test(t-Tin+11,i,j,k,s) = 100*(1 - sum(sum(sum(ycomb5_noage(find(TT2_treat5>=t,1),:,1,[6,12:20]))))./...
                         sum(sum(sum(ycomb5_noage(find(TT2_treat5>=Tin,1),:,:,[6,12:20]))))); % 1-undiagnosed at time t divided by total in 2015
-                    death_test(t-Tin+11,i,j,k) = (sum(sum(ycomb5_noage(find(TT2_treat5>=t,1)-1,:,:,22))) - sum(sum(ycomb5_noage(find(TT2_treat5>=t-1,1),:,:,22))))...
+                    death_test(t-Tin+11,i,j,k,s) = (sum(sum(ycomb5_noage(find(TT2_treat5>=t,1)-1,:,:,22))) - sum(sum(ycomb5_noage(find(TT2_treat5>=t-1,1),:,:,22))))...
                         ./(TT2_treat5(find(TT2_treat5>=t,1))-TT2_treat5(find(TT2_treat5>=t-1,1)));
                 end
                 summary_test(i,j,k,:,s) = summary(5,:,s);
@@ -196,18 +199,20 @@ for s=1:sens
     range_test = [0,0.5]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.95];
-    harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    %harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
-            for k =1:length(harm_reduction_range)
+            for k =1:length(harm_reduction_range(1,:))
                 prop_test = prop_test_range(1);
                 followup = range_followup(1);
                 if harm_reduction_range(k)<0
                     nsp_coverage = 0.04;
                     ost_coverage = 0.42;
                 else
-                    nsp_coverage = harm_reduction_range(k);
-                    ost_coverage = harm_reduction_range(k);
+                    nsp_coverage = harm_reduction_range(1,k);
+                    ost_coverage = harm_reduction_range(2,k);
                 end
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
@@ -226,18 +231,18 @@ for s=1:sens
                 y1_end_sim(:,1,:,:,1,:,1:20) = y1_end_sim(:,1,:,:,1,:,1:20) + sum(y1_end_sim(:,2:end,:,:,1,:,1:20),2);
                 y1_end_sim(:,2:end,:,:,1,:,1:20) = 0;
                 [TT2_treat3,y2_treat3]=DE_track_age(Run,y1_end_sim,TT1,treat_no);
-                [ycomb3_noage, summary(3,:,s), tr3, tr3_] = gather_outputs(y1,y2_treat3,TT2_treat3);
+                [ycomb3_noage, summary(3,:,s), tr3, tr3_, c_treat_DBS(:,i,j,k,s)] = gather_outputs(y1,y2_treat3,TT2_treat3);
                 
                 for t = (Tin-10):(Tin+Run)
-                    inc_DBS(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t-1,1):find(TT2_treat3>=t,1)-1,:,:,27)))));
-                    inc_DBS_PWID(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t-1,1):find(TT2_treat3>=t,1)-1,1,:,27)))));
-                    prev_DBS(t-Tin+11,i,j,k) = 100*sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),1,:,[6,12:20])))./...
+                    inc_DBS(t-Tin+11,i,j,k,s) = (sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t-1,1):find(TT2_treat3>=t,1)-1,:,:,27)))));
+                    inc_DBS_PWID(t-Tin+11,i,j,k,s) = (sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t-1,1):find(TT2_treat3>=t,1)-1,1,:,27)))));
+                    prev_DBS(t-Tin+11,i,j,k,s) = 100*sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),1,:,[6,12:20])))./...
                         sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),1,:,1:20)));
 %                     diag_DBS(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,2:end,[6,12:20]))))./...
 %                         sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,:,[6,12:20]))));
-                    diag_DBS(t-Tin+11,i,j,k) = 100*(1 - sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,1,[6,12:20]))))./...
+                    diag_DBS(t-Tin+11,i,j,k,s) = 100*(1 - sum(sum(sum(ycomb3_noage(find(TT2_treat3>=t,1),:,1,[6,12:20]))))./...
                         sum(sum(sum(ycomb3_noage(find(TT2_treat3>=Tin,1),:,:,[6,12:20]))))); % 1-undiagnosed at time t divided by total in 2015
-                    death_DBS(t-Tin+11,i,j,k) = (sum(sum(ycomb3_noage(find(TT2_treat3>=t,1)-1,:,:,22))) - sum(sum(ycomb3_noage(find(TT2_treat3>=t-1,1),:,:,22))))...
+                    death_DBS(t-Tin+11,i,j,k,s) = (sum(sum(ycomb3_noage(find(TT2_treat3>=t,1)-1,:,:,22))) - sum(sum(ycomb3_noage(find(TT2_treat3>=t-1,1),:,:,22))))...
                         ./(TT2_treat3(find(TT2_treat3>=t,1))-TT2_treat3(find(TT2_treat3>=t-1,1)));
                 end
                 summary_DBS(i,j,k,:,s) = summary(3,:,s);
@@ -260,18 +265,20 @@ for s=1:sens
     range_test = [0,0.5]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.8];
-    harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    %harm_reduction_range = [0,-1,0.1:0.1:0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
-            for k =1:length(harm_reduction_range)
+            for k =1:length(harm_reduction_range(1,:))
                 prop_test = prop_test_range(1);
                 followup = range_followup(1);
                 if harm_reduction_range(k)<0
                     nsp_coverage = 0.04;
                     ost_coverage = 0.42;
                 else
-                    nsp_coverage = harm_reduction_range(k);
-                    ost_coverage = harm_reduction_range(k);
+                    nsp_coverage = harm_reduction_range(1,k);
+                    ost_coverage = harm_reduction_range(2,k);
                 end
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
@@ -290,18 +297,18 @@ for s=1:sens
                 y1_end_sim(:,1,:,:,1,:,1:20) = y1_end_sim(:,1,:,:,1,:,1:20) + sum(y1_end_sim(:,2:end,:,:,1,:,1:20),2);
                 y1_end_sim(:,2:end,:,:,1,:,1:20) = 0;
                 [TT2_treat6,y2_treat6]=DE_track_age(Run,y1_end_sim,TT1,treat);
-                [ycomb6_noage, summary(6,:,s), tr6, tr6_] = gather_outputs(y1,y2_treat6,TT2_treat6);
+                [ycomb6_noage, summary(6,:,s), tr6, tr6_, c_treat_serum(:,i,j,k,s)] = gather_outputs(y1,y2_treat6,TT2_treat6);
                 
                 for t = (Tin-10):(Tin+Run)
-                    inc_serum(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t-1,1):find(TT2_treat6>=t,1)-1,:,:,27)))));
-                    inc_serum_PWID(t-Tin+11,i,j,k) = (sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t-1,1):find(TT2_treat6>=t,1)-1,1,:,27)))));
-                    prev_serum(t-Tin+11,i,j,k) = 100*sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),1,:,[6,12:20])))./...
+                    inc_serum(t-Tin+11,i,j,k,s) = (sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t-1,1):find(TT2_treat6>=t,1)-1,:,:,27)))));
+                    inc_serum_PWID(t-Tin+11,i,j,k,s) = (sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t-1,1):find(TT2_treat6>=t,1)-1,1,:,27)))));
+                    prev_serum(t-Tin+11,i,j,k,s) = 100*sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),1,:,[6,12:20])))./...
                         sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),1,:,1:20)));
 %                     diag_serum(t-Tin+11,i,j,k) = 100*sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),:,2:end,[6,12:20]))))./...
 %                         sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),:,:,[6,12:20]))));
-                    diag_serum(t-Tin+11,i,j,k) = 100*(1 - sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),:,1,[6,12:20]))))./...
+                    diag_serum(t-Tin+11,i,j,k,s) = 100*(1 - sum(sum(sum(ycomb6_noage(find(TT2_treat6>=t,1),:,1,[6,12:20]))))./...
                         sum(sum(sum(ycomb6_noage(find(TT2_treat6>=Tin,1),:,:,[6,12:20]))))); % 1-undiagnosed at time t divided by total in 2015
-                    death_serum(t-Tin+11,i,j,k) = (sum(sum(ycomb6_noage(find(TT2_treat6>=t,1)-1,:,:,22))) - sum(sum(ycomb6_noage(find(TT2_treat6>=t-1,1),:,:,22))))...
+                    death_serum(t-Tin+11,i,j,k,s) = (sum(sum(ycomb6_noage(find(TT2_treat6>=t,1)-1,:,:,22))) - sum(sum(ycomb6_noage(find(TT2_treat6>=t-1,1),:,:,22))))...
                         ./(TT2_treat6(find(TT2_treat6>=t,1))-TT2_treat6(find(TT2_treat6>=t-1,1)));
                 end
                 summary_serum(i,j,k,:,s) = summary(6,:,s);
@@ -319,7 +326,7 @@ for s=1:sens
     range_followup = [0.74];
     range_test = [0,0.5]; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
-    prop_test_range = [0.9];
+    prop_test_range = [0.95];
     followup = 0.76; %DBS sensitivity
     for i = 1:length(range_test)
         for j = 1:length(range_diagnosed_risk_reduction)
@@ -460,210 +467,213 @@ summary(1:6,5,:)= 100*(summary(1:6,5,:)- repmat(inc_year_sens(1,1,:),[6,1]))./re
 summary(1:6,6,:)= 100*(summary(1:6,6,:)- repmat(death_year_sens(1,1,:),[6,1]))./repmat(death_year_sens(1,1,:),[6,1]); %Percent reduction in mortality
 
 %Additional costs/QALYs compared to baseline
-summary2=zeros(6,12,sens);
-summary2(1,:,:)=summary(1,:,:);
-summary2(2:6,:,:)=summary(2:6,:,:)-repmat(summary(1,:,:),[5,1,1]);
-summary2(2:6,4,:)=summary(2:6,4,:);
-
-% Confidence intervals on outputs from uncertainty analysis
-margins=zeros(6,12,3); 
-margins(:,:,1)=mean(summary(:,:,:),3); %margins(5,:,1)=mean(summary(5,:,treat_scaleup(1,:)>=0),3);
-margins2=zeros(6,12,3); 
-margins2(:,:,1)=mean(summary2(:,:,:),3); %margins2(5,:,1)=mean(summary2(5,:,treat_scaleup(1,:)>=0),3);
-total_treat_summary = zeros(6,4,3); 
-total_treat_summary(:,:,1) = mean(total_treat(:,:,:),3); %total_treat_summary(5,:,1) = mean(total_treat(5,:,treat_scaleup(1,:)>=0),3);
-total_treat_2030_summary = zeros(6,4,3); 
-total_treat_2030_summary(:,:,1) = mean(total_treat_2030(:,:,:),3); %total_treat_2030_summary(5,:,1) = mean(total_treat_2030(5,:,treat_scaleup(1,:)>=0),3);
-
-for i=1:6
-    for j=1:12
-%         if i==5
-%             margins(i,j,2)=prctile(summary(i,j,treat_scaleup(1,:)>=0),5); %Lower bound
-%             margins(i,j,3)=prctile(summary(i,j,treat_scaleup(1,:)>=0),95); %Upper bound
-%         
-%             margins2(i,j,2)=prctile(summary2(i,j,treat_scaleup(1,:)>=0),5); %Lower bound
-%             margins2(i,j,3)=prctile(summary2(i,j,treat_scaleup(1,:)>=0),95); %Upper bound
-%         else
-            margins(i,j,2)=prctile(summary(i,j,:),5); %Lower bound
-            margins(i,j,3)=prctile(summary(i,j,:),95); %Upper bound
-        
-            margins2(i,j,2)=prctile(summary2(i,j,:),5); %Lower bound
-            margins2(i,j,3)=prctile(summary2(i,j,:),95); %Upper bound
-%         end
-    end
-    for j=1:4
-%         if i==5
-%             total_treat_summary(i,j,2)=prctile(total_treat(i,j,treat_scaleup(1,:)>=0),25); %Lower bound
-%             total_treat_summary(i,j,3)=prctile(total_treat(i,j,treat_scaleup(1,:)>=0),75); %Upper bound
-%             total_treat_2030_summary(i,j,2)=prctile(total_treat_2030(i,j,treat_scaleup(1,:)>=0),25); %Lower bound
-%             total_treat_2030_summary(i,j,3)=prctile(total_treat_2030(i,j,treat_scaleup(1,:)>=0),75); %Upper bound
-%         else
-            total_treat_summary(i,j,2)=prctile(total_treat(i,j,:),25); %Lower bound
-            total_treat_summary(i,j,3)=prctile(total_treat(i,j,:),75); %Upper bound
-            total_treat_2030_summary(i,j,2)=prctile(total_treat_2030(i,j,:),25); %Lower bound
-            total_treat_2030_summary(i,j,3)=prctile(total_treat_2030(i,j,:),75); %Upper bound
-%         end
-    end
-end
-%charts_Tanz
-% %Table for paper
-% margins_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','margins');
-% total_treat_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','total_treat_summary');
-% total_treat_2030_summary_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','total_treat_2030_summary');
-% treat_scaleup_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','treat_scaleup');
-% inc_year = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\point','inc_year');
-% R0_summary_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','R0_summary');
-% margins_point = struct2array(margins_point); total_treat_point = struct2array(total_treat_point);
-% treat_scaleup_point = struct2array(treat_scaleup_point);
-% total_treat_2030_summary_point = struct2array(total_treat_2030_summary_point);
-% inc_year = struct2array(inc_year); R0_summary_point = struct2array(R0_summary_point);
-
-summary_HR_point = struct2array(load('Base_draftv2','summary_HR'));
-inc_HR_point = struct2array(load('Base_draftv2','inc_HR'));
-death_year_sens_point = struct2array(load('Base_draftv2','death_year_sens'));
-paper = [round(summary_HR_point(:,1)/10^6,2),...
-    round(summary_HR_point(:,2)/10^6,1),...
-    round(sum(inc_HR_point(11:23,:),1)/1000,1)',...
-    round(summary_HR_point(:,9),0),...
-    round(summary_HR_point(:,5),0),...
-    round(summary_HR_point(:,8),0),...
-    round(100*(summary_HR_point(:,5)-inc_HR_point(8,:))/inc_HR_point(8,:),0),...
-    round(100*(summary_HR_point(:,6)-repmat(death_year_sens_point(1,6,1),length(summary_HR_point(:,6)),1))./repmat(death_year_sens_point(1,6,1),length(summary_HR_point(:,6)),1),0)];
-    
-% paper = [round(prctile(summary_HR(:,1,:),50,3)/10^6,2),...
-%     round(prctile(summary_HR(:,2,:),50,3)/10^6,1),...
-%     round(prctile(sum(inc_HR(11:23,:,:),1),50,3)/1000,1)',...
-%     round(prctile(summary_HR(:,9,:),50,3),0),...
-%     round(prctile(summary_HR(:,5,:),50,3),0),...
-%     round(prctile(summary_HR(:,8,:),50,3),0),...
-%     round(100*(prctile(summary_HR(:,5,:),50,3)-prctile(inc_HR(8,:,:),50,3))/prctile(inc_HR(8,:,:),50,3),0),...
-%     round(100*(prctile(summary_HR(:,6,:),50,3)-repmat(prctile(death_year_sens(1,6,:),50,3),length(prctile(summary_HR(:,6,:),50,3)),1))./repmat(prctile(death_year_sens(1,6,:),50,3),length(prctile(summary_HR(:,6,:),50,3)),1),0)];
+% summary2=zeros(6,12,sens);
+% summary2(1,:,:)=summary(1,:,:);
+% summary2(2:6,:,:)=summary(2:6,:,:)-repmat(summary(1,:,:),[5,1,1]);
+% summary2(2:6,4,:)=summary(2:6,4,:);
 % 
+% % Confidence intervals on outputs from uncertainty analysis
+% margins=zeros(6,12,3); 
+% margins(:,:,1)=mean(summary(:,:,:),3); %margins(5,:,1)=mean(summary(5,:,treat_scaleup(1,:)>=0),3);
+% margins2=zeros(6,12,3); 
+% margins2(:,:,1)=mean(summary2(:,:,:),3); %margins2(5,:,1)=mean(summary2(5,:,treat_scaleup(1,:)>=0),3);
+% total_treat_summary = zeros(6,4,3); 
+% total_treat_summary(:,:,1) = mean(total_treat(:,:,:),3); %total_treat_summary(5,:,1) = mean(total_treat(5,:,treat_scaleup(1,:)>=0),3);
+% total_treat_2030_summary = zeros(6,4,3); 
+% total_treat_2030_summary(:,:,1) = mean(total_treat_2030(:,:,:),3); %total_treat_2030_summary(5,:,1) = mean(total_treat_2030(5,:,treat_scaleup(1,:)>=0),3);
+% 
+% for i=1:6
+%     for j=1:12
+% %         if i==5
+% %             margins(i,j,2)=prctile(summary(i,j,treat_scaleup(1,:)>=0),5); %Lower bound
+% %             margins(i,j,3)=prctile(summary(i,j,treat_scaleup(1,:)>=0),95); %Upper bound
+% %         
+% %             margins2(i,j,2)=prctile(summary2(i,j,treat_scaleup(1,:)>=0),5); %Lower bound
+% %             margins2(i,j,3)=prctile(summary2(i,j,treat_scaleup(1,:)>=0),95); %Upper bound
+% %         else
+%             margins(i,j,2)=prctile(summary(i,j,:),5); %Lower bound
+%             margins(i,j,3)=prctile(summary(i,j,:),95); %Upper bound
+%         
+%             margins2(i,j,2)=prctile(summary2(i,j,:),5); %Lower bound
+%             margins2(i,j,3)=prctile(summary2(i,j,:),95); %Upper bound
+% %         end
+%     end
+%     for j=1:4
+% %         if i==5
+% %             total_treat_summary(i,j,2)=prctile(total_treat(i,j,treat_scaleup(1,:)>=0),25); %Lower bound
+% %             total_treat_summary(i,j,3)=prctile(total_treat(i,j,treat_scaleup(1,:)>=0),75); %Upper bound
+% %             total_treat_2030_summary(i,j,2)=prctile(total_treat_2030(i,j,treat_scaleup(1,:)>=0),25); %Lower bound
+% %             total_treat_2030_summary(i,j,3)=prctile(total_treat_2030(i,j,treat_scaleup(1,:)>=0),75); %Upper bound
+% %         else
+%             total_treat_summary(i,j,2)=prctile(total_treat(i,j,:),25); %Lower bound
+%             total_treat_summary(i,j,3)=prctile(total_treat(i,j,:),75); %Upper bound
+%             total_treat_2030_summary(i,j,2)=prctile(total_treat_2030(i,j,:),25); %Lower bound
+%             total_treat_2030_summary(i,j,3)=prctile(total_treat_2030(i,j,:),75); %Upper bound
+% %         end
+%     end
+% end
+% save(filename)
+% charts_Tanz
+% % %Table for paper
+% % margins_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','margins');
+% % total_treat_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','total_treat_summary');
+% % total_treat_2030_summary_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','total_treat_2030_summary');
+% % treat_scaleup_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','treat_scaleup');
+% % inc_year = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\point','inc_year');
+% % R0_summary_point = load('C:\Users\Nick\Desktop\Matlab Sims\Iceland\baseline_point','R0_summary');
+% % margins_point = struct2array(margins_point); total_treat_point = struct2array(total_treat_point);
+% % treat_scaleup_point = struct2array(treat_scaleup_point);
+% % total_treat_2030_summary_point = struct2array(total_treat_2030_summary_point);
+% % inc_year = struct2array(inc_year); R0_summary_point = struct2array(R0_summary_point);
+% 
+% summary_HR_point = struct2array(load('Base_draftv2','summary_HR'));
+% inc_HR_point = struct2array(load('Base_draftv2','inc_HR'));
+% death_year_sens_point = struct2array(load('Base_draftv2','death_year_sens'));
+% paper = [round(summary_HR_point(:,1)/10^6,2),...
+%     round(summary_HR_point(:,2)/10^6,1),...
+%     round(sum(inc_HR_point(11:23,:),1)/1000,1)',...
+%     round(summary_HR_point(:,9),0),...
+%     round(summary_HR_point(:,5),0),...
+%     round(summary_HR_point(:,8),0),...
+%     round(100*(summary_HR_point(:,5)-inc_HR_point(8,:))/inc_HR_point(8,:),0),...
+%     round(100*(summary_HR_point(:,6)-repmat(death_year_sens_point(1,6,1),length(summary_HR_point(:,6)),1))./repmat(death_year_sens_point(1,6,1),length(summary_HR_point(:,6)),1),0)];
+%     
+% % paper = [round(prctile(summary_HR(:,1,:),50,3)/10^6,2),...
+% %     round(prctile(summary_HR(:,2,:),50,3)/10^6,1),...
+% %     round(prctile(sum(inc_HR(11:23,:,:),1),50,3)/1000,1)',...
+% %     round(prctile(summary_HR(:,9,:),50,3),0),...
+% %     round(prctile(summary_HR(:,5,:),50,3),0),...
+% %     round(prctile(summary_HR(:,8,:),50,3),0),...
+% %     round(100*(prctile(summary_HR(:,5,:),50,3)-prctile(inc_HR(8,:,:),50,3))/prctile(inc_HR(8,:,:),50,3),0),...
+% %     round(100*(prctile(summary_HR(:,6,:),50,3)-repmat(prctile(death_year_sens(1,6,:),50,3),length(prctile(summary_HR(:,6,:),50,3)),1))./repmat(prctile(death_year_sens(1,6,:),50,3),length(prctile(summary_HR(:,6,:),50,3)),1),0)];
+% % 
+% 
+% paper_LB = [round(prctile(summary_HR(:,1,:),5,3)/10^6,2),...
+%     round(prctile(summary_HR(:,2,:),5,3)/10^6,1),...
+%     round(prctile(sum(inc_HR(11:23,:,:),1),5,3)/1000,1)',...
+%     round(prctile(summary_HR(:,9,:),5,3),0),...
+%     round(prctile(summary_HR(:,5,:),5,3),0),...
+%     round(prctile(summary_HR(:,8,:),5,3),0),...
+%     round(100*(prctile(summary_HR(:,5,:),5,3)-prctile(inc_HR(8,:,:),5,3))/prctile(inc_HR(8,:,:),5,3),0),...
+%     round(100*(prctile(summary_HR(:,6,:),5,3)-repmat(prctile(death_year_sens(1,6,:),5,3),length(prctile(summary_HR(:,6,:),5,3)),1))./repmat(prctile(death_year_sens(1,6,:),5,3),length(prctile(summary_HR(:,6,:),5,3)),1),0)];
+% 
+% 
+% paper_UB = [round(prctile(summary_HR(:,1,:),95,3)/10^6,2),...
+%     round(prctile(summary_HR(:,2,:),95,3)/10^6,1),...
+%     round(prctile(sum(inc_HR(11:23,:,:),1),95,3)/1000,1)',...
+%     round(prctile(summary_HR(:,9,:),95,3),0),...
+%     round(prctile(summary_HR(:,5,:),95,3),0),...
+%     round(prctile(summary_HR(:,8,:),95,3),0),...
+%     round(100*(prctile(summary_HR(:,5,:),95,3)-prctile(inc_HR(8,:,:),95,3))/prctile(inc_HR(8,:,:),95,3),0),...
+%     round(100*(prctile(summary_HR(:,6,:),95,3)-repmat(prctile(death_year_sens(1,6,:),95,3),length(prctile(summary_HR(:,6,:),95,3)),1))./repmat(prctile(death_year_sens(1,6,:),95,3),length(prctile(summary_HR(:,6,:),95,3)),1),0)];
+% 
+% 
+% 
+% paper_text = zeros(length(paper(:,1))+1,1+length(paper(1,:)));
+% paper_text = num2cell(paper_text);
+% paper_text{1,1} = 'Scenario';
+% paper_text{1,2} = 'Total costs 2018-2030 (US$M)';
+% paper_text{1,3} = 'Total QALYs 2018-2030 (M)';
+% paper_text{1,4} = 'Cumulative incidence 2018-2030 (thousand)';
+% paper_text{1,5} = 'Cumulative liver-related deaths 2018-2030';
+% paper_text{1,6} = 'Incidence in 2030';
+% paper_text{1,7} = 'Prevalence among PWID 2030';
+% paper_text{1,8} = 'Incidence reduction relative to 2015';
+% paper_text{1,9} = 'Mortality reduction relative to 2015';
+% 
+% 
+% 
+% for i = 1:length(paper(:,1))
+%     for j = 1:length(paper(1,:))
+%         paper_text{i+1,j+1} = [num2str(paper(i,j)),' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
+%     end
+% end
 
-paper_LB = [round(prctile(summary_HR(:,1,:),5,3)/10^6,2),...
-    round(prctile(summary_HR(:,2,:),5,3)/10^6,1),...
-    round(prctile(sum(inc_HR(11:23,:,:),1),5,3)/1000,1)',...
-    round(prctile(summary_HR(:,9,:),5,3),0),...
-    round(prctile(summary_HR(:,5,:),5,3),0),...
-    round(prctile(summary_HR(:,8,:),5,3),0),...
-    round(100*(prctile(summary_HR(:,5,:),5,3)-prctile(inc_HR(8,:,:),5,3))/prctile(inc_HR(8,:,:),5,3),0),...
-    round(100*(prctile(summary_HR(:,6,:),5,3)-repmat(prctile(death_year_sens(1,6,:),5,3),length(prctile(summary_HR(:,6,:),5,3)),1))./repmat(prctile(death_year_sens(1,6,:),5,3),length(prctile(summary_HR(:,6,:),5,3)),1),0)];
-
-
-paper_UB = [round(prctile(summary_HR(:,1,:),95,3)/10^6,2),...
-    round(prctile(summary_HR(:,2,:),95,3)/10^6,1),...
-    round(prctile(sum(inc_HR(11:23,:,:),1),95,3)/1000,1)',...
-    round(prctile(summary_HR(:,9,:),95,3),0),...
-    round(prctile(summary_HR(:,5,:),95,3),0),...
-    round(prctile(summary_HR(:,8,:),95,3),0),...
-    round(100*(prctile(summary_HR(:,5,:),95,3)-prctile(inc_HR(8,:,:),95,3))/prctile(inc_HR(8,:,:),95,3),0),...
-    round(100*(prctile(summary_HR(:,6,:),95,3)-repmat(prctile(death_year_sens(1,6,:),95,3),length(prctile(summary_HR(:,6,:),95,3)),1))./repmat(prctile(death_year_sens(1,6,:),95,3),length(prctile(summary_HR(:,6,:),95,3)),1),0)];
-
-
-
-paper_text = zeros(length(paper(:,1))+1,1+length(paper(1,:)));
-paper_text = num2cell(paper_text);
-paper_text{1,1} = 'Scenario';
-paper_text{1,2} = 'Total costs 2018-2030 (US$M)';
-paper_text{1,3} = 'Total QALYs 2018-2030 (M)';
-paper_text{1,4} = 'Cumulative incidence 2018-2030 (thousand)';
-paper_text{1,5} = 'Cumulative liver-related deaths 2018-2030';
-paper_text{1,6} = 'Incidence in 2030';
-paper_text{1,7} = 'Prevalence among PWID 2030';
-paper_text{1,8} = 'Incidence reduction relative to 2015';
-paper_text{1,9} = 'Mortality reduction relative to 2015';
-
-
-
-for i = 1:length(paper(:,1))
-    for j = 1:length(paper(1,:))
-        paper_text{i+1,j+1} = [num2str(paper(i,j)),' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
-    end
-end
+cost_summary = round([c_treat_base', c_treat_test(:,2,2,4,1), c_treat_serum(:,2,2,4,1), c_treat_DBS(:,2,2,4,1)]/10^6,2);
 
 if isempty(find(diag_test(:,2,2,1)>90,1))==1 aa1=0; else aa1=find(diag_test(:,2,2,1)>90,1); end
 if isempty(find(diag_serum(:,2,2,1)>90,1))==1 aa2=0; else aa2=find(diag_serum(:,2,2,1)>90,1); end
 if isempty(find(diag_DBS(:,2,2,1)>90,1))==1 aa3=0; else aa3=find(diag_DBS(:,2,2,1)>90,1); end
 
-paper2_0HR = [round([0, diag_test(23,2,2,1), diag_serum(23,2,2,1), diag_DBS(23,2,2,1)],0);...
-     [2007, aa1+2007,aa2+2007,aa3+2007];...
+paper2_0HR = [round([0, diag_test(23,2,2,1,1), diag_serum(23,2,2,1,1), diag_DBS(23,2,2,1,1)],0);...
+     round([c_treat_base(3), c_treat_test(3,2,2,1,1), c_treat_serum(3,2,2,1,1), c_treat_DBS(3,2,2,1,1)]/10^6,2);... % treatment costs only
      round([summary_HR(1,1,1), summary_test(2,2,1,1,1), summary_serum(2,2,1,1,1), summary_DBS(2,2,1,1,1)]/10^6,2);...% Total costs
      round([summary_HR(1,4,1), summary_test(2,2,1,4,1), summary_serum(2,2,1,4,1), summary_DBS(2,2,1,4,1)]/10^3,2);... % total treatments
      round([summary_HR(1,9,1), summary_test(2,2,1,9,1), summary_serum(2,2,1,9,1), summary_DBS(2,2,1,9,1)],0);... % total deaths
      %round([summary_HR(1,2,1), summary_test(2,2,1,2,1), summary_serum(2,2,1,2,1), summary_DBS(2,2,1,2,1)]/10^3,0);... % total DALYs
-     round([sum(inc_HR_PWID(11:23,1),1), sum(inc_test_PWID(11:23,2,2,1),1), sum(inc_serum_PWID(11:23,2,2,1),1), sum(inc_DBS_PWID(11:23,2,2,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR(11:23,1),1), sum(inc_test(11:23,2,2,1),1), sum(inc_serum(11:23,2,2,1),1), sum(inc_DBS(11:23,2,2,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR_PWID(11:23,1,1),1), sum(inc_test_PWID(11:23,2,2,1,1),1), sum(inc_serum_PWID(11:23,2,2,1,1),1), sum(inc_DBS_PWID(11:23,2,2,1,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR(11:23,1,1),1), sum(inc_test(11:23,2,2,1,1),1), sum(inc_serum(11:23,2,2,1,1),1), sum(inc_DBS(11:23,2,2,1,1),1)],0);... % incidence in 2018-2030
      round([summary_HR(1,8,1), summary_test(2,2,1,8,1), summary_serum(2,2,1,8,1), summary_DBS(2,2,1,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(1,5,1), summary_test(2,2,1,5,1), summary_serum(2,2,1,5,1), summary_DBS(2,2,1,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(1,6,1), summary_test(2,2,1,6,1), summary_serum(2,2,1,6,1), summary_DBS(2,2,1,6,1)])/death2017,0)]; % mortality reduction in 2030
-paper2_currentHR = [round([0, diag_test(23,2,2,2), diag_serum(23,2,2,2), diag_DBS(23,2,2,2)],0);...
-     [2007, aa1+2007,aa2+2007,aa3+2007];...
+paper2_currentHR = [round([0, diag_test(23,2,2,2,1), diag_serum(23,2,2,2,1), diag_DBS(23,2,2,2,1)],0);...
+     round([c_treat_base(3), c_treat_test(3,2,2,2,1), c_treat_serum(3,2,2,2,1), c_treat_DBS(3,2,2,2,1)]/10^6,2);... % treatment costs only
      round([summary_HR(2,1,1), summary_test(2,2,2,1,1), summary_serum(2,2,2,1,1), summary_DBS(2,2,2,1,1)]/10^6,2);...% Total costs
      round([summary_HR(2,4,1), summary_test(2,2,2,4,1), summary_serum(2,2,2,4,1), summary_DBS(2,2,2,4,1)]/10^3,2);... % total treatments
      round([summary_HR(2,9,1), summary_test(2,2,2,9,1), summary_serum(2,2,2,9,1), summary_DBS(2,2,2,9,1)],0);... % total deaths
      %round([summary_HR(2,2,1), summary_test(2,2,2,2,1), summary_serum(2,2,2,2,1), summary_DBS(2,2,2,2,1)]/10^3,0);... % total DALYs
-     round([sum(inc_HR_PWID(11:23,2),1), sum(inc_test_PWID(11:23,2,2,2),1), sum(inc_serum_PWID(11:23,2,2,2),1), sum(inc_DBS_PWID(11:23,2,2,2),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR(11:23,2),1), sum(inc_test(11:23,2,2,2),1), sum(inc_serum(11:23,2,2,2),1), sum(inc_DBS(11:23,2,2,2),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR_PWID(11:23,2,1),1), sum(inc_test_PWID(11:23,2,2,2,1),1), sum(inc_serum_PWID(11:23,2,2,2,1),1), sum(inc_DBS_PWID(11:23,2,2,2,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR(11:23,2,1),1), sum(inc_test(11:23,2,2,2,1),1), sum(inc_serum(11:23,2,2,2,1),1), sum(inc_DBS(11:23,2,2,2,1),1)],0);... % incidence in 2018-2030
      round([summary_HR(2,8,1), summary_test(2,2,2,8,1), summary_serum(2,2,2,8,1), summary_DBS(2,2,2,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(2,5,1), summary_test(2,2,2,5,1), summary_serum(2,2,2,5,1), summary_DBS(2,2,2,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(2,6,1), summary_test(2,2,2,6,1), summary_serum(2,2,2,6,1), summary_DBS(2,2,2,6,1)])/death2017,0)]; % mortality reduction in 2030
-paper2_10HR = [round([0, diag_test(23,2,2,3), diag_serum(23,2,2,3), diag_DBS(23,2,2,3)],0);...
-     [2007, aa1+2007,aa2+2007,aa3+2007];...
+paper2_10HR = [round([0, diag_test(23,2,2,3,1), diag_serum(23,2,2,3,1), diag_DBS(23,2,2,3,1)],0);...
+     round([c_treat_base(3), c_treat_test(3,2,2,3,1), c_treat_serum(3,2,2,3,1), c_treat_DBS(3,2,2,3,1)]/10^6,2);... % treatment costs only
      round([summary_HR(3,1,1), summary_test(2,2,3,1,1), summary_serum(2,2,3,1,1), summary_DBS(2,2,3,1,1)]/10^6,2);...% Total costs
      round([summary_HR(3,4,1), summary_test(2,2,3,4,1), summary_serum(2,2,3,4,1), summary_DBS(2,2,3,4,1)]/10^3,2);... % total treatments
      round([summary_HR(3,9,1), summary_test(2,2,3,9,1), summary_serum(2,2,3,9,1), summary_DBS(2,2,3,9,1)],0);... % total deaths
      %round([summary_HR(3,2,1), summary_test(2,2,3,2,1), summary_serum(2,2,3,2,1), summary_DBS(2,2,3,2,1)]/10^3,0);... % total DALYs
-     round([sum(inc_HR_PWID(11:23,3),1), sum(inc_test_PWID(11:23,2,2,3),1), sum(inc_serum_PWID(11:23,2,2,3),1), sum(inc_DBS_PWID(11:23,2,2,3),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR(11:23,3),1), sum(inc_test(11:23,2,2,3),1), sum(inc_serum(11:23,2,2,3),1), sum(inc_DBS(11:23,2,2,3),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR_PWID(11:23,3,1),1), sum(inc_test_PWID(11:23,2,2,3,1),1), sum(inc_serum_PWID(11:23,2,2,3,1),1), sum(inc_DBS_PWID(11:23,2,2,3,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR(11:23,3,1),1), sum(inc_test(11:23,2,2,3,1),1), sum(inc_serum(11:23,2,2,3,1),1), sum(inc_DBS(11:23,2,2,3,1),1)],0);... % incidence in 2018-2030
      round([summary_HR(3,8,1), summary_test(2,2,3,8,1), summary_serum(2,2,3,8,1), summary_DBS(2,2,3,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(3,5,1), summary_test(2,2,3,5,1), summary_serum(2,2,3,5,1), summary_DBS(2,2,3,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(3,6,1), summary_test(2,2,3,6,1), summary_serum(2,2,3,6,1), summary_DBS(2,2,3,6,1)])/death2017,0)]; % mortality reduction in 2030
-paper2_20HR = [round([0, diag_test(23,2,2,4), diag_serum(23,2,2,4), diag_DBS(23,2,2,4)],0);...
-     [2007, aa1+2007,aa2+2007,aa3+2007];...
+paper2_20HR = [round([0, diag_test(23,2,2,4,1), diag_serum(23,2,2,4,1), diag_DBS(23,2,2,4,1)],0);...
+     round([c_treat_base(3), c_treat_test(3,2,2,4,1), c_treat_serum(3,2,2,4,1), c_treat_DBS(3,2,2,4,1)]/10^6,2);... % treatment costs only
      round([summary_HR(4,1,1), summary_test(2,2,4,1,1), summary_serum(2,2,4,1,1), summary_DBS(2,2,4,1,1)]/10^6,2);...% Total costs
      round([summary_HR(4,4,1), summary_test(2,2,4,4,1), summary_serum(2,2,4,4,1), summary_DBS(2,2,4,4,1)]/10^3,2);... % total treatments
      round([summary_HR(4,9,1), summary_test(2,2,4,9,1), summary_serum(2,2,4,9,1), summary_DBS(2,2,4,9,1)],0);... % total deaths
      %round([summary_HR(4,2,1), summary_test(2,2,4,2,1), summary_serum(2,2,4,2,1), summary_DBS(2,2,4,2,1)]/10^3,0);... % total DALYs
-     round([sum(inc_HR_PWID(11:23,4),1), sum(inc_test_PWID(11:23,2,2,4),1), sum(inc_serum_PWID(11:23,2,2,4),1), sum(inc_DBS_PWID(11:23,2,2,4),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR(11:23,4),1), sum(inc_test(11:23,2,2,4),1), sum(inc_serum(11:23,2,2,4),1), sum(inc_DBS(11:23,2,2,4),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR_PWID(11:23,4,1),1), sum(inc_test_PWID(11:23,2,2,4,1),1), sum(inc_serum_PWID(11:23,2,2,4,1),1), sum(inc_DBS_PWID(11:23,2,2,4,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR(11:23,4,1),1), sum(inc_test(11:23,2,2,4,1),1), sum(inc_serum(11:23,2,2,4,1),1), sum(inc_DBS(11:23,2,2,4,1),1)],0);... % incidence in 2018-2030
      round([summary_HR(4,8,1), summary_test(2,2,4,8,1), summary_serum(2,2,4,8,1), summary_DBS(2,2,4,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(4,5,1), summary_test(2,2,4,5,1), summary_serum(2,2,4,5,1), summary_DBS(2,2,4,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(4,6,1), summary_test(2,2,4,6,1), summary_serum(2,2,4,6,1), summary_DBS(2,2,4,6,1)])/death2017,0)]; % mortality reduction in 2030
- paper2_30HR = [round([0, diag_test(23,2,2,5), diag_serum(23,2,2,5), diag_DBS(23,2,2,5)],0);...
-     [2007, aa1+2007,aa2+2007,aa3+2007];...
+ paper2_30HR = [round([0, diag_test(23,2,2,5,1), diag_serum(23,2,2,5,1), diag_DBS(23,2,2,5,1)],0);...
+     round([c_treat_base(3), c_treat_test(3,2,2,5,1), c_treat_serum(3,2,2,5,1), c_treat_DBS(3,2,2,5,1)]/10^6,2);... % treatment costs only
      round([summary_HR(5,1,1), summary_test(2,2,5,1,1), summary_serum(2,2,5,1,1), summary_DBS(2,2,5,1,1)]/10^6,2);...% Total costs
      round([summary_HR(5,4,1), summary_test(2,2,5,4,1), summary_serum(2,2,5,4,1), summary_DBS(2,2,5,4,1)]/10^3,2);... % total treatments
      round([summary_HR(5,9,1), summary_test(2,2,5,9,1), summary_serum(2,2,5,9,1), summary_DBS(2,2,5,9,1)],0);... % total deaths
      %round([summary_HR(5,2,1), summary_test(2,2,5,2,1), summary_serum(2,2,5,2,1), summary_DBS(2,2,5,2,1)]/10^3,0);... % total DALYs
-     round([sum(inc_HR_PWID(11:23,5),1), sum(inc_test_PWID(11:23,2,2,5),1), sum(inc_serum_PWID(11:23,2,2,5),1), sum(inc_DBS_PWID(11:23,2,2,5),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR(11:23,5),1), sum(inc_test(11:23,2,2,5),1), sum(inc_serum(11:23,2,2,5),1), sum(inc_DBS(11:23,2,2,5),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR_PWID(11:23,5,1),1), sum(inc_test_PWID(11:23,2,2,5,1),1), sum(inc_serum_PWID(11:23,2,2,5,1),1), sum(inc_DBS_PWID(11:23,2,2,5,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR(11:23,5,1),1), sum(inc_test(11:23,2,2,5,1),1), sum(inc_serum(11:23,2,2,5,1),1), sum(inc_DBS(11:23,2,2,5,1),1)],0);... % incidence in 2018-2030
      round([summary_HR(5,8,1), summary_test(2,2,5,8,1), summary_serum(2,2,5,8,1), summary_DBS(2,2,5,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(5,5,1), summary_test(2,2,5,5,1), summary_serum(2,2,5,5,1), summary_DBS(2,2,5,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(5,6,1), summary_test(2,2,5,6,1), summary_serum(2,2,5,6,1), summary_DBS(2,2,5,6,1)])/death2017,0)]; % mortality reduction in 2030
- paper2_40HR = [round([0, diag_test(23,2,2,6), diag_serum(23,2,2,6), diag_DBS(23,2,2,6)],0);...
-     [2007, aa1+2007,aa2+2007,aa3+2007];...
+ paper2_40HR = [round([0, diag_test(23,2,2,6,1), diag_serum(23,2,2,6,1), diag_DBS(23,2,2,6,1)],0);...
+     round([c_treat_base(3), c_treat_test(3,2,2,6,1), c_treat_serum(3,2,2,6,1), c_treat_DBS(3,2,2,6,1)]/10^6,2);... % treatment costs only
      round([summary_HR(6,1,1), summary_test(2,2,6,1,1), summary_serum(2,2,6,1,1), summary_DBS(2,2,6,1,1)]/10^6,2);...% Total costs
      round([summary_HR(6,4,1), summary_test(2,2,6,4,1), summary_serum(2,2,6,4,1), summary_DBS(2,2,6,4,1)]/10^3,2);... % total treatments
      round([summary_HR(6,9,1), summary_test(2,2,6,9,1), summary_serum(2,2,6,9,1), summary_DBS(2,2,6,9,1)],0);... % total deaths
      %round([summary_HR(6,2,1), summary_test(2,2,6,2,1), summary_serum(2,2,6,2,1), summary_DBS(2,2,6,2,1)]/10^3,0);... % total DALYs
-     round([sum(inc_HR_PWID(11:23,6),1), sum(inc_test_PWID(11:23,2,2,6),1), sum(inc_serum_PWID(11:23,2,2,6),1), sum(inc_DBS_PWID(11:23,2,2,6),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR(11:23,6),1), sum(inc_test(11:23,2,2,6),1), sum(inc_serum(11:23,2,2,6),1), sum(inc_DBS(11:23,2,2,6),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR_PWID(11:23,6,1),1), sum(inc_test_PWID(11:23,2,2,6,1),1), sum(inc_serum_PWID(11:23,2,2,6,1),1), sum(inc_DBS_PWID(11:23,2,2,6,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR(11:23,6,1),1), sum(inc_test(11:23,2,2,6,1),1), sum(inc_serum(11:23,2,2,6,1),1), sum(inc_DBS(11:23,2,2,6,1),1)],0);... % incidence in 2018-2030
      round([summary_HR(6,8,1), summary_test(2,2,6,8,1), summary_serum(2,2,6,8,1), summary_DBS(2,2,6,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(6,5,1), summary_test(2,2,6,5,1), summary_serum(2,2,6,5,1), summary_DBS(2,2,6,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(6,6,1), summary_test(2,2,6,6,1), summary_serum(2,2,6,6,1), summary_DBS(2,2,6,6,1)])/death2017,0)]; % mortality reduction in 2030
- paper2_50HR = [round([0, diag_test(23,2,2,7), diag_serum(23,2,2,7), diag_DBS(23,2,2,7)],0);...
-     [2007, aa1+2007,aa2+2007,aa3+2007];...
+ paper2_50HR = [round([0, diag_test(23,2,2,7,1), diag_serum(23,2,2,7,1), diag_DBS(23,2,2,7,1)],0);...
+     round([c_treat_base(3), c_treat_test(3,2,2,7,1), c_treat_serum(3,2,2,7,1), c_treat_DBS(3,2,2,7,1)]/10^6,2);... % treatment costs only
      round([summary_HR(7,1,1), summary_test(2,2,7,1,1), summary_serum(2,2,7,1,1), summary_DBS(2,2,7,1,1)]/10^6,2);...% Total costs
      round([summary_HR(7,4,1), summary_test(2,2,7,4,1), summary_serum(2,2,7,4,1), summary_DBS(2,2,7,4,1)]/10^3,2);... % total treatments
      round([summary_HR(7,9,1), summary_test(2,2,7,9,1), summary_serum(2,2,7,9,1), summary_DBS(2,2,7,9,1)],0);... % total deaths
      %round([summary_HR(7,2,1), summary_test(2,2,7,2,1), summary_serum(2,2,7,2,1), summary_DBS(2,2,7,2,1)]/10^3,0);... % total DALYs
-     round([sum(inc_HR_PWID(11:23,7),1), sum(inc_test_PWID(11:23,2,2,7),1), sum(inc_serum_PWID(11:23,2,2,7),1), sum(inc_DBS_PWID(11:23,2,2,7),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR(11:23,7),1), sum(inc_test(11:23,2,2,7),1), sum(inc_serum(11:23,2,2,7),1), sum(inc_DBS(11:23,2,2,7),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR_PWID(11:23,7,1),1), sum(inc_test_PWID(11:23,2,2,7,1),1), sum(inc_serum_PWID(11:23,2,2,7,1),1), sum(inc_DBS_PWID(11:23,2,2,7,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR(11:23,7,1),1), sum(inc_test(11:23,2,2,7,1),1), sum(inc_serum(11:23,2,2,7,1),1), sum(inc_DBS(11:23,2,2,7,1),1)],0);... % incidence in 2018-2030
      round([summary_HR(7,8,1), summary_test(2,2,7,8,1), summary_serum(2,2,7,8,1), summary_DBS(2,2,7,8,1)],0);... % prevalence in 2030
      round(100*(inc2017 - [summary_HR(7,5,1), summary_test(2,2,7,5,1), summary_serum(2,2,7,5,1), summary_DBS(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
      round(100*(death2017 - [summary_HR(7,6,1), summary_test(2,2,7,6,1), summary_serum(2,2,7,6,1), summary_DBS(2,2,7,6,1)])/death2017,0)]; % mortality reduction in 2030
 
-paper2 = [paper2_0HR; zeros(1,4); paper2_10HR; zeros(1,4); paper2_20HR; zeros(1,4); paper2_currentHR; zeros(1,4); paper2_30HR; zeros(1,4); paper2_40HR; zeros(1,4); paper2_50HR];
+paper2 = [paper2_0HR; zeros(1,4); paper2_currentHR; zeros(1,4); paper2_10HR; zeros(1,4); paper2_20HR; zeros(1,4); paper2_30HR; zeros(1,4); paper2_40HR; zeros(1,4); paper2_50HR];
  
 paper2_text = zeros(length(paper2(:,1))+7,1+length(paper2(1,:)));
 paper2_text = num2cell(paper2_text);
@@ -674,7 +684,7 @@ paper2_text{1,4} = 'Serum-based HCVcAg';
 paper2_text{1,5} = 'Dry Blood Spot HCVcAg';
 
 paper2_text{2,1} = 'Percentage diagnosed in 2030';
-paper2_text{3,1} = 'Year 80% diagnosed reached';
+paper2_text{3,1} = 'Treatment costs only';
 paper2_text{4,1} = 'Total costs 2018-2030 (million US$)';
 paper2_text{5,1} = 'Total treatments 2018-2030 (thousand)';
 paper2_text{6,1} = 'Total HCV-related deaths 2018-2030';
@@ -756,5 +766,5 @@ for i = 1:length(paper2(:,1))
     end
 end
 
-save(filename)
 
+save(filename)

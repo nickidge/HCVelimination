@@ -36,11 +36,13 @@ prop_test = 1;
 
 %%  Scenario 1: Scaled harm reduction
 scenario = 'current';
-harm_reduction_range = [0,0.06,0.1:0.1:0.5];
-summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
-for h = 1:length(harm_reduction_range)
-    nsp_coverage = harm_reduction_range(h);
-    ost_coverage = harm_reduction_range(h);
+%harm_reduction_range = [0,0.06,0.1:0.1:0.5];
+harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
+        0,0,0.42,0.42,0.42,0.5,0.5];
+summary_HR = zeros(length(harm_reduction_range(1,:)),length(summary(1,:,1)),sens);
+for h = 1:length(harm_reduction_range(1,:))
+    nsp_coverage = harm_reduction_range(1,h);
+    ost_coverage = harm_reduction_range(2,h);
     [TT2_treat,y2_treat]=DE_track_age(Run,y1_end,TT1,treat);
     [ycomb2_noage, summary(2,:,s), tr2, tr2_] = gather_outputs(y1,y2_treat,TT2_treat);
     

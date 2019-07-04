@@ -14,8 +14,8 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-directory=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\");
-calibration_file = strcat(directory,"calibration_draftv2.mat");
+directory=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania R1\");
+calibration_file = strcat(directory,"calibration_R1.mat");
 
 
 loaddata
