@@ -21,8 +21,7 @@ sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 %summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
 followup = 1;
-UHC = 1;
-    
+UHC = 1;    
 
 %% Sensitivity of parameters
 for s=1:sens
@@ -37,7 +36,7 @@ for s=1:sens
     %    calibrate_optim_par(200, 30);
     %save(filename2); 
     load(filename2); %infect = 0.1066; imp6=3*imp6; imp7=3.4*imp9; imp8=3.4*imp9; imp9=3.4*imp9;
-    filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\sens_GPscreening");
+    filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\sens_50diagnosedtreated");
     infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
@@ -124,7 +123,7 @@ for s=1:sens
     progression(1,6,2,1) = 1/(30/365); progression(2,6,2,1) = 1/(30/365); progression(3,6,2,1) = 1/(30/365); 
     range_test = [0, 0.5]*2; % divided by 2 to assume that infection happens midway between tests
     range_followup = [0.74];
-    range_treat = [0,-0.8]; % 80% of diagnosed treated according to WHO
+    range_treat = [0,-0.5]; % 80% of diagnosed treated according to WHO
     %range_test = [4]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.7]; % 80% coverage
@@ -145,7 +144,7 @@ for s=1:sens
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
                     progression(2,1,2,1) = 2/12;%range_test(i);
-                    progression(3,1,2,1) = 2/12;
+                    progression(3,1,2,1) = 0;
                 else
                     progression(1,1,2,1) = 0;
                     progression(2,1,2,1) = 0;
@@ -197,7 +196,7 @@ for s=1:sens
     progression(1,5,2,1) = 1/(30/365); progression(2,5,2,1) = 1/(30/365); progression(3,5,2,1) = 1/(30/365); 
     progression(1,6,2,1) = 1/(30/365); progression(2,6,2,1) = 1/(30/365); progression(3,6,2,1) = 1/(30/365); 
     range_followup = [0.76]; % Reduced test sensitivity
-    range_treat = [0,-0.8];
+    range_treat = [0,-0.5];
     range_test = [0,0.5]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.9];
@@ -219,7 +218,7 @@ for s=1:sens
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
                     progression(2,1,2,1) = 2/12;%range_test(i);
-                    progression(3,1,2,1) = 2/12;
+                    progression(3,1,2,1) = 0;
                 else
                     progression(1,1,2,1) = 0;
                     progression(2,1,2,1) = 0;
@@ -263,7 +262,7 @@ for s=1:sens
     progression(1,5,2,1) = 1/(30/365); progression(2,5,2,1) = 1/(30/365); progression(3,5,2,1) = 1/(30/365); 
     progression(1,6,2,1) = 1/(30/365); progression(2,6,2,1) = 1/(30/365); progression(3,6,2,1) = 1/(30/365); 
     range_followup = [1];
-    range_treat = [0,-0.8];
+    range_treat = [0,-0.5];
     range_test = [0,0.5]*2; % divided by 2 to assume that infection happens midway between tests
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.7];
@@ -285,7 +284,7 @@ for s=1:sens
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
                     progression(2,1,2,1) = 2/12;%range_test(i);
-                    progression(3,1,2,1) = 2/12;
+                    progression(3,1,2,1) = 0;
                 else
                     progression(1,1,2,1) = 0;
                     progression(2,1,2,1) = 0;
@@ -813,6 +812,5 @@ for i = 1:length(paper2(:,1))
         paper2_text{i+1,j+1} = [num2str(paper2(i,j))];%,' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
     end
 end
-
 
 save(filename)

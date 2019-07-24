@@ -1,6 +1,6 @@
 function[c,DALY,life,tr,c_HR,c_treat_total]=Costs_age(y,TT,y_large)
 global Q_sens q_svr q_svr_PWID q_treat sens c_daa discount care cascade_scale_time scenario prop_test progression ...
-    num_pops num_cascade num_age num_intervention dt s
+    num_pops num_cascade num_age num_intervention dt s UHC
 
 %% Costs
 [costing0,costing0_label,costing0_raw] = xlsread('Template.xlsx','costs'); 
@@ -102,8 +102,13 @@ end
 DALY1=trapz(TT,sum(y(:,1,:,17),3).*exp(-discount.*TT))*DALY_DC;
 DALY2=trapz(TT,sum(y(:,1,:,18),3).*exp(-discount.*TT))*DALY_HCC;
 DALY3=trapz(TT,sum(y(:,1,:,22),3).*exp(-discount.*TT))*DALY_death;
+DALY4 = trapz(TT,sum(y(:,1,:,12),3).*exp(-discount.*TT)) * 0.012;
+DALY5 = trapz(TT,sum(y(:,1,:,13),3).*exp(-discount.*TT)) * 0.012;
+DALY6 = trapz(TT,sum(y(:,1,:,14),3).*exp(-discount.*TT)) * 0.012;
+DALY7 = trapz(TT,sum(y(:,1,:,15),3).*exp(-discount.*TT)) * 0.068;
+DALY8 = trapz(TT,sum(y(:,1,:,16),3).*exp(-discount.*TT)) * 0.068;
 
-DALY_PWID = (DALY1+DALY2+DALY3);
+DALY_PWID = (DALY1+DALY2+DALY3+DALY4+DALY5+DALY6+DALY7+DALY8);
 
 q_PWID=(Q1a+Q1b+Q1c+Q3+Q4a+Q4b+Q4c+Q5+Q6+Q7+Q8+Q9+Q10+Q11+Q12+Q13); 
 
@@ -151,33 +156,40 @@ Q13=trapz(TT,sum(sum(y(:,2:3,:,20),2),3).*exp(-discount.*TT))*q_LT2;
 DALY1=trapz(TT,sum(sum(y(:,2:3,:,17),3),2).*exp(-discount.*TT))*DALY_DC;
 DALY2=trapz(TT,sum(sum(y(:,2:3,:,18),3),2).*exp(-discount.*TT))*DALY_HCC;
 DALY3=trapz(TT,sum(sum(y(:,2:3,:,22),3),2).*exp(-discount.*TT))*DALY_death;
+DALY4=trapz(TT,sum(sum(y(:,2:3,:,12),3),2).*exp(-discount.*TT))*0.012;
+DALY5=trapz(TT,sum(sum(y(:,2:3,:,13),3),2).*exp(-discount.*TT))*0.012;
+DALY6=trapz(TT,sum(sum(y(:,2:3,:,14),3),2).*exp(-discount.*TT))*0.012;
+DALY7=trapz(TT,sum(sum(y(:,2:3,:,15),3),2).*exp(-discount.*TT))*0.068;
+DALY8=trapz(TT,sum(sum(y(:,2:3,:,16),3),2).*exp(-discount.*TT))*0.068;
 
-DALY_other = (DALY1+DALY2+DALY3);
+
+
+DALY_other = (DALY1+DALY2+DALY3+DALY4+DALY5+DALY6+DALY7+DALY8);
 
 q_former=(Q1a+Q1b+Q1c+Q3+Q4a+Q4b+Q4c+Q5+Q6+Q7+Q8+Q9+Q10+Q11+Q12+Q13); 
 
 %% Cascade costs
 if strcmp(scenario,'rapidRNA') == 1 || strcmp(scenario,'WHO') == 1 || strcmp(scenario,'WHO1') == 1 || strcmp(scenario,'current') == 1
     c_cascade2 = 163.90; % cost of rapid RNA test
-    Cas_cost1=trapz(TT, sum(sum(y(:,1,1,1:20),2),4).*exp(-discount.*TT)) * prop_test * progression(1,1,2,1) /2 * c_cascade2_ab...; % ab testing, for all PWID. Divide by two becuase progression rate is doube the testing (diagnosis iassumed to be in between tests)
-        + trapz(TT, sum(sum(y(:,2,1,1:20),2),4).*exp(-discount.*TT)) * prop_test * progression(1,1,2,1) /2 * c_cascade2_ab...
-        + trapz(TT, sum(sum(y(:,3,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(3,1,2,1) /2 * c_cascade2_ab; % 100 is for test positivity rate
-    Cas_cost2=sum(sum(sum(y(:,:,:,29),3),2).*exp(-discount.*TT))*c_cascade2_RNA; % i.e. RNA tests
+    Cas_cost1=trapz(TT, sum(sum(y(:,1,1,1:20),2),4).*exp(-discount.*TT)) * prop_test * progression(1,1,2,1) * (UHC*4.28 + c_cascade2_ab)...; % ab testing, for all PWID. Divide by two becuase progression rate is doube the testing (diagnosis iassumed to be in between tests)
+        + trapz(TT, sum(sum(y(:,2,1,1:20),2),4).*exp(-discount.*TT)) * prop_test * progression(1,1,2,1) * (UHC*4.28 + c_cascade2_ab)...
+        + trapz(TT, sum(sum(y(:,3,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(3,1,2,1)  * (UHC*4.28 + c_cascade2_ab); % 100 is for test positivity rate
+    Cas_cost2=sum(sum(sum(y(:,:,:,29),3),2).*exp(-discount.*TT))* (UHC*4.28 + c_cascade2_RNA); % i.e. RNA tests
     
 elseif strcmp(scenario,'serum_HCVcAg') == 1
-    Cas_cost1=trapz(TT, sum(sum(y(:,1,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) /2 * c_cascade2_serum...% i.e. serum tests only, for all PWID and former PWID
-        + trapz(TT, sum(sum(y(:,2,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) /2 * c_cascade2_serum...
-        +trapz(TT, sum(sum(y(:,3,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(3,1,2,1) /2 * c_cascade2_serum; 
+    Cas_cost1=trapz(TT, sum(sum(y(:,1,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) * (UHC*4.28 + c_cascade2_serum)...% i.e. serum tests only, for all PWID and former PWID
+        + trapz(TT, sum(sum(y(:,2,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) * (UHC*4.28 + c_cascade2_serum)...
+        +trapz(TT, sum(sum(y(:,3,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(3,1,2,1) * (UHC*4.28 + c_cascade2_serum); 
     Cas_cost2 = 0;
 elseif strcmp(scenario,'DBS_HCVcAg') == 1
-    Cas_cost1=trapz(TT, sum(sum(y(:,1,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1)/2 * c_cascade2_DBS...; % i.e. DBS tests only, for all PWID
-        + trapz(TT, sum(sum(y(:,2,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1)/2 * c_cascade2_DBS...
-        +trapz(TT, sum(sum(y(:,3,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(3,1,2,1) /2 * c_cascade2_DBS; 
+    Cas_cost1=trapz(TT, sum(sum(y(:,1,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) * (UHC*4.28 + c_cascade2_DBS)...; % i.e. DBS tests only, for all PWID
+        + trapz(TT, sum(sum(y(:,2,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) * (UHC*4.28 + c_cascade2_DBS)...
+        +trapz(TT, sum(sum(y(:,3,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(3,1,2,1) * (UHC*4.28 + c_cascade2_DBS); 
     Cas_cost2 = 0;
 else
-    Cas_cost1=trapz(TT, sum(sum(y(:,1,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) /2 * c_cascade1...; % i.e. antibody tests
-        + trapz(TT, sum(sum(y(:,2,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) /2 * c_cascade1...
-        + trapz(TT, sum(sum(y(:,3,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(3,1,2,1) /2 * c_cascade1;
+    Cas_cost1=trapz(TT, sum(sum(y(:,1,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) * (UHC*4.28 + c_cascade1)...; % i.e. antibody tests
+        + trapz(TT, sum(sum(y(:,2,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(1,1,2,1) * (UHC*4.28 + c_cascade1)...
+        + trapz(TT, sum(sum(y(:,3,1,1:20),2),4).*exp(-discount.*TT))* prop_test * progression(3,1,2,1) * (UHC*4.28 + c_cascade1);
     Cas_cost2=sum(sum(sum(y(:,:,:,29),3),2)*c_cascade2.*exp(-discount.*TT)); % i.e RNA tests
 end
 Cas_cost3=sum(sum(sum(y(:,:,:,30),3),2)*c_cascade3(2).*exp(-discount.*TT)); % i.e assumes no genotype tests, just other workup

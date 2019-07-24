@@ -34,6 +34,6 @@ summary = [cost,DALY,tr(4),tr_(4),...
     sum(sum(ycomb_noage(t_val(3),1:3,:,22))),... %Liver related deaths 2015 to 2030
     100*sum(sum(ycomb_noage(find(TT>=69,1),1,:,[6,12:20])))./sum(sum(ycomb_noage(find(TT>=69,1),1,:,1:20))),... %Prevalence among PWID in 2019
     100*sum(sum(ycomb_noage(find(TT>=70,1),1,:,[6,12:20])))./sum(sum(ycomb_noage(find(TT>=70,1),1,:,1:20))),... %Prevalence among PWID in 2020
-    100*sum(sum(ycomb_noage(find(TT>=75,1),1,:,[6,12:20])))./sum(sum(ycomb_noage(find(TT>=75,1),1,:,1:20)))]; %Prevalence among PWID in 2025
+    sum(sum(ycomb_noage(find(TT>=80,1)+1:find(TT>=81,1),1,:,27)))/(TT(find(TT>=81,1))-TT(find(TT>=80,1)))]; %Incidence among PWID in 2030
 
 end

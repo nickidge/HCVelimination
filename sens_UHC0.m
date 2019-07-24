@@ -21,8 +21,7 @@ sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 %summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
 followup = 1;
-UHC = 1;
-    
+UHC = 0;    
 
 %% Sensitivity of parameters
 for s=1:sens
@@ -37,7 +36,7 @@ for s=1:sens
     %    calibrate_optim_par(200, 30);
     %save(filename2); 
     load(filename2); %infect = 0.1066; imp6=3*imp6; imp7=3.4*imp9; imp8=3.4*imp9; imp9=3.4*imp9;
-    filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\sens_GPscreening");
+    filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\sens_UHC0");
     infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
     
@@ -145,7 +144,7 @@ for s=1:sens
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
                     progression(2,1,2,1) = 2/12;%range_test(i);
-                    progression(3,1,2,1) = 2/12;
+                    progression(3,1,2,1) = 0;
                 else
                     progression(1,1,2,1) = 0;
                     progression(2,1,2,1) = 0;
@@ -219,7 +218,7 @@ for s=1:sens
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
                     progression(2,1,2,1) = 2/12;%range_test(i);
-                    progression(3,1,2,1) = 2/12;
+                    progression(3,1,2,1) = 0;
                 else
                     progression(1,1,2,1) = 0;
                     progression(2,1,2,1) = 0;
@@ -285,7 +284,7 @@ for s=1:sens
                 if range_test(i) > 0
                     progression(1,1,2,1) = range_test(i);
                     progression(2,1,2,1) = 2/12;%range_test(i);
-                    progression(3,1,2,1) = 2/12;
+                    progression(3,1,2,1) = 0;
                 else
                     progression(1,1,2,1) = 0;
                     progression(2,1,2,1) = 0;
@@ -813,6 +812,5 @@ for i = 1:length(paper2(:,1))
         paper2_text{i+1,j+1} = [num2str(paper2(i,j))];%,' (',num2str(paper_LB(i,j)),', ',num2str(paper_UB(i,j)),')'];
     end
 end
-
 
 save(filename)
