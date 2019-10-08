@@ -70,8 +70,8 @@ for s=1:sens
     %%  Scenario 1: Scaled harm reduction
     scenario = 'current'; cal = 0;
     %harm_reduction_range = [0,-1,0.1:0.1:0.5];
-    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
-        0,0,0.42,0.42,0.42,0.5,0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.1,0.2,0.3; ...
+        0,0,0.42,0.42,0.5,0.55,0.6];
     progression(1,1,2,1) = 0; progression(2,1,2,1) = 0; progression(3,1,2,1) = 0;
     for h = 1:length(harm_reduction_range(1,:))
         if harm_reduction_range(h)<0

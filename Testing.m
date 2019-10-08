@@ -13,13 +13,13 @@ global filename scenario sens target_late Tin Run start_year num_pops num_cascad
 
 user=extractBetween(pwd,"Users\","\");
 drive=extractBefore(pwd,":");
-filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\base_R1");
+filename=strcat(drive,":\Users\",user,"\Desktop\Matlab Sims\Tanzania\base_R2");
 filename2 = "calibration_R1";
 
 loaddata
 %load('calibration_draftv2'); infect_base=infect; progression_base = progression;
 dt = 1/4; % six-monthly time steps for burn-in / calibration perio 1950-2015
-sens=100; %Number of runs in sensitivity analysis, sens=1 turns off feature
+sens=1; %Number of runs in sensitivity analysis, sens=1 turns off feature
 summary=zeros(6,12,sens);
 %summary_HR = zeros(length(harm_reduction_range),length(summary(1,:,1)),sens);
 followup = 1;
@@ -41,7 +41,7 @@ for s=1:sens
     %imp1 = 0; imp2 = 0; imp3 = 0; imp4 = 0; imp5 = 0; imp6 = 0; imp7 = 0; imp8 = 0; imp9 =0;
     infect_base = infect; progression_base = progression; diagnosed_risk_reduction = 1; treat = [0,0,0];
     %load('calibration_test3'); infect_base=infect; progression_base = progression;
-    filename=strcat("C:\Users\nick.scott\Desktop\Matlab Sims\Tanzania\Unc2");
+    filename=strcat("C:\Users\nick.scott\Desktop\Matlab Sims\Tanzania\Base_R2");
     if s > 1
         perturb_parameters
     end
@@ -74,8 +74,8 @@ for s=1:sens
     %%  Scenario 1: Scaled harm reduction
     scenario = 'current'; cal = 0;
     %harm_reduction_range = [0,-1,0.1:0.1:0.5];
-    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
-        0,0,0.42,0.42,0.42,0.5,0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.1,0.2,0.3; ...
+        0,0,0.42,0.42,0.5,0.55,0.6];
     progression(1,1,2,1) = 0; progression(2,1,2,1) = 0; progression(3,1,2,1) = 0;
     for h = 1:length(harm_reduction_range(1,:))
         if harm_reduction_range(h)<0
@@ -132,8 +132,8 @@ for s=1:sens
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.7]; % 80% coverage
     %harm_reduction_range = [0,-1,0.1:0.1:0.5];
-    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
-        0,0,0.42,0.42,0.42,0.5,0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.1,0.2,0.3; ...
+        0,0,0.42,0.42,0.5,0.55,0.6];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
             for k =1:length(harm_reduction_range(1,:))
@@ -205,8 +205,8 @@ for s=1:sens
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.9];
     %harm_reduction_range = [0,-1,0.1:0.1:0.5];
-    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
-        0,0,0.42,0.42,0.42,0.5,0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.1,0.2,0.3; ...
+        0,0,0.42,0.42,0.5,0.55,0.6];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
             for k =1:length(harm_reduction_range(1,:))
@@ -271,8 +271,8 @@ for s=1:sens
     range_diagnosed_risk_reduction = [0:0.1:0.1]; % risk reduction when diagnosed
     prop_test_range = [0.7];
     %harm_reduction_range = [0,-1,0.1:0.1:0.5];
-    harm_reduction_range = [0,0.04,0,0.04,0.5,0.5,0.5; ...
-        0,0,0.42,0.42,0.42,0.5,0.5];
+    harm_reduction_range = [0,0.04,0,0.04,0.1,0.2,0.3; ...
+        0,0,0.42,0.42,0.5,0.55,0.6];
     for i = 1:length(range_test)
         for j = 1:length(range_treat)
             for k =1:length(harm_reduction_range(1,:))
@@ -486,6 +486,10 @@ end
 
 summary(1:6,5,:)= 100*(summary(1:6,5,:)- repmat(inc_year_sens(1,1,:),[6,1]))./repmat(inc_year_sens(1,1,:),[6,1]); %Percent reduction in incidence
 summary(1:6,6,:)= 100*(summary(1:6,6,:)- repmat(death_year_sens(1,1,:),[6,1]))./repmat(death_year_sens(1,1,:),[6,1]); %Percent reduction in mortality
+
+
+CE_map = [(squeeze(summary_test(2,2,4,1,:)) - squeeze(summary_HR(4,1,:)))/10^6,(squeeze(summary_HR(4,2,:)) -squeeze(summary_test(2,2,4,2,:)))/10^3, (squeeze(summary_serum(2,2,4,1,:)) - squeeze(summary_HR(4,1,:)))/10^6,(squeeze(summary_HR(4,2,:)) -squeeze(summary_serum(2,2,4,2,:)))/10^3,...
+         (squeeze(summary_DBS(2,2,4,1,:)) - squeeze(summary_HR(4,1,:)))/10^6,(squeeze(summary_HR(4,2,:)) -squeeze(summary_DBS(2,2,4,2,:)))/10^3];
 
 %Additional costs/QALYs compared to baseline
 % summary2=zeros(6,12,sens);
@@ -858,95 +862,95 @@ ICER_UB = prctile(ICER,95,3);
 
 paper2_0HR = [round([0, diag_test_LB(23,2,2,1,1), diag_serum_LB(23,2,2,1,1), diag_DBS_LB(23,2,2,1,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,1,1), c_treat_serum(3,2,2,1,1), c_treat_DBS(3,2,2,1,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_LB(1,1,1), summary_test_LB(2,2,1,1,1), summary_test_LB(2,2,1,1,1), summary_DBS_LB(2,2,1,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_LB(1,4,1), summary_test_LB(2,2,1,4,1), summary_test_LB(2,2,1,4,1), summary_DBS_LB(2,2,1,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_LB(1,9,1), summary_test_LB(2,2,1,9,1), summary_test_LB(2,2,1,9,1), summary_DBS_LB(2,2,1,9,1)],0);... % total deaths
+     round([summary_HR_LB(1,1,1), summary_test_LB(2,2,1,1,1), summary_serum_LB(2,2,1,1,1), summary_DBS_LB(2,2,1,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_LB(1,4,1), summary_test_LB(2,2,1,4,1), summary_serum_LB(2,2,1,4,1), summary_DBS_LB(2,2,1,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_LB(1,9,1), summary_test_LB(2,2,1,9,1), summary_serum_LB(2,2,1,9,1), summary_DBS_LB(2,2,1,9,1)],0);... % total deaths
      round([sum(inc_HR_LB_PWID(11:23,1,1),1), sum(inc_test_LB_PWID(11:23,2,2,1,1),1), sum(inc_serum_LB_PWID(11:23,2,2,1,1),1), sum(inc_DBS_LB_PWID(11:23,2,2,1,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_LB(11:23,1,1),1), sum(inc_test(11:23,2,2,1,1),1), sum(inc_serum(11:23,2,2,1,1),1), sum(inc_DBS(11:23,2,2,1,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_LB(1,8,1), summary_test_LB(2,2,1,8,1), summary_test_LB(2,2,1,8,1), summary_DBS_LB(2,2,1,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_LB(1,5,1), summary_test_LB(2,2,1,5,1), summary_test_LB(2,2,1,5,1), summary_DBS_LB(2,2,1,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_LB(1,12,1), summary_test_LB(2,2,1,12,1), summary_test_LB(2,2,1,12,1), summary_DBS_LB(2,2,1,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_LB(11:23,1,1),1), sum(inc_test_LB(11:23,2,2,1,1),1), sum(inc_serum_LB(11:23,2,2,1,1),1), sum(inc_DBS_LB(11:23,2,2,1,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_LB(1,8,1), summary_test_LB(2,2,1,8,1), summary_serum_LB(2,2,1,8,1), summary_DBS_LB(2,2,1,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_LB(1,5,1), summary_test_LB(2,2,1,5,1), summary_serum_LB(2,2,1,5,1), summary_DBS_LB(2,2,1,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_LB(1,12,1), summary_test_LB(2,2,1,12,1), summary_serum_LB(2,2,1,12,1), summary_DBS_LB(2,2,1,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_LB(1,6,1), summary_test_LB(2,2,1,6,1), summary_test_LB(2,2,1,6,1), summary_DBS_LB(2,2,1,6,1)])/death2017,0);...% mortality reduction in 2030
-     round([summary_HR_LB(1,2,1), summary_test_LB(2,2,1,2,1), summary_test_LB(2,2,1,2,1), summary_DBS_LB(2,2,1,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_LB(1,2,1), summary_test_LB(2,2,1,2,1), summary_serum_LB(2,2,1,2,1), summary_DBS_LB(2,2,1,2,1)]/10^3,2);... % total DALYs
      round(ICER_LB(1,:,1),0)];
 paper2_1HR = [round([0, diag_test_LB(23,2,2,2,1), diag_serum_LB(23,2,2,2,1), diag_DBS_LB(23,2,2,2,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,2,1), c_treat_serum(3,2,2,2,1), c_treat_DBS(3,2,2,2,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_LB(2,1,1), summary_test_LB(2,2,2,1,1), summary_test_LB(2,2,2,1,1), summary_DBS_LB(2,2,2,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_LB(2,4,1), summary_test_LB(2,2,2,4,1), summary_test_LB(2,2,2,4,1), summary_DBS_LB(2,2,2,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_LB(2,9,1), summary_test_LB(2,2,2,9,1), summary_test_LB(2,2,2,9,1), summary_DBS_LB(2,2,2,9,1)],0);... % total deaths
+     round([summary_HR_LB(2,1,1), summary_test_LB(2,2,2,1,1), summary_serum_LB(2,2,2,1,1), summary_DBS_LB(2,2,2,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_LB(2,4,1), summary_test_LB(2,2,2,4,1), summary_serum_LB(2,2,2,4,1), summary_DBS_LB(2,2,2,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_LB(2,9,1), summary_test_LB(2,2,2,9,1), summary_serum_LB(2,2,2,9,1), summary_DBS_LB(2,2,2,9,1)],0);... % total deaths
      round([sum(inc_HR_LB_PWID(11:23,2,1),1), sum(inc_test_LB_PWID(11:23,2,2,2,1),1), sum(inc_serum_LB_PWID(11:23,2,2,2,1),1), sum(inc_DBS_LB_PWID(11:23,2,2,2,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_LB(11:23,2,1),1), sum(inc_test(11:23,2,2,2,1),1), sum(inc_serum(11:23,2,2,2,1),1), sum(inc_DBS(11:23,2,2,2,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_LB(2,8,1), summary_test_LB(2,2,2,8,1), summary_test_LB(2,2,2,8,1), summary_DBS_LB(2,2,2,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_LB(2,5,1), summary_test_LB(2,2,2,5,1), summary_test_LB(2,2,2,5,1), summary_DBS_LB(2,2,2,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_LB(2,12,1), summary_test_LB(2,2,2,12,1), summary_test_LB(2,2,2,12,1), summary_DBS_LB(2,2,2,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_LB(11:23,2,1),1), sum(inc_test_LB(11:23,2,2,2,1),1), sum(inc_serum_LB(11:23,2,2,2,1),1), sum(inc_DBS_LB(11:23,2,2,2,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_LB(2,8,1), summary_test_LB(2,2,2,8,1), summary_serum_LB(2,2,2,8,1), summary_DBS_LB(2,2,2,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_LB(2,5,1), summary_test_LB(2,2,2,5,1), summary_serum_LB(2,2,2,5,1), summary_DBS_LB(2,2,2,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_LB(2,12,1), summary_test_LB(2,2,2,12,1), summary_serum_LB(2,2,2,12,1), summary_DBS_LB(2,2,2,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_LB(2,6,1), summary_test_LB(2,2,2,6,1), summary_test_LB(2,2,2,6,1), summary_DBS_LB(2,2,2,6,1)])/death2017,0);...]; % mortality reduction in 2030
-     round([summary_HR_LB(2,2,1), summary_test_LB(2,2,2,2,1), summary_test_LB(2,2,2,2,1), summary_DBS_LB(2,2,2,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_LB(2,2,1), summary_test_LB(2,2,2,2,1), summary_serum_LB(2,2,2,2,1), summary_DBS_LB(2,2,2,2,1)]/10^3,2);... % total DALYs
      round(ICER_LB(2,:,1),0)];
 paper2_2HR = [round([0, diag_test_LB(23,2,2,3,1), diag_serum_LB(23,2,2,3,1), diag_DBS_LB(23,2,2,3,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,3,1), c_treat_serum(3,2,2,3,1), c_treat_DBS(3,2,2,3,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_LB(3,1,1), summary_test_LB(2,2,3,1,1), summary_test_LB(2,2,3,1,1), summary_DBS_LB(2,2,3,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_LB(3,4,1), summary_test_LB(2,2,3,4,1), summary_test_LB(2,2,3,4,1), summary_DBS_LB(2,2,3,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_LB(3,9,1), summary_test_LB(2,2,3,9,1), summary_test_LB(2,2,3,9,1), summary_DBS_LB(2,2,3,9,1)],0);... % total deaths
+     round([summary_HR_LB(3,1,1), summary_test_LB(2,2,3,1,1), summary_serum_LB(2,2,3,1,1), summary_DBS_LB(2,2,3,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_LB(3,4,1), summary_test_LB(2,2,3,4,1), summary_serum_LB(2,2,3,4,1), summary_DBS_LB(2,2,3,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_LB(3,9,1), summary_test_LB(2,2,3,9,1), summary_serum_LB(2,2,3,9,1), summary_DBS_LB(2,2,3,9,1)],0);... % total deaths
      round([sum(inc_HR_LB_PWID(11:23,3,1),1), sum(inc_test_LB_PWID(11:23,2,2,3,1),1), sum(inc_serum_LB_PWID(11:23,2,2,3,1),1), sum(inc_DBS_LB_PWID(11:23,2,2,3,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_LB(11:23,3,1),1), sum(inc_test(11:23,2,2,3,1),1), sum(inc_serum(11:23,2,2,3,1),1), sum(inc_DBS(11:23,2,2,3,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_LB(3,8,1), summary_test_LB(2,2,3,8,1), summary_test_LB(2,2,3,8,1), summary_DBS_LB(2,2,3,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_LB(3,5,1), summary_test_LB(2,2,3,5,1), summary_test_LB(2,2,3,5,1), summary_DBS_LB(2,2,3,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_LB(3,12,1), summary_test_LB(2,2,3,12,1), summary_test_LB(2,2,3,12,1), summary_DBS_LB(2,2,3,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_LB(11:23,3,1),1), sum(inc_test_LB(11:23,2,2,3,1),1), sum(inc_serum_LB(11:23,2,2,3,1),1), sum(inc_DBS_LB(11:23,2,2,3,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_LB(3,8,1), summary_test_LB(2,2,3,8,1), summary_serum_LB(2,2,3,8,1), summary_DBS_LB(2,2,3,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_LB(3,5,1), summary_test_LB(2,2,3,5,1), summary_serum_LB(2,2,3,5,1), summary_DBS_LB(2,2,3,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_LB(3,12,1), summary_test_LB(2,2,3,12,1), summary_serum_LB(2,2,3,12,1), summary_DBS_LB(2,2,3,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_LB(3,6,1), summary_test_LB(2,2,3,6,1), summary_test_LB(2,2,3,6,1), summary_DBS_LB(2,2,3,6,1)])/death2017,0);...]; % mortality reduction in 2030
-     round([summary_HR_LB(3,2,1), summary_test_LB(2,2,3,2,1), summary_test_LB(2,2,3,2,1), summary_DBS_LB(2,2,3,2,1)]/10^3,2);... % total DALYs
-     round(ICER(3,:,1),0)];
+     round([summary_HR_LB(3,2,1), summary_test_LB(2,2,3,2,1), summary_serum_LB(2,2,3,2,1), summary_DBS_LB(2,2,3,2,1)]/10^3,2);... % total DALYs
+     round(ICER_LB(3,:,1),0)];
 paper2_3HR = [round([0, diag_test_LB(23,2,2,4,1), diag_serum_LB(23,2,2,4,1), diag_DBS_LB(23,2,2,4,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,4,1), c_treat_serum(3,2,2,4,1), c_treat_DBS(3,2,2,4,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_LB(4,1,1), summary_test_LB(2,2,4,1,1), summary_test_LB(2,2,4,1,1), summary_DBS_LB(2,2,4,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_LB(4,4,1), summary_test_LB(2,2,4,4,1), summary_test_LB(2,2,4,4,1), summary_DBS_LB(2,2,4,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_LB(4,9,1), summary_test_LB(2,2,4,9,1), summary_test_LB(2,2,4,9,1), summary_DBS_LB(2,2,4,9,1)],0);... % total deaths
+     round([summary_HR_LB(4,1,1), summary_test_LB(2,2,4,1,1), summary_serum_LB(2,2,4,1,1), summary_DBS_LB(2,2,4,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_LB(4,4,1), summary_test_LB(2,2,4,4,1), summary_serum_LB(2,2,4,4,1), summary_DBS_LB(2,2,4,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_LB(4,9,1), summary_test_LB(2,2,4,9,1), summary_serum_LB(2,2,4,9,1), summary_DBS_LB(2,2,4,9,1)],0);... % total deaths
      round([sum(inc_HR_LB_PWID(11:23,4,1),1), sum(inc_test_LB_PWID(11:23,2,2,4,1),1), sum(inc_serum_LB_PWID(11:23,2,2,4,1),1), sum(inc_DBS_LB_PWID(11:23,2,2,4,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_LB(11:23,4,1),1), sum(inc_test(11:23,2,2,4,1),1), sum(inc_serum(11:23,2,2,4,1),1), sum(inc_DBS(11:23,2,2,4,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_LB(4,8,1), summary_test_LB(2,2,4,8,1), summary_test_LB(2,2,4,8,1), summary_DBS_LB(2,2,4,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_LB(4,5,1), summary_test_LB(2,2,4,5,1), summary_test_LB(2,2,4,5,1), summary_DBS_LB(2,2,4,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_LB(4,12,1), summary_test_LB(2,2,4,12,1), summary_test_LB(2,2,4,12,1), summary_DBS_LB(2,2,4,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_LB(11:23,4,1),1), sum(inc_test_LB(11:23,2,2,4,1),1), sum(inc_serum_LB(11:23,2,2,4,1),1), sum(inc_DBS_LB(11:23,2,2,4,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_LB(4,8,1), summary_test_LB(2,2,4,8,1), summary_serum_LB(2,2,4,8,1), summary_DBS_LB(2,2,4,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_LB(4,5,1), summary_test_LB(2,2,4,5,1), summary_serum_LB(2,2,4,5,1), summary_DBS_LB(2,2,4,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_LB(4,12,1), summary_test_LB(2,2,4,12,1), summary_serum_LB(2,2,4,12,1), summary_DBS_LB(2,2,4,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_LB(4,6,1), summary_test_LB(2,2,4,6,1), summary_test_LB(2,2,4,6,1), summary_DBS_LB(2,2,4,6,1)])/death2017,0);...]; % mortality reduction in 2030
-     round([summary_HR_LB(4,2,1), summary_test_LB(2,2,4,2,1), summary_test_LB(2,2,4,2,1), summary_DBS_LB(2,2,4,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_LB(4,2,1), summary_test_LB(2,2,4,2,1), summary_serum_LB(2,2,4,2,1), summary_DBS_LB(2,2,4,2,1)]/10^3,2);... % total DALYs
      round(ICER_LB(4,:,1),0)];
  paper2_4HR = [round([0, diag_test_LB(23,2,2,5,1), diag_serum_LB(23,2,2,5,1), diag_DBS_LB(23,2,2,5,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,5,1), c_treat_serum(3,2,2,5,1), c_treat_DBS(3,2,2,5,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_LB(5,1,1), summary_test_LB(2,2,5,1,1), summary_test_LB(2,2,5,1,1), summary_DBS_LB(2,2,5,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_LB(5,4,1), summary_test_LB(2,2,5,4,1), summary_test_LB(2,2,5,4,1), summary_DBS_LB(2,2,5,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_LB(5,9,1), summary_test_LB(2,2,5,9,1), summary_test_LB(2,2,5,9,1), summary_DBS_LB(2,2,5,9,1)],0);... % total deaths
+     round([summary_HR_LB(5,1,1), summary_test_LB(2,2,5,1,1), summary_serum_LB(2,2,5,1,1), summary_DBS_LB(2,2,5,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_LB(5,4,1), summary_test_LB(2,2,5,4,1), summary_serum_LB(2,2,5,4,1), summary_DBS_LB(2,2,5,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_LB(5,9,1), summary_test_LB(2,2,5,9,1), summary_serum_LB(2,2,5,9,1), summary_DBS_LB(2,2,5,9,1)],0);... % total deaths
      %round([summary_HR_LB(5,2,1), summary_test_LB(2,2,5,2,1), summary_test_LB(2,2,5,2,1), summary_DBS_LB(2,2,5,2,1)]/10^3,0);... % total DALYs
      round([sum(inc_HR_LB_PWID(11:23,5,1),1), sum(inc_test_LB_PWID(11:23,2,2,5,1),1), sum(inc_serum_LB_PWID(11:23,2,2,5,1),1), sum(inc_DBS_LB_PWID(11:23,2,2,5,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_LB(11:23,5,1),1), sum(inc_test(11:23,2,2,5,1),1), sum(inc_serum(11:23,2,2,5,1),1), sum(inc_DBS(11:23,2,2,5,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_LB(5,8,1), summary_test_LB(2,2,5,8,1), summary_test_LB(2,2,5,8,1), summary_DBS_LB(2,2,5,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_LB(5,5,1), summary_test_LB(2,2,5,5,1), summary_test_LB(2,2,5,5,1), summary_DBS_LB(2,2,5,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_LB(5,12,1), summary_test_LB(2,2,5,12,1), summary_test_LB(2,2,5,12,1), summary_DBS_LB(2,2,5,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_LB(11:23,5,1),1), sum(inc_test_LB(11:23,2,2,5,1),1), sum(inc_serum_LB(11:23,2,2,5,1),1), sum(inc_DBS_LB(11:23,2,2,5,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_LB(5,8,1), summary_test_LB(2,2,5,8,1), summary_serum_LB(2,2,5,8,1), summary_DBS_LB(2,2,5,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_LB(5,5,1), summary_test_LB(2,2,5,5,1), summary_serum_LB(2,2,5,5,1), summary_DBS_LB(2,2,5,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_LB(5,12,1), summary_test_LB(2,2,5,12,1), summary_serum_LB(2,2,5,12,1), summary_DBS_LB(2,2,5,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_LB(5,6,1), summary_test_LB(2,2,5,6,1), summary_test_LB(2,2,5,6,1), summary_DBS_LB(2,2,5,6,1)])/death2017,0);... % mortality reduction in 2030
-     round([summary_HR_LB(5,2,1), summary_test_LB(2,2,5,2,1), summary_test_LB(2,2,5,2,1), summary_DBS_LB(2,2,5,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_LB(5,2,1), summary_test_LB(2,2,5,2,1), summary_serum_LB(2,2,5,2,1), summary_DBS_LB(2,2,5,2,1)]/10^3,2);... % total DALYs
      round(ICER_LB(5,:,1),0)];
  paper2_5HR = [round([0, diag_test_LB(23,2,2,6,1), diag_serum_LB(23,2,2,6,1), diag_DBS_LB(23,2,2,6,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,6,1), c_treat_serum(3,2,2,6,1), c_treat_DBS(3,2,2,6,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_LB(6,1,1), summary_test_LB(2,2,6,1,1), summary_test_LB(2,2,6,1,1), summary_DBS_LB(2,2,6,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_LB(6,4,1), summary_test_LB(2,2,6,4,1), summary_test_LB(2,2,6,4,1), summary_DBS_LB(2,2,6,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_LB(6,9,1), summary_test_LB(2,2,6,9,1), summary_test_LB(2,2,6,9,1), summary_DBS_LB(2,2,6,9,1)],0);... % total deaths
+     round([summary_HR_LB(6,1,1), summary_test_LB(2,2,6,1,1), summary_serum_LB(2,2,6,1,1), summary_DBS_LB(2,2,6,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_LB(6,4,1), summary_test_LB(2,2,6,4,1), summary_serum_LB(2,2,6,4,1), summary_DBS_LB(2,2,6,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_LB(6,9,1), summary_test_LB(2,2,6,9,1), summary_serum_LB(2,2,6,9,1), summary_DBS_LB(2,2,6,9,1)],0);... % total deaths
      %round([summary_HR_LB(6,2,1), summary_test_LB(2,2,6,2,1), summary_test_LB(2,2,6,2,1), summary_DBS_LB(2,2,6,2,1)]/10^3,0);... % total DALYs
      round([sum(inc_HR_LB_PWID(11:23,6,1),1), sum(inc_test_LB_PWID(11:23,2,2,6,1),1), sum(inc_serum_LB_PWID(11:23,2,2,6,1),1), sum(inc_DBS_LB_PWID(11:23,2,2,6,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_LB(11:23,6,1),1), sum(inc_test(11:23,2,2,6,1),1), sum(inc_serum(11:23,2,2,6,1),1), sum(inc_DBS(11:23,2,2,6,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_LB(6,8,1), summary_test_LB(2,2,6,8,1), summary_test_LB(2,2,6,8,1), summary_DBS_LB(2,2,6,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_LB(6,5,1), summary_test_LB(2,2,6,5,1), summary_test_LB(2,2,6,5,1), summary_DBS_LB(2,2,6,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_LB(6,12,1), summary_test_LB(2,2,6,12,1), summary_test_LB(2,2,6,12,1), summary_DBS_LB(2,2,6,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_LB(11:23,6,1),1), sum(inc_test_LB(11:23,2,2,6,1),1), sum(inc_serum_LB(11:23,2,2,6,1),1), sum(inc_DBS_LB(11:23,2,2,6,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_LB(6,8,1), summary_test_LB(2,2,6,8,1), summary_serum_LB(2,2,6,8,1), summary_DBS_LB(2,2,6,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_LB(6,5,1), summary_test_LB(2,2,6,5,1), summary_serum_LB(2,2,6,5,1), summary_DBS_LB(2,2,6,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_LB(6,12,1), summary_test_LB(2,2,6,12,1), summary_serum_LB(2,2,6,12,1), summary_DBS_LB(2,2,6,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_LB(6,6,1), summary_test_LB(2,2,6,6,1), summary_test_LB(2,2,6,6,1), summary_DBS_LB(2,2,6,6,1)])/death2017,0);... % mortality reduction in 2030
-     round([summary_HR_LB(6,2,1), summary_test_LB(2,2,6,2,1), summary_test_LB(2,2,6,2,1), summary_DBS_LB(2,2,6,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_LB(6,2,1), summary_test_LB(2,2,6,2,1), summary_serum_LB(2,2,6,2,1), summary_DBS_LB(2,2,6,2,1)]/10^3,2);... % total DALYs
      round(ICER_LB(6,:,1),0)];
  paper2_6HR = [round([0, diag_test_LB(23,2,2,7,1), diag_serum_LB(23,2,2,7,1), diag_DBS_LB(23,2,2,7,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,7,1), c_treat_serum(3,2,2,7,1), c_treat_DBS(3,2,2,7,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_LB(7,1,1), summary_test_LB(2,2,7,1,1), summary_test_LB(2,2,7,1,1), summary_DBS_LB(2,2,7,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_LB(7,4,1), summary_test_LB(2,2,7,4,1), summary_test_LB(2,2,7,4,1), summary_DBS_LB(2,2,7,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_LB(7,9,1), summary_test_LB(2,2,7,9,1), summary_test_LB(2,2,7,9,1), summary_DBS_LB(2,2,7,9,1)],0);... % total deaths
+     round([summary_HR_LB(7,1,1), summary_test_LB(2,2,7,1,1), summary_serum_LB(2,2,7,1,1), summary_DBS_LB(2,2,7,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_LB(7,4,1), summary_test_LB(2,2,7,4,1), summary_serum_LB(2,2,7,4,1), summary_DBS_LB(2,2,7,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_LB(7,9,1), summary_test_LB(2,2,7,9,1), summary_serum_LB(2,2,7,9,1), summary_DBS_LB(2,2,7,9,1)],0);... % total deaths
      %round([summary_HR_LB(7,2,1), summary_test_LB(2,2,7,2,1), summary_test_LB(2,2,7,2,1), summary_DBS_LB(2,2,7,2,1)]/10^3,0);... % total DALYs
      round([sum(inc_HR_LB_PWID(11:23,7,1),1), sum(inc_test_LB_PWID(11:23,2,2,7,1),1), sum(inc_serum_LB_PWID(11:23,2,2,7,1),1), sum(inc_DBS_LB_PWID(11:23,2,2,7,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_LB(11:23,7,1),1), sum(inc_test(11:23,2,2,7,1),1), sum(inc_serum(11:23,2,2,7,1),1), sum(inc_DBS(11:23,2,2,7,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_LB(7,8,1), summary_test_LB(2,2,7,8,1), summary_test_LB(2,2,7,8,1), summary_DBS_LB(2,2,7,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_LB(7,5,1), summary_test_LB(2,2,7,5,1), summary_test_LB(2,2,7,5,1), summary_DBS_LB(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_LB(7,12,1), summary_test_LB(2,2,7,12,1), summary_test_LB(2,2,7,12,1), summary_DBS_LB(2,2,7,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_LB(11:23,7,1),1), sum(inc_test_LB(11:23,2,2,7,1),1), sum(inc_serum_LB(11:23,2,2,7,1),1), sum(inc_DBS_LB(11:23,2,2,7,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_LB(7,8,1), summary_test_LB(2,2,7,8,1), summary_serum_LB(2,2,7,8,1), summary_DBS_LB(2,2,7,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_LB(7,5,1), summary_test_LB(2,2,7,5,1), summary_serum_LB(2,2,7,5,1), summary_DBS_LB(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_LB(7,12,1), summary_test_LB(2,2,7,12,1), summary_serum_LB(2,2,7,12,1), summary_DBS_LB(2,2,7,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR(7,6,1), summary_test_LB(2,2,7,6,1), summary_serum(2,2,7,6,1), summary_DBS_LB(2,2,7,6,1)])/death2017,0);... % mortality reduction in 2030
      round([summary_HR_LB(7,2,1), summary_test_LB(2,2,7,2,1), summary_serum_LB(2,2,7,2,1), summary_DBS_LB(2,2,7,2,1)]/10^3,2);... % total DALYs
      round(ICER_LB(7,:,1),0)];
@@ -1063,95 +1067,95 @@ end
 
 paper2_0HR = [round([0, diag_test_UB(23,2,2,1,1), diag_serum_UB(23,2,2,1,1), diag_DBS_UB(23,2,2,1,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,1,1), c_treat_serum(3,2,2,1,1), c_treat_DBS(3,2,2,1,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_UB(1,1,1), summary_test_UB(2,2,1,1,1), summary_test_UB(2,2,1,1,1), summary_DBS_UB(2,2,1,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_UB(1,4,1), summary_test_UB(2,2,1,4,1), summary_test_UB(2,2,1,4,1), summary_DBS_UB(2,2,1,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_UB(1,9,1), summary_test_UB(2,2,1,9,1), summary_test_UB(2,2,1,9,1), summary_DBS_UB(2,2,1,9,1)],0);... % total deaths
+     round([summary_HR_UB(1,1,1), summary_test_UB(2,2,1,1,1), summary_serum_UB(2,2,1,1,1), summary_DBS_UB(2,2,1,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_UB(1,4,1), summary_test_UB(2,2,1,4,1), summary_serum_UB(2,2,1,4,1), summary_DBS_UB(2,2,1,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_UB(1,9,1), summary_test_UB(2,2,1,9,1), summary_serum_UB(2,2,1,9,1), summary_DBS_UB(2,2,1,9,1)],0);... % total deaths
      round([sum(inc_HR_UB_PWID(11:23,1,1),1), sum(inc_test_UB_PWID(11:23,2,2,1,1),1), sum(inc_serum_UB_PWID(11:23,2,2,1,1),1), sum(inc_DBS_UB_PWID(11:23,2,2,1,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_UB(11:23,1,1),1), sum(inc_test(11:23,2,2,1,1),1), sum(inc_serum(11:23,2,2,1,1),1), sum(inc_DBS(11:23,2,2,1,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_UB(1,8,1), summary_test_UB(2,2,1,8,1), summary_test_UB(2,2,1,8,1), summary_DBS_UB(2,2,1,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_UB(1,5,1), summary_test_UB(2,2,1,5,1), summary_test_UB(2,2,1,5,1), summary_DBS_UB(2,2,1,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_UB(1,12,1), summary_test_UB(2,2,1,12,1), summary_test_UB(2,2,1,12,1), summary_DBS_UB(2,2,1,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_UB(11:23,1,1),1), sum(inc_test_UB(11:23,2,2,1,1),1), sum(inc_serum_UB(11:23,2,2,1,1),1), sum(inc_DBS_UB(11:23,2,2,1,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_UB(1,8,1), summary_test_UB(2,2,1,8,1), summary_serum_UB(2,2,1,8,1), summary_DBS_UB(2,2,1,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_UB(1,5,1), summary_test_UB(2,2,1,5,1), summary_serum_UB(2,2,1,5,1), summary_DBS_UB(2,2,1,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_UB(1,12,1), summary_test_UB(2,2,1,12,1), summary_serum_UB(2,2,1,12,1), summary_DBS_UB(2,2,1,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_UB(1,6,1), summary_test_UB(2,2,1,6,1), summary_test_UB(2,2,1,6,1), summary_DBS_UB(2,2,1,6,1)])/death2017,0);...% mortality reduction in 2030
-     round([summary_HR_UB(1,2,1), summary_test_UB(2,2,1,2,1), summary_test_UB(2,2,1,2,1), summary_DBS_UB(2,2,1,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_UB(1,2,1), summary_test_UB(2,2,1,2,1), summary_serum_UB(2,2,1,2,1), summary_DBS_UB(2,2,1,2,1)]/10^3,2);... % total DALYs
      round(ICER_UB(1,:,1),0)];
 paper2_1HR = [round([0, diag_test_UB(23,2,2,2,1), diag_serum_UB(23,2,2,2,1), diag_DBS_UB(23,2,2,2,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,2,1), c_treat_serum(3,2,2,2,1), c_treat_DBS(3,2,2,2,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_UB(2,1,1), summary_test_UB(2,2,2,1,1), summary_test_UB(2,2,2,1,1), summary_DBS_UB(2,2,2,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_UB(2,4,1), summary_test_UB(2,2,2,4,1), summary_test_UB(2,2,2,4,1), summary_DBS_UB(2,2,2,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_UB(2,9,1), summary_test_UB(2,2,2,9,1), summary_test_UB(2,2,2,9,1), summary_DBS_UB(2,2,2,9,1)],0);... % total deaths
+     round([summary_HR_UB(2,1,1), summary_test_UB(2,2,2,1,1), summary_serum_UB(2,2,2,1,1), summary_DBS_UB(2,2,2,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_UB(2,4,1), summary_test_UB(2,2,2,4,1), summary_serum_UB(2,2,2,4,1), summary_DBS_UB(2,2,2,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_UB(2,9,1), summary_test_UB(2,2,2,9,1), summary_serum_UB(2,2,2,9,1), summary_DBS_UB(2,2,2,9,1)],0);... % total deaths
      round([sum(inc_HR_UB_PWID(11:23,2,1),1), sum(inc_test_UB_PWID(11:23,2,2,2,1),1), sum(inc_serum_UB_PWID(11:23,2,2,2,1),1), sum(inc_DBS_UB_PWID(11:23,2,2,2,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_UB(11:23,2,1),1), sum(inc_test(11:23,2,2,2,1),1), sum(inc_serum(11:23,2,2,2,1),1), sum(inc_DBS(11:23,2,2,2,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_UB(2,8,1), summary_test_UB(2,2,2,8,1), summary_test_UB(2,2,2,8,1), summary_DBS_UB(2,2,2,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_UB(2,5,1), summary_test_UB(2,2,2,5,1), summary_test_UB(2,2,2,5,1), summary_DBS_UB(2,2,2,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_UB(2,12,1), summary_test_UB(2,2,2,12,1), summary_test_UB(2,2,2,12,1), summary_DBS_UB(2,2,2,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_UB(11:23,2,1),1), sum(inc_test_UB(11:23,2,2,2,1),1), sum(inc_serum_UB(11:23,2,2,2,1),1), sum(inc_DBS_UB(11:23,2,2,2,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_UB(2,8,1), summary_test_UB(2,2,2,8,1), summary_serum_UB(2,2,2,8,1), summary_DBS_UB(2,2,2,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_UB(2,5,1), summary_test_UB(2,2,2,5,1), summary_serum_UB(2,2,2,5,1), summary_DBS_UB(2,2,2,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_UB(2,12,1), summary_test_UB(2,2,2,12,1), summary_serum_UB(2,2,2,12,1), summary_DBS_UB(2,2,2,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_UB(2,6,1), summary_test_UB(2,2,2,6,1), summary_test_UB(2,2,2,6,1), summary_DBS_UB(2,2,2,6,1)])/death2017,0);...]; % mortality reduction in 2030
-     round([summary_HR_UB(2,2,1), summary_test_UB(2,2,2,2,1), summary_test_UB(2,2,2,2,1), summary_DBS_UB(2,2,2,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_UB(2,2,1), summary_test_UB(2,2,2,2,1), summary_serum_UB(2,2,2,2,1), summary_DBS_UB(2,2,2,2,1)]/10^3,2);... % total DALYs
      round(ICER_UB(2,:,1),0)];
 paper2_2HR = [round([0, diag_test_UB(23,2,2,3,1), diag_serum_UB(23,2,2,3,1), diag_DBS_UB(23,2,2,3,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,3,1), c_treat_serum(3,2,2,3,1), c_treat_DBS(3,2,2,3,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_UB(3,1,1), summary_test_UB(2,2,3,1,1), summary_test_UB(2,2,3,1,1), summary_DBS_UB(2,2,3,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_UB(3,4,1), summary_test_UB(2,2,3,4,1), summary_test_UB(2,2,3,4,1), summary_DBS_UB(2,2,3,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_UB(3,9,1), summary_test_UB(2,2,3,9,1), summary_test_UB(2,2,3,9,1), summary_DBS_UB(2,2,3,9,1)],0);... % total deaths
+     round([summary_HR_UB(3,1,1), summary_test_UB(2,2,3,1,1), summary_serum_UB(2,2,3,1,1), summary_DBS_UB(2,2,3,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_UB(3,4,1), summary_test_UB(2,2,3,4,1), summary_serum_UB(2,2,3,4,1), summary_DBS_UB(2,2,3,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_UB(3,9,1), summary_test_UB(2,2,3,9,1), summary_serum_UB(2,2,3,9,1), summary_DBS_UB(2,2,3,9,1)],0);... % total deaths
      round([sum(inc_HR_UB_PWID(11:23,3,1),1), sum(inc_test_UB_PWID(11:23,2,2,3,1),1), sum(inc_serum_UB_PWID(11:23,2,2,3,1),1), sum(inc_DBS_UB_PWID(11:23,2,2,3,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_UB(11:23,3,1),1), sum(inc_test(11:23,2,2,3,1),1), sum(inc_serum(11:23,2,2,3,1),1), sum(inc_DBS(11:23,2,2,3,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_UB(3,8,1), summary_test_UB(2,2,3,8,1), summary_test_UB(2,2,3,8,1), summary_DBS_UB(2,2,3,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_UB(3,5,1), summary_test_UB(2,2,3,5,1), summary_test_UB(2,2,3,5,1), summary_DBS_UB(2,2,3,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_UB(3,12,1), summary_test_UB(2,2,3,12,1), summary_test_UB(2,2,3,12,1), summary_DBS_UB(2,2,3,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_UB(11:23,3,1),1), sum(inc_test_UB(11:23,2,2,3,1),1), sum(inc_serum_UB(11:23,2,2,3,1),1), sum(inc_DBS_UB(11:23,2,2,3,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_UB(3,8,1), summary_test_UB(2,2,3,8,1), summary_serum_UB(2,2,3,8,1), summary_DBS_UB(2,2,3,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_UB(3,5,1), summary_test_UB(2,2,3,5,1), summary_serum_UB(2,2,3,5,1), summary_DBS_UB(2,2,3,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_UB(3,12,1), summary_test_UB(2,2,3,12,1), summary_serum_UB(2,2,3,12,1), summary_DBS_UB(2,2,3,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_UB(3,6,1), summary_test_UB(2,2,3,6,1), summary_test_UB(2,2,3,6,1), summary_DBS_UB(2,2,3,6,1)])/death2017,0);...]; % mortality reduction in 2030
-     round([summary_HR_UB(3,2,1), summary_test_UB(2,2,3,2,1), summary_test_UB(2,2,3,2,1), summary_DBS_UB(2,2,3,2,1)]/10^3,2);... % total DALYs
-     round(ICER(3,:,1),0)];
+     round([summary_HR_UB(3,2,1), summary_test_UB(2,2,3,2,1), summary_serum_UB(2,2,3,2,1), summary_DBS_UB(2,2,3,2,1)]/10^3,2);... % total DALYs
+     round(ICER_UB(3,:,1),0)];
 paper2_3HR = [round([0, diag_test_UB(23,2,2,4,1), diag_serum_UB(23,2,2,4,1), diag_DBS_UB(23,2,2,4,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,4,1), c_treat_serum(3,2,2,4,1), c_treat_DBS(3,2,2,4,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_UB(4,1,1), summary_test_UB(2,2,4,1,1), summary_test_UB(2,2,4,1,1), summary_DBS_UB(2,2,4,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_UB(4,4,1), summary_test_UB(2,2,4,4,1), summary_test_UB(2,2,4,4,1), summary_DBS_UB(2,2,4,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_UB(4,9,1), summary_test_UB(2,2,4,9,1), summary_test_UB(2,2,4,9,1), summary_DBS_UB(2,2,4,9,1)],0);... % total deaths
+     round([summary_HR_UB(4,1,1), summary_test_UB(2,2,4,1,1), summary_serum_UB(2,2,4,1,1), summary_DBS_UB(2,2,4,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_UB(4,4,1), summary_test_UB(2,2,4,4,1), summary_serum_UB(2,2,4,4,1), summary_DBS_UB(2,2,4,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_UB(4,9,1), summary_test_UB(2,2,4,9,1), summary_serum_UB(2,2,4,9,1), summary_DBS_UB(2,2,4,9,1)],0);... % total deaths
      round([sum(inc_HR_UB_PWID(11:23,4,1),1), sum(inc_test_UB_PWID(11:23,2,2,4,1),1), sum(inc_serum_UB_PWID(11:23,2,2,4,1),1), sum(inc_DBS_UB_PWID(11:23,2,2,4,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_UB(11:23,4,1),1), sum(inc_test(11:23,2,2,4,1),1), sum(inc_serum(11:23,2,2,4,1),1), sum(inc_DBS(11:23,2,2,4,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_UB(4,8,1), summary_test_UB(2,2,4,8,1), summary_test_UB(2,2,4,8,1), summary_DBS_UB(2,2,4,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_UB(4,5,1), summary_test_UB(2,2,4,5,1), summary_test_UB(2,2,4,5,1), summary_DBS_UB(2,2,4,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_UB(4,12,1), summary_test_UB(2,2,4,12,1), summary_test_UB(2,2,4,12,1), summary_DBS_UB(2,2,4,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_UB(11:23,4,1),1), sum(inc_test_UB(11:23,2,2,4,1),1), sum(inc_serum_UB(11:23,2,2,4,1),1), sum(inc_DBS_UB(11:23,2,2,4,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_UB(4,8,1), summary_test_UB(2,2,4,8,1), summary_serum_UB(2,2,4,8,1), summary_DBS_UB(2,2,4,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_UB(4,5,1), summary_test_UB(2,2,4,5,1), summary_serum_UB(2,2,4,5,1), summary_DBS_UB(2,2,4,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_UB(4,12,1), summary_test_UB(2,2,4,12,1), summary_serum_UB(2,2,4,12,1), summary_DBS_UB(2,2,4,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_UB(4,6,1), summary_test_UB(2,2,4,6,1), summary_test_UB(2,2,4,6,1), summary_DBS_UB(2,2,4,6,1)])/death2017,0);...]; % mortality reduction in 2030
-     round([summary_HR_UB(4,2,1), summary_test_UB(2,2,4,2,1), summary_test_UB(2,2,4,2,1), summary_DBS_UB(2,2,4,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_UB(4,2,1), summary_test_UB(2,2,4,2,1), summary_serum_UB(2,2,4,2,1), summary_DBS_UB(2,2,4,2,1)]/10^3,2);... % total DALYs
      round(ICER_UB(4,:,1),0)];
  paper2_4HR = [round([0, diag_test_UB(23,2,2,5,1), diag_serum_UB(23,2,2,5,1), diag_DBS_UB(23,2,2,5,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,5,1), c_treat_serum(3,2,2,5,1), c_treat_DBS(3,2,2,5,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_UB(5,1,1), summary_test_UB(2,2,5,1,1), summary_test_UB(2,2,5,1,1), summary_DBS_UB(2,2,5,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_UB(5,4,1), summary_test_UB(2,2,5,4,1), summary_test_UB(2,2,5,4,1), summary_DBS_UB(2,2,5,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_UB(5,9,1), summary_test_UB(2,2,5,9,1), summary_test_UB(2,2,5,9,1), summary_DBS_UB(2,2,5,9,1)],0);... % total deaths
+     round([summary_HR_UB(5,1,1), summary_test_UB(2,2,5,1,1), summary_serum_UB(2,2,5,1,1), summary_DBS_UB(2,2,5,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_UB(5,4,1), summary_test_UB(2,2,5,4,1), summary_serum_UB(2,2,5,4,1), summary_DBS_UB(2,2,5,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_UB(5,9,1), summary_test_UB(2,2,5,9,1), summary_serum_UB(2,2,5,9,1), summary_DBS_UB(2,2,5,9,1)],0);... % total deaths
      %round([summary_HR_UB(5,2,1), summary_test_UB(2,2,5,2,1), summary_test_UB(2,2,5,2,1), summary_DBS_UB(2,2,5,2,1)]/10^3,0);... % total DALYs
      round([sum(inc_HR_UB_PWID(11:23,5,1),1), sum(inc_test_UB_PWID(11:23,2,2,5,1),1), sum(inc_serum_UB_PWID(11:23,2,2,5,1),1), sum(inc_DBS_UB_PWID(11:23,2,2,5,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_UB(11:23,5,1),1), sum(inc_test(11:23,2,2,5,1),1), sum(inc_serum(11:23,2,2,5,1),1), sum(inc_DBS(11:23,2,2,5,1),1)],0);... % incidence in 2018-2030
+     round([sum(inc_HR_UB(11:23,5,1),1), sum(inc_test_UB(11:23,2,2,5,1),1), sum(inc_serum_UB(11:23,2,2,5,1),1), sum(inc_DBS_UB(11:23,2,2,5,1),1)],0);... % incidence in 2018-2030
      round([summary_HR_UB(5,8,1), summary_test_UB(2,2,5,8,1), summary_test_UB(2,2,5,8,1), summary_DBS_UB(2,2,5,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_UB(5,5,1), summary_test_UB(2,2,5,5,1), summary_test_UB(2,2,5,5,1), summary_DBS_UB(2,2,5,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_UB(5,12,1), summary_test_UB(2,2,5,12,1), summary_test_UB(2,2,5,12,1), summary_DBS_UB(2,2,5,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round(100*(inc2017 - [summary_HR_UB(5,5,1), summary_test_UB(2,2,5,5,1), summary_serum_UB(2,2,5,5,1), summary_DBS_UB(2,2,5,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_UB(5,12,1), summary_test_UB(2,2,5,12,1), summary_serum_UB(2,2,5,12,1), summary_DBS_UB(2,2,5,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_UB(5,6,1), summary_test_UB(2,2,5,6,1), summary_test_UB(2,2,5,6,1), summary_DBS_UB(2,2,5,6,1)])/death2017,0);... % mortality reduction in 2030
-     round([summary_HR_UB(5,2,1), summary_test_UB(2,2,5,2,1), summary_test_UB(2,2,5,2,1), summary_DBS_UB(2,2,5,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_UB(5,2,1), summary_test_UB(2,2,5,2,1), summary_serum_UB(2,2,5,2,1), summary_DBS_UB(2,2,5,2,1)]/10^3,2);... % total DALYs
      round(ICER_UB(5,:,1),0)];
  paper2_5HR = [round([0, diag_test_UB(23,2,2,6,1), diag_serum_UB(23,2,2,6,1), diag_DBS_UB(23,2,2,6,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,6,1), c_treat_serum(3,2,2,6,1), c_treat_DBS(3,2,2,6,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_UB(6,1,1), summary_test_UB(2,2,6,1,1), summary_test_UB(2,2,6,1,1), summary_DBS_UB(2,2,6,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_UB(6,4,1), summary_test_UB(2,2,6,4,1), summary_test_UB(2,2,6,4,1), summary_DBS_UB(2,2,6,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_UB(6,9,1), summary_test_UB(2,2,6,9,1), summary_test_UB(2,2,6,9,1), summary_DBS_UB(2,2,6,9,1)],0);... % total deaths
+     round([summary_HR_UB(6,1,1), summary_test_UB(2,2,6,1,1), summary_serum_UB(2,2,6,1,1), summary_DBS_UB(2,2,6,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_UB(6,4,1), summary_test_UB(2,2,6,4,1), summary_serum_UB(2,2,6,4,1), summary_DBS_UB(2,2,6,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_UB(6,9,1), summary_test_UB(2,2,6,9,1), summary_serum_UB(2,2,6,9,1), summary_DBS_UB(2,2,6,9,1)],0);... % total deaths
      %round([summary_HR_UB(6,2,1), summary_test_UB(2,2,6,2,1), summary_test_UB(2,2,6,2,1), summary_DBS_UB(2,2,6,2,1)]/10^3,0);... % total DALYs
      round([sum(inc_HR_UB_PWID(11:23,6,1),1), sum(inc_test_UB_PWID(11:23,2,2,6,1),1), sum(inc_serum_UB_PWID(11:23,2,2,6,1),1), sum(inc_DBS_UB_PWID(11:23,2,2,6,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_UB(11:23,6,1),1), sum(inc_test(11:23,2,2,6,1),1), sum(inc_serum(11:23,2,2,6,1),1), sum(inc_DBS(11:23,2,2,6,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_UB(6,8,1), summary_test_UB(2,2,6,8,1), summary_test_UB(2,2,6,8,1), summary_DBS_UB(2,2,6,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_UB(6,5,1), summary_test_UB(2,2,6,5,1), summary_test_UB(2,2,6,5,1), summary_DBS_UB(2,2,6,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_UB(6,12,1), summary_test_UB(2,2,6,12,1), summary_test_UB(2,2,6,12,1), summary_DBS_UB(2,2,6,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_UB(11:23,6,1),1), sum(inc_test_UB(11:23,2,2,6,1),1), sum(inc_serum_UB(11:23,2,2,6,1),1), sum(inc_DBS_UB(11:23,2,2,6,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_UB(6,8,1), summary_test_UB(2,2,6,8,1), summary_serum_UB(2,2,6,8,1), summary_DBS_UB(2,2,6,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_UB(6,5,1), summary_test_UB(2,2,6,5,1), summary_serum_UB(2,2,6,5,1), summary_DBS_UB(2,2,6,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_UB(6,12,1), summary_test_UB(2,2,6,12,1), summary_serum_UB(2,2,6,12,1), summary_DBS_UB(2,2,6,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR_UB(6,6,1), summary_test_UB(2,2,6,6,1), summary_test_UB(2,2,6,6,1), summary_DBS_UB(2,2,6,6,1)])/death2017,0);... % mortality reduction in 2030
-     round([summary_HR_UB(6,2,1), summary_test_UB(2,2,6,2,1), summary_test_UB(2,2,6,2,1), summary_DBS_UB(2,2,6,2,1)]/10^3,2);... % total DALYs
+     round([summary_HR_UB(6,2,1), summary_test_UB(2,2,6,2,1), summary_serum_UB(2,2,6,2,1), summary_DBS_UB(2,2,6,2,1)]/10^3,2);... % total DALYs
      round(ICER_UB(6,:,1),0)];
  paper2_6HR = [round([0, diag_test_UB(23,2,2,7,1), diag_serum_UB(23,2,2,7,1), diag_DBS_UB(23,2,2,7,1)],0);...
      round([c_treat_base(3), c_treat_test(3,2,2,7,1), c_treat_serum(3,2,2,7,1), c_treat_DBS(3,2,2,7,1)]/10^6,2);... % treatment costs only
-     round([summary_HR_UB(7,1,1), summary_test_UB(2,2,7,1,1), summary_test_UB(2,2,7,1,1), summary_DBS_UB(2,2,7,1,1)]/10^6,2);...% Total costs
-     round([summary_HR_UB(7,4,1), summary_test_UB(2,2,7,4,1), summary_test_UB(2,2,7,4,1), summary_DBS_UB(2,2,7,4,1)]/10^3,2);... % total treatments
-     round([summary_HR_UB(7,9,1), summary_test_UB(2,2,7,9,1), summary_test_UB(2,2,7,9,1), summary_DBS_UB(2,2,7,9,1)],0);... % total deaths
+     round([summary_HR_UB(7,1,1), summary_test_UB(2,2,7,1,1), summary_serum_UB(2,2,7,1,1), summary_DBS_UB(2,2,7,1,1)]/10^6,2);...% Total costs
+     round([summary_HR_UB(7,4,1), summary_test_UB(2,2,7,4,1), summary_serum_UB(2,2,7,4,1), summary_DBS_UB(2,2,7,4,1)]/10^3,2);... % total treatments
+     round([summary_HR_UB(7,9,1), summary_test_UB(2,2,7,9,1), summary_serum_UB(2,2,7,9,1), summary_DBS_UB(2,2,7,9,1)],0);... % total deaths
      %round([summary_HR_UB(7,2,1), summary_test_UB(2,2,7,2,1), summary_test_UB(2,2,7,2,1), summary_DBS_UB(2,2,7,2,1)]/10^3,0);... % total DALYs
      round([sum(inc_HR_UB_PWID(11:23,7,1),1), sum(inc_test_UB_PWID(11:23,2,2,7,1),1), sum(inc_serum_UB_PWID(11:23,2,2,7,1),1), sum(inc_DBS_UB_PWID(11:23,2,2,7,1),1)],0);... % incidence in 2018-2030
-     round([sum(inc_HR_UB(11:23,7,1),1), sum(inc_test(11:23,2,2,7,1),1), sum(inc_serum(11:23,2,2,7,1),1), sum(inc_DBS(11:23,2,2,7,1),1)],0);... % incidence in 2018-2030
-     round([summary_HR_UB(7,8,1), summary_test_UB(2,2,7,8,1), summary_test_UB(2,2,7,8,1), summary_DBS_UB(2,2,7,8,1)],0);... % prevalence in 2030
-     round(100*(inc2017 - [summary_HR_UB(7,5,1), summary_test_UB(2,2,7,5,1), summary_test_UB(2,2,7,5,1), summary_DBS_UB(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
-     round(100*(inc2017_PWID - [summary_HR_UB(7,12,1), summary_test_UB(2,2,7,12,1), summary_test_UB(2,2,7,12,1), summary_DBS_UB(2,2,7,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
+     round([sum(inc_HR_UB(11:23,7,1),1), sum(inc_test_UB(11:23,2,2,7,1),1), sum(inc_serum_UB(11:23,2,2,7,1),1), sum(inc_DBS_UB(11:23,2,2,7,1),1)],0);... % incidence in 2018-2030
+     round([summary_HR_UB(7,8,1), summary_test_UB(2,2,7,8,1), summary_serum_UB(2,2,7,8,1), summary_DBS_UB(2,2,7,8,1)],0);... % prevalence in 2030
+     round(100*(inc2017 - [summary_HR_UB(7,5,1), summary_test_UB(2,2,7,5,1), summary_serum_UB(2,2,7,5,1), summary_DBS_UB(2,2,7,5,1)])/inc2017,0);... % incidence reduction in 2030
+     round(100*(inc2017_PWID - [summary_HR_UB(7,12,1), summary_test_UB(2,2,7,12,1), summary_serum_UB(2,2,7,12,1), summary_DBS_UB(2,2,7,12,1)])/inc2017_PWID,0);... % incidence reduction in 2030
      %round(100*(death2017 - [summary_HR(7,6,1), summary_test_UB(2,2,7,6,1), summary_serum(2,2,7,6,1), summary_DBS_UB(2,2,7,6,1)])/death2017,0);... % mortality reduction in 2030
      round([summary_HR_UB(7,2,1), summary_test_UB(2,2,7,2,1), summary_serum_UB(2,2,7,2,1), summary_DBS_UB(2,2,7,2,1)]/10^3,2);... % total DALYs
      round(ICER_UB(7,:,1),0)];

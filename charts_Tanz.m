@@ -1,12 +1,12 @@
 CM = colormap(copper(length(prev_HR(1,:))+3));
 CML = colormap(lines(5));
 
-CML2 = colormap(lines(6));
+CML2 = colormap(lines(7));
 
 figure(1)
 subplot(1,2,1)
 hold on; grid on;
-for i = 1:(length(prev_HR(1,:))-1)
+for i = 1:(length(prev_HR(1,:)))
     h(i) = plot(prev_HR(:,i), 'color', CML2(i,:), 'linewidth',2);
 end
 h2 = plot(prev_HR(:,4)', 'color', 'k', 'linewidth',2);
@@ -17,12 +17,12 @@ ylabel('HCV prevalence among PWID (%)');
 title({['Projected HCV prevalence among PWID']});% 10 '\rm\fontsize{10}Scaled up over three years and maintained']});
 subplot(1,2,2)
 hold on; grid on;
-for i = 1:(length(inc_HR(1,:))-1)
+for i = 1:(length(inc_HR(1,:)))
     h_inc(i) = plot(inc_HR(:,i), 'color', CML2(i,:), 'linewidth',2);
 end
 h2_inc = plot(inc_HR(:,4), 'color', 'k', 'linewidth',2);
 target = plot(0.2*repmat(inc_HR(5,1),1,30),':k', 'linewidth',2); text(3.5,0.2*inc_HR(5,1)-150,'WHO 2030 target','fontsize',10);
-legend([d1,h_inc(1:3),h2_inc,h_inc(5:6)],'Data','No harm reduction','Existing NSP only (4%)','Existing OST only (42%)','Existing NSP + OST','NSP increased to 50%','NSP + OST both increased to 50%',...
+legend([d1,h_inc(1:3),h2_inc,h_inc(5:7)],'Data','No harm reduction','Existing NSP only (4%)','Existing OST only (42%)','Existing NSP + OST','10% NSP / 50% OST','20% NSP / 55% OST','30% NSP / 60% OST',...
     'location','southwest');
 set(gca, 'Ylim',[0,2000],'YTick',0:500:10000,'YTickLabel',0:500:10000, 'Xlim',[3,23],'XTick',3:5:23,'XTickLabel',2010:5:2030);
 ylabel('New HCV infections per year');
